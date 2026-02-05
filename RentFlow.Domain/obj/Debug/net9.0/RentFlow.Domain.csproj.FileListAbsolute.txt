@@ -1,0 +1,11 @@
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/bin/Debug/net9.0/RentFlow.Domain.deps.json
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/bin/Debug/net9.0/RentFlow.Domain.dll
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/bin/Debug/net9.0/RentFlow.Domain.pdb
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/obj/Debug/net9.0/RentFlow.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/obj/Debug/net9.0/RentFlow.Domain.AssemblyInfoInputs.cache
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/obj/Debug/net9.0/RentFlow.Domain.AssemblyInfo.cs
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/obj/Debug/net9.0/RentFlow.Domain.csproj.CoreCompileInputs.cache
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/obj/Debug/net9.0/RentFlow.Domain.dll
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/obj/Debug/net9.0/refint/RentFlow.Domain.dll
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/obj/Debug/net9.0/RentFlow.Domain.pdb
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/obj/Debug/net9.0/ref/RentFlow.Domain.dll

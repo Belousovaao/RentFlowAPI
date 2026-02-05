@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "RentFlow.Domain/1.0.0": {
+        "runtime": {
+          "RentFlow.Domain.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "RentFlow.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
