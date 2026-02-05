@@ -17,3 +17,4 @@
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Persistance/obj/Debug/net9.0/RentFlow.Persistance.pdb
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Persistance/obj/Debug/net9.0/RentFlow.Persistance.genruntimeconfig.cache
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Persistance/obj/Debug/net9.0/ref/RentFlow.Persistance.dll
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Persistance/obj/Debug/net9.0/RentFlow.Persistance.sourcelink.json

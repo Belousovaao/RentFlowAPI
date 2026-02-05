@@ -13,3 +13,4 @@
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/Debug/net9.0/refint/RentFlow.Application.dll
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/Debug/net9.0/RentFlow.Application.pdb
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/Debug/net9.0/ref/RentFlow.Application.dll
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/Debug/net9.0/RentFlow.Application.sourcelink.json

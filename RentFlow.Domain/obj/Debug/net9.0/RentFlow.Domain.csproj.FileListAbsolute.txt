@@ -9,3 +9,4 @@
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/obj/Debug/net9.0/refint/RentFlow.Domain.dll
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/obj/Debug/net9.0/RentFlow.Domain.pdb
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/obj/Debug/net9.0/ref/RentFlow.Domain.dll
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/obj/Debug/net9.0/RentFlow.Domain.sourcelink.json
