@@ -31,9 +31,8 @@ namespace RentFlow.Persistance.Migrations
                     b.Property<bool>("CanDeliver")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Category")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Code")
                         .IsRequired()
@@ -74,6 +73,24 @@ namespace RentFlow.Persistance.Migrations
                     b.HasIndex("LocationId");
 
                     b.ToTable("Assets");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                            CanDeliver = true,
+                            Category = 1,
+                            Code = "cityray",
+                            DailyPrice = 6000m,
+                            DeliveryPrice = 500m,
+                            Deposit = 10000m,
+                            FullDescription = "<b>Основные характеристики:</b>",
+                            LocationId = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Name = "Geely Cityray",
+                            ShortDescription = "Краткое описание!",
+                            Status = 1,
+                            Type = 1
+                        });
                 });
 
             modelBuilder.Entity("RentFlow.Domain.Assets.AssetPhoto", b =>
@@ -94,6 +111,14 @@ namespace RentFlow.Persistance.Migrations
                     b.HasIndex("AssetId");
 
                     b.ToTable("AssetPhotos");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                            AssetId = new Guid("11111111-1111-1111-1111-111111111111"),
+                            Url = "https://freeimage.host/i/fHys5hP"
+                        });
                 });
 
             modelBuilder.Entity("RentFlow.Domain.Locations.Location", b =>
@@ -109,6 +134,18 @@ namespace RentFlow.Persistance.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Locations");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                            Name = "City Center"
+                        },
+                        new
+                        {
+                            Id = new Guid("44444444-4444-4444-4444-444444444444"),
+                            Name = "Airport"
+                        });
                 });
 
             modelBuilder.Entity("RentFlow.Domain.Assets.Asset", b =>

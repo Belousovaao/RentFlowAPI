@@ -37,8 +37,8 @@ public class AssetRepository : IAssetRepository
                 x.Name.ToLower().Contains(s));
         }
 
-        if (!string.IsNullOrWhiteSpace(filter.Category))
-            query = query.Where(x => x.Category == filter.Category);
+        if (filter.Category.HasValue)
+            query = query.Where(x => x.Category == filter.Category.Value);
 
         if (filter.PriceFrom.HasValue)
             query = query.Where(x => x.DailyPrice >= filter.PriceFrom.Value);
