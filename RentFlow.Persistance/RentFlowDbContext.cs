@@ -54,6 +54,9 @@ public class RentFlowDbContext : DbContext
             Url = "https://freeimage.host/i/fHys5hP"
         });
 
+        modelBuilder.Entity<Booking>().OwnsOne(b => b.RentalPeriod);
+        modelBuilder.Entity<Booking>().OwnsOne(b => b.AssetSnapshot);
+
         modelBuilder.Entity<RentalPeriod>().HasData(new RentalPeriod
         {
             StartDate = DateTime.Today,
@@ -66,6 +69,7 @@ public class RentFlowDbContext : DbContext
             AssetId = assetId,
             CustomerId = customerId,
             TotalPrice = 18000,
+
         });
     }
 }

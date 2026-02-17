@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RentFlow.Application.Interfaces;
 using RentFlow.Domain.Bookings;
+using RentFlow.Application.Bookings.Commands;
+using RentFlow.Application.Bookings.Handlers;
 
 namespace RentFlow.Api.Controllers
 {
@@ -10,10 +12,12 @@ namespace RentFlow.Api.Controllers
     public class BookingController : ControllerBase
     {
         private readonly IBookingRepository _repo;
+        private readonly CreateBookingHandler _handler;
 
-        public BookingController(IBookingRepository repo)
+        public BookingController(IBookingRepository repo, CreateBookingHandler handler)
         {
             _repo = repo;
+            _handler = handler;
         }
 
         [HttpGet]
@@ -24,9 +28,9 @@ namespace RentFlow.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Booking booking)
+        public async Task<IActionResult> Create(CreateBookingCommand cmd, CancellationToken ct)
         {
-            await _repo.AddAsync(booking);
+            Booking booking = await _handler.Handle(cmd, ct);
             return Ok(booking);
         }
     }

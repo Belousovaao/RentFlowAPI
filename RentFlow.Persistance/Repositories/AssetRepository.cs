@@ -16,6 +16,11 @@ public class AssetRepository : IAssetRepository
         _db = db;
     }
 
+    public async Task<Asset?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        return await _db.Assets.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, ct);
+    }
+
     public async Task<Asset?> GetByCodeAsync(string code, CancellationToken ct = default)
     {
         return await _db.Assets
@@ -60,8 +65,14 @@ public class AssetRepository : IAssetRepository
 
     public async Task<IEnumerable<Asset?>> SearchAvailableAsync(RentalPeriod rentalPeriod, CancellationToken ct = default)
     {
-        var assets = await _db.Assets.Include(a => a.bookings).AsNoTracking().ToListAsync();
-        return assets.Where(a => a.IsAvailable(rentalPeriod));
+        return await _db.Assets.AsNoTracking().Where(a =>
+            !_db.Bookings.Any(b =>
+                b.AssetId == a.Id &&
+                b.Status != BookingStatus.Cancelled &&
+                b.RentalPeriod.StartDate < rentalPeriod.EndDate &&
+                b.RentalPeriod.EndDate > rentalPeriod.StartDate))
+            .OrderBy(a => a.Name)
+            .ToListAsync(ct);
     }
 
 }

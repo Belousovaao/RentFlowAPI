@@ -14,16 +14,18 @@ public class Booking
     public BookingStatus Status { get; private set; }
     private readonly List<BookingRole> _roles = new List<BookingRole>();
     public IReadOnlyCollection<BookingRole> Roles => _roles;
+    public BookingAssetSnapshot AssetSnapshot { get; set; }
 
     private Booking() {}
 
-    public Booking(Guid assetId, Guid customerId, RentalPeriod period, decimal totalPrice)
+    public Booking(Guid assetId, Guid customerId, RentalPeriod period, decimal totalPrice, BookingAssetSnapshot assetSnapshot)
     {
         Id = Guid.NewGuid();
         AssetId = assetId;
         CustomerId = customerId;
         RentalPeriod = period;
         TotalPrice = totalPrice;
+        AssetSnapshot = assetSnapshot;
         Status = BookingStatus.Pending;
     }
 
