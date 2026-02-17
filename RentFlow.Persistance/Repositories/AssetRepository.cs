@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RentFlow.Domain.Assets;
 using RentFlow.Application.Interfaces;
 using RentFlow.Application.Assets.Queries;
+using RentFlow.Domain.Bookings;
 
 namespace RentFlow.Persistance.Repositories;
 
@@ -55,6 +56,12 @@ public class AssetRepository : IAssetRepository
         return await query
             .OrderBy(x => x.Name)
             .ToListAsync(ct);
+    }
+
+    public async Task<IEnumerable<Asset?>> SearchAvailableAsync(RentalPeriod rentalPeriod, CancellationToken ct = default)
+    {
+        var assets = await _db.Assets.Include(a => a.bookings).AsNoTracking().ToListAsync();
+        return assets.Where(a => a.IsAvailable(rentalPeriod));
     }
 
 }

@@ -2,8 +2,9 @@ using System;
 
 namespace RentFlow.Domain.Customers;
 
-public class IndividualEntrepreneur : Customer
+public class IndividualEntrepreneur
 {
+    public Guid Id { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string MiddleName { get; set; }
@@ -18,5 +19,6 @@ public class IndividualEntrepreneur : Customer
     public string FullName => $"Индивидуальный предприниматель {LastName} {FirstName} {MiddleName}".Trim();
     
     public string ShortName => $"ИП {LastName} {FirstName} {MiddleName}".Trim();
+    public Guid RepresentativeId { get; set; }
 
 }

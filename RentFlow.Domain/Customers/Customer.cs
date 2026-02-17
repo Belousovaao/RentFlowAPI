@@ -6,6 +6,8 @@ public abstract class Customer
 {
     public Guid Id { get; set; }
     public CustomerType Type {get; set; }
+    public Guid? PersonId { get; set; }
+    public Guid? OrganizationId { get; set; }
     public string Email {get; set; }
     public string Phone { get; set;}
 }

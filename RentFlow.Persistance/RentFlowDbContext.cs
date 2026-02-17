@@ -56,7 +56,6 @@ public class RentFlowDbContext : DbContext
 
         modelBuilder.Entity<RentalPeriod>().HasData(new RentalPeriod
         {
-            Id = rentalPeriodId,
             StartDate = DateTime.Today,
             EndDate = DateTime.Today.AddDays(3)
         });
@@ -66,9 +65,7 @@ public class RentFlowDbContext : DbContext
             Id = Guid.NewGuid(),
             AssetId = assetId,
             CustomerId = customerId,
-            RentalPeriodId = rentalPeriodId,
             TotalPrice = 18000,
-            Status = BookingStatus.Pending
         });
     }
 }

@@ -2,7 +2,7 @@ using System;
 
 namespace RentFlow.Domain.Customers;
 
-public class Individual : Customer
+public class Individual
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }

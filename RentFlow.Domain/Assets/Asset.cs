@@ -1,4 +1,5 @@
 using System;
+using RentFlow.Domain.Bookings;
 using RentFlow.Domain.Locations;
 
 namespace RentFlow.Domain.Assets;
@@ -26,4 +27,11 @@ public class Asset
 
     private readonly List<AssetPhoto> _photos = new();
     public IReadOnlyCollection<AssetPhoto> Photos => _photos;
+    private readonly List<Booking> _bookings = new();
+    public IReadOnlyCollection<Booking> bookings => _bookings;
+
+    public bool IsAvailable(RentalPeriod requestedPeriod)
+    {
+        return !_bookings.Any(b => b.RentalPeriod.Intersects(requestedPeriod));
+    }
 }
