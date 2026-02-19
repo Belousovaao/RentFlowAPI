@@ -15,10 +15,21 @@ public class Booking
     private readonly List<BookingRole> _roles = new List<BookingRole>();
     public IReadOnlyCollection<BookingRole> Roles => _roles;
     public BookingAssetSnapshot AssetSnapshot { get; set; }
+    public BookingIndividualSnapshot? IndividualSnapshot { get; set; }
+    public BookingEntrepreneurSnapshot? EntrepreneurSnapshot { get; set; }
+    public BookingOrganizationSnapshot? OrganizationSnapshot { get; set; }
 
     private Booking() {}
 
-    public Booking(Guid assetId, Guid customerId, RentalPeriod period, decimal totalPrice, BookingAssetSnapshot assetSnapshot)
+    public Booking(
+        Guid assetId, 
+        Guid customerId, 
+        RentalPeriod period, 
+        decimal totalPrice, 
+        BookingAssetSnapshot assetSnapshot, 
+        BookingIndividualSnapshot? individualSnapshot,
+        BookingEntrepreneurSnapshot? entrepreneurSnapshot,
+        BookingOrganizationSnapshot? organizationSnapshot)
     {
         Id = Guid.NewGuid();
         AssetId = assetId;
@@ -26,27 +37,59 @@ public class Booking
         RentalPeriod = period;
         TotalPrice = totalPrice;
         AssetSnapshot = assetSnapshot;
+        IndividualSnapshot = individualSnapshot;
+        EntrepreneurSnapshot = entrepreneurSnapshot;
+        OrganizationSnapshot = organizationSnapshot;
         Status = BookingStatus.Pending;
     }
 
+    private void EnsureTransitionAllowed(BookingStatus target)
+    {
+        bool allowed = Status switch
+        {
+            BookingStatus.Pending =>
+                target is BookingStatus.Confirmed or BookingStatus.Cancelled,
+
+            BookingStatus.Confirmed =>
+                target is BookingStatus.Active or BookingStatus.Cancelled,
+
+            BookingStatus.Active => target is BookingStatus.Completed,
+
+            BookingStatus.Completed => false,
+
+            BookingStatus.Cancelled => false,
+
+            _ => false
+        };
+
+        if (!allowed)
+            throw new InvalidOperationException($"Transition from {Status} to {target} is not allowed.");   
+    }
+
+
     public void Confirm()
     {
-        if (Status != BookingStatus.Pending)
-            throw new InvalidOperationException("Может быть подтверждено только бронирование в статусе ожидания");
+        EnsureTransitionAllowed(BookingStatus.Confirmed);
         
         Status = BookingStatus.Confirmed;
     }
 
     public void Cancel()
     {
+        EnsureTransitionAllowed(BookingStatus.Cancelled);
         Status = BookingStatus.Cancelled;
     }
 
     public void Complete()
     {
-        if (Status != BookingStatus.Confirmed)
-            throw new InvalidOperationException("Может быть завершено только бронирование в статусе подтверждено");
+        EnsureTransitionAllowed(BookingStatus.Completed);
         Status = BookingStatus.Completed;
+    }
+
+    public void Activate()
+    {
+        EnsureTransitionAllowed(BookingStatus.Active);
+        Status = BookingStatus.Active;
     }
 
     public void AddRole(BookingRole role)
@@ -60,5 +103,6 @@ public enum BookingStatus
     Pending,
     Confirmed,
     Cancelled,
-    Completed
+    Completed,
+    Active
 }

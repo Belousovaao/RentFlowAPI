@@ -2,6 +2,7 @@
 using RentFlow.Domain.Assets;
 using RentFlow.Domain.Locations;
 using RentFlow.Domain.Bookings;
+using RentFlow.Domain.Customers;
 
 namespace RentFlow.Persistance;
 
@@ -54,8 +55,32 @@ public class RentFlowDbContext : DbContext
             Url = "https://freeimage.host/i/fHys5hP"
         });
 
+        modelBuilder.Entity<Individual>().OwnsOne(b => b.Name);
+        modelBuilder.Entity<Individual>().OwnsOne(b => b.IndividualPassport);
+        modelBuilder.Entity<Individual>().OwnsOne(b => b.IndividualDriverLicense);
+        modelBuilder.Entity<Individual>().OwnsOne(b => b.IndividualBankAccount);
+        modelBuilder.Entity<IndividualEntrepreneur>().OwnsOne(b => b.Name);
+        modelBuilder.Entity<IndividualEntrepreneur>().OwnsOne(b => b.IPBankAccount);
+        modelBuilder.Entity<IndividualEntrepreneur>().OwnsOne(b => b.IPPassport);
+        modelBuilder.Entity<Organization>().OwnsOne(b => b.SigningBasis);
+        modelBuilder.Entity<Organization>().OwnsOne(b => b.OrganizationBankAccount);
+
         modelBuilder.Entity<Booking>().OwnsOne(b => b.RentalPeriod);
         modelBuilder.Entity<Booking>().OwnsOne(b => b.AssetSnapshot);
+        modelBuilder.Entity<Booking>().OwnsOne(b => b.IndividualSnapshot, cs =>
+        {
+            cs.OwnsOne(s => s.Name);
+            cs.OwnsOne(s => s.Passport);
+        });
+        modelBuilder.Entity<Booking>().OwnsOne(b => b.EntrepreneurSnapshot, cs =>
+        {
+            cs.OwnsOne(s => s.Name);
+            cs.OwnsOne(s => s.IPBankAccount);
+        });
+        modelBuilder.Entity<Booking>().OwnsOne(b => b.OrganizationSnapshot, cs =>
+        {
+            cs.OwnsOne(s => s.BankAccount);
+        });
 
         modelBuilder.Entity<RentalPeriod>().HasData(new RentalPeriod
         {
