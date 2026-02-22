@@ -1,9 +1,10 @@
 using System;
+using RentFlow.Domain.Bookings.Snapshots;
 using RentFlow.Domain.Customers;
 
 namespace RentFlow.Domain.Bookings;
 
-public class BookingOrganizationSnapshot
+public class BookingOrganizationSnapshot : BookingCustomerSnapshot
 {
     public string FullName { get; set; }
     public string ShortName { get; set; }

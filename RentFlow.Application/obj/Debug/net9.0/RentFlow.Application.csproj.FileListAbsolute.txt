@@ -1,16 +1,6 @@
-/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/bin/Debug/net9.0/RentFlow.Application.deps.json
-/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/bin/Debug/net9.0/RentFlow.Application.dll
-/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/bin/Debug/net9.0/RentFlow.Application.pdb
-/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/bin/Debug/net9.0/RentFlow.Domain.dll
-/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/bin/Debug/net9.0/RentFlow.Domain.pdb
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/Debug/net9.0/RentFlow.Application.csproj.AssemblyReference.cache
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/Debug/net9.0/RentFlow.Application.GeneratedMSBuildEditorConfig.editorconfig
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/Debug/net9.0/RentFlow.Application.AssemblyInfoInputs.cache
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/Debug/net9.0/RentFlow.Application.AssemblyInfo.cs
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/Debug/net9.0/RentFlow.Application.csproj.CoreCompileInputs.cache
-/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/Debug/net9.0/RentFlow.CB65EF4C.Up2Date
-/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/Debug/net9.0/RentFlow.Application.dll
-/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/Debug/net9.0/refint/RentFlow.Application.dll
-/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/Debug/net9.0/RentFlow.Application.pdb
-/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/Debug/net9.0/ref/RentFlow.Application.dll
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/Debug/net9.0/RentFlow.Application.sourcelink.json

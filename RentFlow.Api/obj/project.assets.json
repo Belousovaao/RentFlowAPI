@@ -1000,6 +1000,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
+          "Microsoft.EntityFrameworkCore": "8.0.7",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "8.0.4",
           "RentFlow.Application": "1.0.0",
           "RentFlow.Domain": "1.0.0"

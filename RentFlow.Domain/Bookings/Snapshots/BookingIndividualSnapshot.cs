@@ -1,9 +1,10 @@
 using System;
+using RentFlow.Domain.Bookings.Snapshots;
 using RentFlow.Domain.Customers;
 
 namespace RentFlow.Domain.Bookings;
 
-public sealed class BookingIndividualSnapshot
+public sealed class BookingIndividualSnapshot : BookingCustomerSnapshot
 {
     public PersonName Name { get; set; }
     public Passport Passport { get; set; }
