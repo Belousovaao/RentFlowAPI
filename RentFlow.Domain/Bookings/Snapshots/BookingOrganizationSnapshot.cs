@@ -6,12 +6,12 @@ namespace RentFlow.Domain.Bookings;
 
 public class BookingOrganizationSnapshot : BookingCustomerSnapshot
 {
-    public string FullName { get; set; }
-    public string ShortName { get; set; }
-    public string KPP { get; set; }
-    public string OrganizationAdress { get; set; }
-    public string FactAdress { get; set; }
-    public BankAccount BankAccount { get; set; }
+    public string FullName { get; }
+    public string ShortName { get; }
+    public string KPP { get; }
+    public string OrganizationAdress { get; }
+    public string FactAdress { get; }
+    public BankAccount BankAccount { get; }
 
     private BookingOrganizationSnapshot() {}
     public BookingOrganizationSnapshot(string fullName, string shortName, string kpp, string organizationAdress, string factAdress, BankAccount bankAccount)

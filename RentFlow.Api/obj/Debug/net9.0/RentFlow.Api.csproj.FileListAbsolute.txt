@@ -97,6 +97,7 @@
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Api/obj/Debug/net9.0/RentFlow.Api.csproj.CoreCompileInputs.cache
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Api/obj/Debug/net9.0/RentFlow.Api.MvcApplicationPartsAssemblyInfo.cs
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Api/obj/Debug/net9.0/RentFlow.Api.MvcApplicationPartsAssemblyInfo.cache
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Api/obj/Debug/net9.0/RentFlow.Api.sourcelink.json
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Api/obj/Debug/net9.0/rjimswa.dswa.cache.json
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Api/obj/Debug/net9.0/rjsmrazor.dswa.cache.json
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Api/obj/Debug/net9.0/rjsmcshtml.dswa.cache.json
@@ -111,4 +112,3 @@
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Api/obj/Debug/net9.0/RentFlow.Api.pdb
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Api/obj/Debug/net9.0/RentFlow.Api.genruntimeconfig.cache
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Api/obj/Debug/net9.0/ref/RentFlow.Api.dll
-/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Api/obj/Debug/net9.0/RentFlow.Api.sourcelink.json

@@ -5,13 +5,13 @@ namespace RentFlow.Domain.Bookings;
 
 public class BookingAssetSnapshot
 {
-    public string Name { get; set; }
-    public AssetType Type { get; set; }
-    public AssetCategory Category { get; set; }
-    public decimal DailyPrice { get; set; }
-    public decimal Deposit { get; set; }
-    public bool CanDeliver { get; set; }
-    public decimal? DeliveryPrice { get; set; }
+    public string Name { get; }
+    public AssetType Type { get; }
+    public AssetCategory Category { get; }
+    public decimal DailyPrice { get; }
+    public decimal Deposit { get; }
+    public bool CanDeliver { get; }
+    public decimal? DeliveryPrice { get; }
     private BookingAssetSnapshot() {}
     public BookingAssetSnapshot(string name, AssetType type, 
         AssetCategory category, decimal dailePrice, decimal deposit, 

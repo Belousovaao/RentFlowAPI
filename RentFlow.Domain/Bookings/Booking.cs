@@ -1,6 +1,7 @@
 using System;
 using RentFlow.Domain.Assets;
 using RentFlow.Domain.Bookings.Snapshots;
+using RentFlow.Domain.Common;
 using RentFlow.Domain.Customers;
 
 namespace RentFlow.Domain.Bookings;
@@ -38,30 +39,18 @@ public class Booking
         Status = BookingStatus.Pending;
     }
 
-    private void EnsureTransitionAllowed(BookingStatus target)
+    private static readonly Dictionary<BookingStatus, BookingStatus[]> TransitionAllowed = new()
     {
-        bool allowed = Status switch
-        {
-            BookingStatus.Pending =>
-                target is BookingStatus.Confirmed or BookingStatus.Cancelled,
+        {BookingStatus.Pending, new[] {BookingStatus.Confirmed, BookingStatus.Cancelled}},
+        {BookingStatus.Confirmed, new[] {BookingStatus.Active, BookingStatus.Cancelled}},
+        {BookingStatus.Active, new[] {BookingStatus.Completed}},
+    };
 
-            BookingStatus.Confirmed =>
-                target is BookingStatus.Active or BookingStatus.Cancelled,
-
-            BookingStatus.Active => target is BookingStatus.Completed,
-
-            BookingStatus.Completed => false,
-
-            BookingStatus.Cancelled => false,
-
-            _ => false
-        };
-
-        if (!allowed)
-            throw new InvalidOperationException($"Transition from {Status} to {target} is not allowed.");   
+    private void EnsureTransitionAllowed(BookingStatus status)
+    {
+        if (!TransitionAllowed.TryGetValue(Status, out var allowed) || !allowed.Contains(status))
+            throw new InvalidStatusTransitionException();
     }
-
-
     public void Confirm()
     {
         EnsureTransitionAllowed(BookingStatus.Confirmed);
@@ -87,13 +76,23 @@ public class Booking
         Status = BookingStatus.Active;
     }
 
-    public void AddRole(BookingRole role)
+    public void AddRole(BookingRoleType role, Guid personId)
     {
-        _roles.Add(role);
+        if (role == BookingRoleType.Signatory && _roles.Any(r => r.RoleType == BookingRoleType.Signatory))
+        {
+            throw new DublicateSignatoryException();
+        }
+        _roles.Add(new BookingRole(personId, role));
     }
 
     public static Booking Create(Asset asset, Customer customer, RentalPeriod period)
     {
+        if (asset.Status != AssetStatus.Available)
+            throw new InvalidOperationException("AssetStatus is not available");
+
+        if (period.TotalDays < 1)
+            throw new InvalidRentalPeriodException();
+
         BookingAssetSnapshot assetSnapshot = new BookingAssetSnapshot(
             asset.Name,
             asset.Type,
@@ -130,9 +129,15 @@ public class Booking
             _ => throw new InvalidOperationException("Invalid customer type")
         };
 
-        decimal totalPrice = asset.DailyPrice * (decimal) (period.EndDate - period.StartDate).TotalDays;
+        decimal totalPrice = asset.DailyPrice * (decimal)period.TotalDays;
 
         return new Booking(asset.Id, customer.Id, period, totalPrice, assetSnapshot, customerSnapshot);
+    }
+
+    public void ChangePeriod(RentalPeriod newPeriod, decimal newTotalPrice)
+    {
+        RentalPeriod = newPeriod;
+        TotalPrice = newTotalPrice;
     }
 }
 

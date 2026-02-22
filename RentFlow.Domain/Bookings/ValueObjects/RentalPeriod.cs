@@ -4,8 +4,10 @@ namespace RentFlow.Domain.Bookings;
 
 public class RentalPeriod
 {
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
+    public DateTime StartDate { get; }
+    public DateTime EndDate { get; }
+
+    public int TotalDays => (EndDate - StartDate).Days;
 
     private RentalPeriod() {}
     public RentalPeriod(DateTime start, DateTime end)

@@ -13,6 +13,7 @@ builder.Services.AddDbContext<RentFlowDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Db")));
 
 builder.Services.AddScoped<IAssetRepository, AssetRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
 builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();

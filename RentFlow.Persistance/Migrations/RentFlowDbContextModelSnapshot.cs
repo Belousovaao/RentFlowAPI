@@ -84,7 +84,7 @@ namespace RentFlow.Persistance.Migrations
                             DailyPrice = 6000m,
                             DeliveryPrice = 500m,
                             Deposit = 10000m,
-                            FullDescription = "<b>Основные характеристики:</b>",
+                            FullDescription = "Основные характеристики:",
                             LocationId = new Guid("33333333-3333-3333-3333-333333333333"),
                             Name = "Geely Cityray",
                             ShortDescription = "Краткое описание!",
@@ -121,6 +121,141 @@ namespace RentFlow.Persistance.Migrations
                         });
                 });
 
+            modelBuilder.Entity("RentFlow.Domain.Bookings.Booking", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssetId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("numeric");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Bookings");
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Bookings.BookingRole", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("BookingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BoolingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PersonId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("RoleType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingId");
+
+                    b.ToTable("BookingRole");
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Bookings.PricingRule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Condition")
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Multiplier")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PricingRules");
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Bookings.Snapshots.BookingCustomerSnapshot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CustomerType")
+                        .IsRequired()
+                        .HasMaxLength(34)
+                        .HasColumnType("character varying(34)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingId")
+                        .IsUnique();
+
+                    b.ToTable("BookingCustomerSnapshot");
+
+                    b.HasDiscriminator<string>("CustomerType").HasValue("BookingCustomerSnapshot");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Customers.Customer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CustomerType")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("character varying(13)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("IndividualEntrepreneurId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("IndividualId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("OrganizationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Customers");
+
+                    b.HasDiscriminator<string>("CustomerType").HasValue("Customer");
+
+                    b.UseTphMappingStrategy();
+                });
+
             modelBuilder.Entity("RentFlow.Domain.Locations.Location", b =>
                 {
                     b.Property<Guid>("Id")
@@ -148,6 +283,122 @@ namespace RentFlow.Persistance.Migrations
                         });
                 });
 
+            modelBuilder.Entity("RentFlow.Domain.Bookings.BookingEntrepreneurSnapshot", b =>
+                {
+                    b.HasBaseType("RentFlow.Domain.Bookings.Snapshots.BookingCustomerSnapshot");
+
+                    b.HasDiscriminator().HasValue("Entrepreneur");
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Bookings.BookingIndividualSnapshot", b =>
+                {
+                    b.HasBaseType("RentFlow.Domain.Bookings.Snapshots.BookingCustomerSnapshot");
+
+                    b.HasDiscriminator().HasValue("Individual");
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Bookings.BookingOrganizationSnapshot", b =>
+                {
+                    b.HasBaseType("RentFlow.Domain.Bookings.Snapshots.BookingCustomerSnapshot");
+
+                    b.HasDiscriminator().HasValue("Organization");
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Customers.Individual", b =>
+                {
+                    b.HasBaseType("RentFlow.Domain.Customers.Customer");
+
+                    b.Property<DateOnly?>("DateOfBirth")
+                        .HasColumnType("date");
+
+                    b.HasDiscriminator().HasValue("Individual");
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Customers.IndividualEntrepreneur", b =>
+                {
+                    b.HasBaseType("RentFlow.Domain.Customers.Customer");
+
+                    b.Property<string>("FactAdress")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("INN")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OGRNIP")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrganizationAdress")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("RepresentativeId")
+                        .HasColumnType("uuid");
+
+                    b.HasDiscriminator().HasValue("Entrepreneur");
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Customers.Organization", b =>
+                {
+                    b.HasBaseType("RentFlow.Domain.Customers.Customer");
+
+                    b.Property<string>("FactAdress")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("FullOrganizationForm")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("INN")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("KPP")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OGRN")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("OrganizationAdress")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("RepresentativeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ShortName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ShortOrganizationForm")
+                        .HasColumnType("integer");
+
+                    b.ToTable("Customers", t =>
+                        {
+                            t.Property("FactAdress")
+                                .HasColumnName("Organization_FactAdress");
+
+                            t.Property("INN")
+                                .HasColumnName("Organization_INN");
+
+                            t.Property("OrganizationAdress")
+                                .HasColumnName("OrganizationAdress1");
+
+                            t.Property("RepresentativeId")
+                                .HasColumnName("Organization_RepresentativeId");
+                        });
+
+                    b.HasDiscriminator().HasValue("Organization");
+                });
+
             modelBuilder.Entity("RentFlow.Domain.Assets.Asset", b =>
                 {
                     b.HasOne("RentFlow.Domain.Locations.Location", "Location")
@@ -170,9 +421,279 @@ namespace RentFlow.Persistance.Migrations
                     b.Navigation("Asset");
                 });
 
+            modelBuilder.Entity("RentFlow.Domain.Bookings.Booking", b =>
+                {
+                    b.OwnsOne("RentFlow.Domain.Bookings.BookingAssetSnapshot", "AssetSnapshot", b1 =>
+                        {
+                            b1.Property<Guid>("BookingId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("BookingId");
+
+                            b1.ToTable("Bookings");
+
+                            b1.WithOwner()
+                                .HasForeignKey("BookingId");
+                        });
+
+                    b.OwnsOne("RentFlow.Domain.Bookings.RentalPeriod", "RentalPeriod", b1 =>
+                        {
+                            b1.Property<Guid>("BookingId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<DateTime>("EndDate")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("EndDate");
+
+                            b1.Property<DateTime>("StartDate")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("StartDate");
+
+                            b1.HasKey("BookingId");
+
+                            b1.ToTable("Bookings");
+
+                            b1.WithOwner()
+                                .HasForeignKey("BookingId");
+                        });
+
+                    b.Navigation("AssetSnapshot")
+                        .IsRequired();
+
+                    b.Navigation("RentalPeriod")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Bookings.BookingRole", b =>
+                {
+                    b.HasOne("RentFlow.Domain.Bookings.Booking", null)
+                        .WithMany("Roles")
+                        .HasForeignKey("BookingId");
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Bookings.Snapshots.BookingCustomerSnapshot", b =>
+                {
+                    b.HasOne("RentFlow.Domain.Bookings.Booking", null)
+                        .WithOne("CustomerSnapshot")
+                        .HasForeignKey("RentFlow.Domain.Bookings.Snapshots.BookingCustomerSnapshot", "BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Customers.Individual", b =>
+                {
+                    b.OwnsOne("RentFlow.Domain.Customers.DriverLicense", "IndividualDriverLicense", b1 =>
+                        {
+                            b1.Property<Guid>("IndividualId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Number")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("IndividualId");
+
+                            b1.ToTable("Customers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("IndividualId");
+                        });
+
+                    b.OwnsOne("RentFlow.Domain.Customers.BankAccount", "IndividualBankAccount", b1 =>
+                        {
+                            b1.Property<Guid>("IndividualId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("BIK")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("BankName")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("CorrespondentAccount")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("CurrentAccount")
+                                .HasColumnType("text");
+
+                            b1.HasKey("IndividualId");
+
+                            b1.ToTable("Customers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("IndividualId");
+                        });
+
+                    b.OwnsOne("RentFlow.Domain.Customers.Passport", "IndividualPassport", b1 =>
+                        {
+                            b1.Property<Guid>("IndividualId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("RegistrationAddress")
+                                .HasColumnType("text");
+
+                            b1.HasKey("IndividualId");
+
+                            b1.ToTable("Customers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("IndividualId");
+                        });
+
+                    b.OwnsOne("RentFlow.Domain.Customers.PersonName", "Name", b1 =>
+                        {
+                            b1.Property<Guid>("IndividualId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("IndividualId");
+
+                            b1.ToTable("Customers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("IndividualId");
+                        });
+
+                    b.Navigation("IndividualBankAccount")
+                        .IsRequired();
+
+                    b.Navigation("IndividualDriverLicense");
+
+                    b.Navigation("IndividualPassport");
+
+                    b.Navigation("Name")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Customers.IndividualEntrepreneur", b =>
+                {
+                    b.OwnsOne("RentFlow.Domain.Customers.BankAccount", "IPBankAccount", b1 =>
+                        {
+                            b1.Property<Guid>("IndividualEntrepreneurId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("BIK")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("BankName")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("CorrespondentAccount")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("CurrentAccount")
+                                .HasColumnType("text");
+
+                            b1.HasKey("IndividualEntrepreneurId");
+
+                            b1.ToTable("Customers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("IndividualEntrepreneurId");
+                        });
+
+                    b.OwnsOne("RentFlow.Domain.Customers.Passport", "IPPassport", b1 =>
+                        {
+                            b1.Property<Guid>("IndividualEntrepreneurId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("RegistrationAddress")
+                                .HasColumnType("text");
+
+                            b1.HasKey("IndividualEntrepreneurId");
+
+                            b1.ToTable("Customers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("IndividualEntrepreneurId");
+                        });
+
+                    b.OwnsOne("RentFlow.Domain.Customers.PersonName", "Name", b1 =>
+                        {
+                            b1.Property<Guid>("IndividualEntrepreneurId")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("IndividualEntrepreneurId");
+
+                            b1.ToTable("Customers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("IndividualEntrepreneurId");
+                        });
+
+                    b.Navigation("IPBankAccount")
+                        .IsRequired();
+
+                    b.Navigation("IPPassport")
+                        .IsRequired();
+
+                    b.Navigation("Name")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Customers.Organization", b =>
+                {
+                    b.OwnsOne("RentFlow.Domain.Customers.BankAccount", "OrganizationBankAccount", b1 =>
+                        {
+                            b1.Property<Guid>("OrganizationId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("BIK")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("BankName")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("CorrespondentAccount")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("CurrentAccount")
+                                .HasColumnType("text");
+
+                            b1.HasKey("OrganizationId");
+
+                            b1.ToTable("Customers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrganizationId");
+                        });
+
+                    b.OwnsOne("RentFlow.Domain.Customers.SigningBasis", "SigningBasis", b1 =>
+                        {
+                            b1.Property<Guid>("OrganizationId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<DateOnly?>("AttorneyDate")
+                                .HasColumnType("date");
+
+                            b1.Property<string>("AttorneyNumber")
+                                .HasColumnType("text");
+
+                            b1.HasKey("OrganizationId");
+
+                            b1.ToTable("Customers");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrganizationId");
+                        });
+
+                    b.Navigation("OrganizationBankAccount")
+                        .IsRequired();
+
+                    b.Navigation("SigningBasis")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RentFlow.Domain.Assets.Asset", b =>
                 {
                     b.Navigation("Photos");
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Bookings.Booking", b =>
+                {
+                    b.Navigation("CustomerSnapshot")
+                        .IsRequired();
+
+                    b.Navigation("Roles");
                 });
 #pragma warning restore 612, 618
         }

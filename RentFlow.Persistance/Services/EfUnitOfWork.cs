@@ -1,6 +1,9 @@
 using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Npgsql;
 using RentFlow.Application.Interfaces;
+using RentFlow.Domain.Common;
 
 namespace RentFlow.Persistance.Services;
 
@@ -30,5 +33,22 @@ public class EfUnitOfWork : IUnitOfWork
             await _tx.RollbackAsync(ct);
     }
 
-    public Task SaveChangesAsync(CancellationToken ct = default) => _db.SaveChangesAsync(ct);
+    public async Task SaveChangesAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            await _db.SaveChangesAsync(ct);
+        }
+        catch(DbUpdateException ex) when (IsExclusionViolation (ex))
+        {
+            throw new BookingConflictException();
+        }
+    }
+
+    private bool IsExclusionViolation(DbUpdateException ex)
+    {
+        if (ex.InnerException is PostgresException pgEx)
+            return pgEx.SqlState == PostgresErrorCodes.ExclusionViolation;
+        return false;
+    }
 }

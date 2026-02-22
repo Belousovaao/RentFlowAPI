@@ -34,8 +34,6 @@ public class CreateBookingHandler
     {
         RentalPeriod period = new RentalPeriod(cmd.StartDate, cmd.EndDate);
 
-        await _uow.BeginTransactionAsync(ct);
-
         bool available = await _availability.IsAvailable(cmd.AssetId, period, ct);
 
         if (!available)
@@ -49,15 +47,25 @@ public class CreateBookingHandler
         Customer customer = await _customers.GetByIdAsync(cmd.CustomerId, ct)
         ?? throw new InvalidOperationException("Customer not found");
 
-        Booking booking = Booking.Create(asset, customer, period);
+        await _uow.BeginTransactionAsync(ct);
+        try
+        {
+            Booking booking = Booking.Create(asset, customer, period);
 
-        booking.AddRole(new BookingRole(cmd.DriverPersonId, BookingRoleType.Driver));
+            booking.AddRole(BookingRoleType.Driver, cmd.DriverPersonId);
 
-        await _bookings.AddAsync(booking, ct);
-        await _uow.SaveChangesAsync(ct);
-        await _uow.CommitAsync(ct);
+            await _bookings.AddAsync(booking, ct);
+            await _uow.SaveChangesAsync(ct);
+            await _uow.CommitAsync(ct);
 
-        return booking;
+            return booking;
+        }
+        catch
+        {
+            await _uow.RollbackAsync(ct);
+            throw;
+        }
+        
     }
 
 }

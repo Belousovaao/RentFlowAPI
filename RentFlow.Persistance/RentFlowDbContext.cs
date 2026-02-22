@@ -22,6 +22,17 @@ public class RentFlowDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Booking>().OwnsOne(b => b.RentalPeriod, rp =>
+        {
+            rp.Property(p => p.StartDate).HasColumnName("StartDate").IsRequired();
+            rp.Property(p => p.EndDate).HasColumnName("EndDate").IsRequired();
+        });
+        modelBuilder.Entity<Booking>().OwnsOne(b => b.AssetSnapshot);
+        modelBuilder.Entity<Booking>()
+                .HasOne(b => b.CustomerSnapshot)
+                .WithOne()
+                .HasForeignKey<BookingCustomerSnapshot>(s => s.BookingId)
+                .OnDelete(DeleteBehavior.Cascade);
         modelBuilder.Entity<BookingCustomerSnapshot>()
             .HasDiscriminator<string>("CustomerType")
             .HasValue<BookingIndividualSnapshot>("Individual")
@@ -42,15 +53,6 @@ public class RentFlowDbContext : DbContext
         .HasValue<Individual>("Individual")
         .HasValue<IndividualEntrepreneur>("Entrepreneur")
         .HasValue<Organization>("Organization");
-
-        modelBuilder.Entity<Booking>().OwnsOne(b => b.RentalPeriod);
-        modelBuilder.Entity<Booking>().OwnsOne(b => b.AssetSnapshot);
-        modelBuilder.Entity<Booking>()
-                .HasOne(b => b.CustomerSnapshot)
-                .WithOne()
-                .HasForeignKey<BookingCustomerSnapshot>(s => s.BookingId)
-                .OnDelete(DeleteBehavior.Cascade);
-
 
         var assetId = Guid.Parse("11111111-1111-1111-1111-111111111111");
         var customerId = Guid.Parse("55555555-5555-5555-5555-555555555555");

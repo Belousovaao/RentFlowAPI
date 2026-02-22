@@ -6,10 +6,10 @@ namespace RentFlow.Domain.Bookings;
 
 public sealed class BookingIndividualSnapshot : BookingCustomerSnapshot
 {
-    public PersonName Name { get; set; }
-    public Passport Passport { get; set; }
-    public string Email { get; set; }
-    public string Phone { get; set; }
+    public PersonName Name { get; }
+    public Passport Passport { get; }
+    public string Email { get; }
+    public string Phone { get; }
     private BookingIndividualSnapshot() {}
     public BookingIndividualSnapshot(PersonName name, Passport passport, string email, string phone)
     {
