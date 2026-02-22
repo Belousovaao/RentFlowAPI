@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RentFlow.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8e71089eef30e7fdf0a9c0dfb77327f3d753d673")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+24f8d7627b7f58df0798e038442e716525c85d44")]
 [assembly: System.Reflection.AssemblyProductAttribute("RentFlow.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RentFlow.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
