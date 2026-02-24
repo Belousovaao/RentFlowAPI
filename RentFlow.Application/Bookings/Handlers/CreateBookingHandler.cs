@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Extensions.Logging;
 using RentFlow.Application.Bookings.Commands;
 using RentFlow.Application.Interfaces;
 using RentFlow.Domain.Assets;
@@ -15,19 +16,22 @@ public class CreateBookingHandler
     private readonly IUnitOfWork _uow;
     private readonly IAssetRepository _assets;
     private readonly ICustomerRepository _customers;
+    private readonly ILogger<CreateBookingHandler> _logger;
 
     public CreateBookingHandler(
         IUnitOfWork unitOfWork, 
         IBookingRepository bookings, 
         IAvailabilityService availability, 
         IAssetRepository asset,
-        ICustomerRepository customer)
+        ICustomerRepository customer, 
+        ILogger<CreateBookingHandler> logger)
     {
         _uow = unitOfWork;
         _bookings = bookings;
         _availability = availability;
         _assets = asset;
         _customers = customer;
+        _logger = logger;
     }
 
     public async Task<Booking> Handle(CreateBookingCommand cmd, CancellationToken ct)
@@ -58,6 +62,8 @@ public class CreateBookingHandler
             await _uow.SaveChangesAsync(ct);
             await _uow.CommitAsync(ct);
 
+            _logger.LogInformation(BookingLogEvent.Created, $"Booking created: {booking.Id} {booking.AssetId} {booking.CustomerId} {booking.RentalPeriod}");
+
             return booking;
         }
         catch
@@ -65,7 +71,6 @@ public class CreateBookingHandler
             await _uow.RollbackAsync(ct);
             throw;
         }
-        
     }
 
 }

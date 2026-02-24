@@ -2,7 +2,7 @@ using System;
 
 namespace RentFlow.Application.Bookings.Commands;
 
-public class CreateBookingCommand
+public record CreateBookingCommand
 {
     public Guid AssetId { get; set; }
     public Guid CustomerId { get; set; }
