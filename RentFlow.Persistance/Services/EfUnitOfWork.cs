@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Npgsql;
@@ -25,12 +26,14 @@ public class EfUnitOfWork : IUnitOfWork
     {
         if (_tx != null)
             await _tx.CommitAsync(ct);
+            await _tx.DisposeAsync();
     }
 
     public async Task RollbackAsync(CancellationToken ct = default)
     {
         if (_tx != null)
             await _tx.RollbackAsync(ct);
+            await _tx.DisposeAsync();
     }
 
     public async Task SaveChangesAsync(CancellationToken ct = default)

@@ -18,6 +18,7 @@ public class Booking
     public IReadOnlyCollection<BookingRole> Roles => _roles;
     public BookingAssetSnapshot AssetSnapshot { get; private set; }
     public BookingCustomerSnapshot CustomerSnapshot { get; private set; }
+    public BookingRole? Signatory { get; private set; }
 
     private Booking() {}
 
@@ -88,10 +89,7 @@ public class Booking
     public static Booking Create(Asset asset, Customer customer, RentalPeriod period)
     {
         if (asset.Status != AssetStatus.Available)
-            throw new InvalidOperationException("AssetStatus is not available");
-
-        if (period.TotalDays < 1)
-            throw new InvalidRentalPeriodException();
+            throw new BookingConflictException();
 
         BookingAssetSnapshot assetSnapshot = new BookingAssetSnapshot(
             asset.Name,
@@ -126,7 +124,7 @@ public class Booking
                 organization.FactAdress,
                 organization.OrganizationBankAccount),
 
-            _ => throw new InvalidOperationException("Invalid customer type")
+            _ => throw new UnsupportedCustomerType()
         };
 
         decimal totalPrice = asset.DailyPrice * (decimal)period.TotalDays;
@@ -136,8 +134,19 @@ public class Booking
 
     public void ChangePeriod(RentalPeriod newPeriod, decimal newTotalPrice)
     {
+        if (Status is BookingStatus.Cancelled or BookingStatus.Completed)
+            throw new BookingModificationNotAllowedException();
+
         RentalPeriod = newPeriod;
         TotalPrice = newTotalPrice;
+    }
+
+    public void SetSignatory(Guid personId)
+    {
+        if (Signatory != null)
+            throw new DublicateSignatoryException();
+
+        Signatory = new BookingRole(personId, BookingRoleType.Signatory);
     }
 }
 

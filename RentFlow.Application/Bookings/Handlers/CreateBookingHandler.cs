@@ -1,10 +1,12 @@
 using System;
+using System.Data;
 using Microsoft.Extensions.Logging;
 using RentFlow.Application.Bookings.Commands;
 using RentFlow.Application.Interfaces;
 using RentFlow.Domain.Assets;
 using RentFlow.Domain.Bookings;
 using RentFlow.Domain.Bookings.Snapshots;
+using RentFlow.Domain.Common;
 using RentFlow.Domain.Customers;
 
 namespace RentFlow.Application.Bookings.Handlers;
@@ -12,7 +14,6 @@ namespace RentFlow.Application.Bookings.Handlers;
 public class CreateBookingHandler
 {
     private readonly IBookingRepository _bookings;
-    private readonly IAvailabilityService _availability;
     private readonly IUnitOfWork _uow;
     private readonly IAssetRepository _assets;
     private readonly ICustomerRepository _customers;
@@ -21,14 +22,12 @@ public class CreateBookingHandler
     public CreateBookingHandler(
         IUnitOfWork unitOfWork, 
         IBookingRepository bookings, 
-        IAvailabilityService availability, 
         IAssetRepository asset,
         ICustomerRepository customer, 
         ILogger<CreateBookingHandler> logger)
     {
         _uow = unitOfWork;
         _bookings = bookings;
-        _availability = availability;
         _assets = asset;
         _customers = customer;
         _logger = logger;
@@ -37,13 +36,6 @@ public class CreateBookingHandler
     public async Task<Booking> Handle(CreateBookingCommand cmd, CancellationToken ct)
     {
         RentalPeriod period = new RentalPeriod(cmd.StartDate, cmd.EndDate);
-
-        bool available = await _availability.IsAvailable(cmd.AssetId, period, ct);
-
-        if (!available)
-        {
-            throw new InvalidOperationException("Asset is not available");
-        }
         
         Asset asset = await _assets.GetByIdAsync(cmd.AssetId, ct)
         ?? throw new InvalidOperationException("Asset not found");
@@ -52,8 +44,14 @@ public class CreateBookingHandler
         ?? throw new InvalidOperationException("Customer not found");
 
         await _uow.BeginTransactionAsync(ct);
+
         try
         {
+            List<Booking> overlapping = await _bookings.GetOverlappingAsync(cmd.AssetId, period, ct);
+
+            if (overlapping.Any())
+                throw new BookingConflictException();
+
             Booking booking = Booking.Create(asset, customer, period);
 
             booking.AddRole(BookingRoleType.Driver, cmd.DriverPersonId);

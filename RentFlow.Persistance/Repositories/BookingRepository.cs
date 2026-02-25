@@ -27,4 +27,15 @@ public class BookingRepository : IBookingRepository
     {
         return await _db.Bookings.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, ct);
     }
+
+    public async Task<List<Booking>> GetOverlappingAsync(Guid assetId, RentalPeriod period, CancellationToken ct)
+    {
+        return await _db.Bookings.Where(b =>
+            b.AssetId == assetId &&
+            b.Status != BookingStatus.Cancelled &&
+            b.Status != BookingStatus.Completed &&
+            b.RentalPeriod.StartDate < period.EndDate &&
+            b.RentalPeriod.EndDate > period.StartDate)
+            .ToListAsync(ct);
+    }
 }

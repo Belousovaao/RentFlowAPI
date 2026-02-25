@@ -1,4 +1,5 @@
 using System;
+using RentFlow.Domain.Common;
 
 namespace RentFlow.Domain.Bookings;
 
@@ -13,7 +14,7 @@ public class RentalPeriod
     public RentalPeriod(DateTime start, DateTime end)
     {
         if (end <= start)
-            throw new ArgumentException("Дата окончания должна быть позже дата начала");
+            throw new InvalidRentalPeriodException();
         StartDate = start;
         EndDate = end;
     }
