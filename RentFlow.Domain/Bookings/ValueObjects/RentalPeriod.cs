@@ -15,6 +15,9 @@ public class RentalPeriod
     {
         if (end <= start)
             throw new InvalidRentalPeriodException();
+
+        if (start.Kind != DateTimeKind.Utc || end.Kind != DateTimeKind.Utc)
+            throw new InvalidRentalPeriodException();
         StartDate = start;
         EndDate = end;
     }

@@ -54,6 +54,10 @@ public class RentFlowDbContext : DbContext
         .HasValue<IndividualEntrepreneur>("Entrepreneur")
         .HasValue<Organization>("Organization");
 
+        modelBuilder.Entity<Asset>().HasMany(a => a.Photos).WithOne()
+        .HasForeignKey(p => p.AssetId)
+        .OnDelete(DeleteBehavior.Cascade);
+
         var assetId = Guid.Parse("11111111-1111-1111-1111-111111111111");
         var customerId = Guid.Parse("55555555-5555-5555-5555-555555555555");
         var rentalPeriodId = Guid.Parse("66666666-6666-6666-6666-666666666666");
@@ -64,30 +68,6 @@ public class RentFlowDbContext : DbContext
             new Location { Id = locationCityCenter, Name = "City Center" },
             new Location { Id = locationAirport, Name = "Airport" }
         );
-
-        modelBuilder.Entity<Asset>().HasData(new Asset
-        {
-            Id = assetId,
-            Code = "cityray",
-            Name = "Geely Cityray",
-            Type = AssetType.Auto,
-            Category = AssetCategory.SUV,
-            ShortDescription = "Краткое описание!",
-            FullDescription = "Основные характеристики:",
-            Status = AssetStatus.Available,
-            DailyPrice = 6000,
-            Deposit = 10000,
-            LocationId = locationCityCenter,
-            CanDeliver = true,
-            DeliveryPrice = 500
-        });
-
-        modelBuilder.Entity<AssetPhoto>().HasData(new AssetPhoto
-        {
-            Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-            AssetId = assetId,
-            Url = "https://freeimage.host/i/fHys5hP"
-        });
     }
 }
 

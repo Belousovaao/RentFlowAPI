@@ -19,12 +19,14 @@ public class Booking
     public BookingAssetSnapshot AssetSnapshot { get; private set; }
     public BookingCustomerSnapshot CustomerSnapshot { get; private set; }
     public BookingRole? Signatory { get; private set; }
+    public Driver BookingDriver { get; private set; }
 
     private Booking() {}
 
     public Booking(
         Guid assetId, 
         Guid customerId, 
+        Driver driver,
         RentalPeriod period, 
         decimal totalPrice, 
         BookingAssetSnapshot assetSnapshot, 
@@ -33,6 +35,7 @@ public class Booking
         Id = Guid.NewGuid();
         AssetId = assetId;
         CustomerId = customerId;
+        BookingDriver = driver;
         RentalPeriod = period;
         TotalPrice = totalPrice;
         AssetSnapshot = assetSnapshot;
@@ -86,13 +89,16 @@ public class Booking
         _roles.Add(new BookingRole(personId, role));
     }
 
-    public static Booking Create(Asset asset, Customer customer, RentalPeriod period)
+    public static Booking Create(Asset asset, Customer customer, Driver? driver, RentalPeriod period)
     {
         if (asset.Status != AssetStatus.Available)
             throw new BookingConflictException();
 
+        Driver bookingDriver = customer.ResolveDriver(driver);
+
         BookingAssetSnapshot assetSnapshot = new BookingAssetSnapshot(
-            asset.Name,
+            asset.BrandName,
+            asset.Model,
             asset.Type,
             asset.Category,
             asset.DailyPrice,
@@ -120,8 +126,8 @@ public class Booking
                 organization.FullName,
                 organization.ShortName,
                 organization.KPP,
-                organization.OrganizationAdress,
-                organization.FactAdress,
+                organization.OrganizationAddress,
+                organization.FactAddress,
                 organization.OrganizationBankAccount),
 
             _ => throw new UnsupportedCustomerType()
@@ -129,7 +135,7 @@ public class Booking
 
         decimal totalPrice = asset.DailyPrice * (decimal)period.TotalDays;
 
-        return new Booking(asset.Id, customer.Id, period, totalPrice, assetSnapshot, customerSnapshot);
+        return new Booking(asset.Id, customer.Id, bookingDriver, period, totalPrice, assetSnapshot, customerSnapshot);
     }
 
     public void ChangePeriod(RentalPeriod newPeriod, decimal newTotalPrice)

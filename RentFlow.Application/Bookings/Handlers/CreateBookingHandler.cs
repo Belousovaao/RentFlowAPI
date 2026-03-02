@@ -38,10 +38,10 @@ public class CreateBookingHandler
         RentalPeriod period = new RentalPeriod(cmd.StartDate, cmd.EndDate);
         
         Asset asset = await _assets.GetByIdAsync(cmd.AssetId, ct)
-        ?? throw new InvalidOperationException("Asset not found");
+        ?? throw new AssetNotFoundException();
 
         Customer customer = await _customers.GetByIdAsync(cmd.CustomerId, ct)
-        ?? throw new InvalidOperationException("Customer not found");
+        ?? throw new CustomerNotFoundException();
 
         await _uow.BeginTransactionAsync(ct);
 
@@ -52,9 +52,22 @@ public class CreateBookingHandler
             if (overlapping.Any())
                 throw new BookingConflictException();
 
-            Booking booking = Booking.Create(asset, customer, period);
+            Driver? driver = null;
+            if (cmd.Driver is not null)
+            {
+                driver = Driver.Create(
+                    new PersonName(cmd.Driver.FirstName, cmd.Driver.LastName, cmd.Driver.MiddleName),
+                    new DriverLicense(cmd.Driver.LisenceNumber, cmd.Driver.Categories, cmd.Driver.IssuedDate, cmd.Driver.ExpirationDate),
+                    cmd.Driver.Phone
+                );
+            }
+            if (cmd.Driver is null && customer is Individual)
+                driver = Driver.FromIndividual((Individual)customer);
 
-            booking.AddRole(BookingRoleType.Driver, cmd.DriverPersonId);
+            if (cmd.Driver is null && customer is IndividualEntrepreneur)
+                driver = Driver.FromEntrepreneur((IndividualEntrepreneur)customer);
+
+            Booking booking = Booking.Create(asset, customer, driver, period);
 
             await _bookings.AddAsync(booking, ct);
             await _uow.SaveChangesAsync(ct);

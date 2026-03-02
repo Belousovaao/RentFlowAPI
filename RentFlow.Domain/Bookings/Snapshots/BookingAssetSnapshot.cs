@@ -9,15 +9,15 @@ public class BookingAssetSnapshot
     public AssetType Type { get; }
     public AssetCategory Category { get; }
     public decimal DailyPrice { get; }
-    public decimal Deposit { get; }
+    public decimal? Deposit { get; }
     public bool CanDeliver { get; }
     public decimal? DeliveryPrice { get; }
     private BookingAssetSnapshot() {}
-    public BookingAssetSnapshot(string name, AssetType type, 
-        AssetCategory category, decimal dailePrice, decimal deposit, 
+    public BookingAssetSnapshot(string brandName, string model, AssetType type, 
+        AssetCategory category, decimal dailePrice, decimal? deposit, 
         bool canDeliver, decimal? deliveryPrice)
     {
-        Name = name;
+        Name = brandName + " " + model;
         Type = type;
         Category = category;
         DailyPrice = dailePrice;

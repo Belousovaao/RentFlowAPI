@@ -1,12 +1,12 @@
 using System;
+using System.Globalization;
+using RentFlow.Application.Bookings.Dtos;
 
 namespace RentFlow.Application.Bookings.Commands;
-
-public record CreateBookingCommand
-{
-    public Guid AssetId { get; set; }
-    public Guid CustomerId { get; set; }
-    public Guid DriverPersonId { get; set; }
-    public DateTime StartDate { get; set;}
-    public DateTime EndDate { get; set; }
-}
+public sealed record CreateBookingCommand(
+    Guid AssetId,
+    Guid CustomerId,
+    DateTime StartDate,
+    DateTime EndDate,
+    DriverDto? Driver
+);

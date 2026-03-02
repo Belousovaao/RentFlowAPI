@@ -3,7 +3,6 @@ using RentFlow.Persistance.Repositories;
 using RentFlow.Persistance;
 using Microsoft.EntityFrameworkCore;
 using RentFlow.Application.Bookings.Handlers;
-using RentFlow.Domain.Bookings.Services;
 using RentFlow.Persistance.Services;
 using RentFlow.Application.Bookings.Commands;
 using RentFlow.Application.Bookings.Validators;
@@ -52,7 +51,6 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavi
 builder.Services.AddScoped<IAssetRepository, AssetRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
-builder.Services.AddScoped<IAvailabilityService, AvailabilityService>();
 builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 builder.Services.AddScoped<CreateBookingHandler>();
 

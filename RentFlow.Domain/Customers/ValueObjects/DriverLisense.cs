@@ -5,7 +5,7 @@ namespace RentFlow.Domain.Customers;
 public sealed class DriverLicense
 {
     public string Number { get; set; }
-    public char Category { get; }
+    public List<char> Categories { get; }
     public DateOnly IssuedDate { get; }
     public DateOnly ExpirationDate { get; }
 
@@ -13,12 +13,12 @@ public sealed class DriverLicense
 
     public DriverLicense(
         string number,
-        char category,
+        List<char> categories,
         DateOnly issuedDate,
         DateOnly expirationDate)
     {
         Number = number;
-        Category = category;
+        Categories = categories;
         IssuedDate = issuedDate;
         ExpirationDate = expirationDate;
     }
