@@ -7,21 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Configurations/" />
+    <ProjectReference Include="..\RentFlow.Domain\RentFlow.Domain.csproj" />
+    <ProjectReference Include="..\RentFlow.Application\RentFlow.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\RentFlow.Domain\RentFlow.Domain.csproj" />
-    <ProjectReference Include="..\RentFlow.Application\RentFlow.Application.csproj" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
   </ItemGroup>
 
 </Project>

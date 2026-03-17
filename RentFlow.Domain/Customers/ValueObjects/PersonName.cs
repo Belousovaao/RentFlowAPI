@@ -2,11 +2,11 @@ using System;
 
 namespace RentFlow.Domain.Customers;
 
-public sealed class PersonName
+public record PersonName
 {
-    public string FirstName { get; }
-    public string LastName { get; }
-    public string? MiddleName { get; }
+    public string FirstName { get; private set; }
+    public string LastName { get; private set; }
+    public string? MiddleName { get; private set; }
 
     private PersonName() { }
 
@@ -25,14 +25,32 @@ public sealed class PersonName
             : middleName.Trim();
     }
 
-    public string FullName =>
-        MiddleName is null
-            ? $"{LastName} {FirstName}"
-            : $"{LastName} {FirstName} {MiddleName}";
+    public string? FullName
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName))
+                return null;
 
-    public string ShortName =>
-        MiddleName is null
-            ? $"{LastName} {FirstName[0]}."
-            : $"{LastName} {FirstName[0]}.{MiddleName[0]}.";
+            if (string.IsNullOrWhiteSpace(MiddleName))
+                return $"{LastName} {FirstName}";
+            
+            return $"{LastName} {FirstName} {MiddleName}";
+        }
+    }
+
+    public string? ShortName
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName))
+                return null;
+
+            if (string.IsNullOrWhiteSpace(MiddleName))
+                return $"{LastName} {FirstName[0]}.";
+            
+            return $"{LastName} {FirstName[0]}.{MiddleName[0]}.";
+        }
+    }
 }
 

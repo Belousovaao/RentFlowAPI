@@ -5,10 +5,10 @@ namespace RentFlow.Domain.Customers;
 
 public sealed class Passport
 {
-    public string Serial { get; }
-    public string Number { get; }
-    public string? IssuedBy { get; }
-    public DateOnly? IssuedDate { get; }
+    public string Serial { get; private set; }
+    public string Number { get; private set; }
+    public string? IssuedBy { get; private set; }
+    public DateOnly? IssuedDate { get; private set; }
     public string? RegistrationAddress { get; set; }
 
     private Passport() { }

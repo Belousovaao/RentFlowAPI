@@ -6,6 +6,7 @@ using System.Xml.Schema;
 using RentFlow.Application.Common.Exceptions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 
 namespace RentFlow.Api.Middleware;
 
@@ -36,28 +37,32 @@ public sealed class ExceptionMiddleware
 
     private static async Task HandleExceptionAsync(HttpContext context, Exception ex)
     {
+        if (context.Response.HasStarted)
+            return;
+
+        context.Response.Clear();
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/problem+json";
+            
         ProblemDetails problem = ex switch
         {
-            NotFoundException nf => CreateProblem(context, HttpStatusCode.NotFound, "Not Found", nf.Message),
+            NotFoundException nf => CreateProblem(context, 404, "Not Found", nf.Message),
 
-            BusinessRuleViolationException br => CreateProblem(context, HttpStatusCode.BadRequest, "Business rule violation", br.Message),
+            BusinessRuleViolationException br => CreateProblem(context, 400, "Business rule violation", br.Message),
 
             ValidationException ve => CreateValidationProblem(context, ve),
 
-            _ => CreateProblem(context, HttpStatusCode.InternalServerError, "Server error", "An unexpected error occured")
+            _ => CreateProblem(context, 500, ex.GetType().Name, ex.ToString())
         };
 
-        context.Response.StatusCode = problem.Status ?? 500;
-        context.Response.ContentType = "application/problem+json";
-
-        await context.Response.WriteAsJsonAsync(problem);
+        await context.Response.WriteAsync(JsonSerializer.Serialize(problem));
     }
 
-    private static ProblemDetails CreateProblem(HttpContext context, HttpStatusCode status, string title, string detail)
+    private static ProblemDetails CreateProblem(HttpContext context, int status, string title, string detail)
     {
         return new ProblemDetails
         {
-            Status = (int)status,
+            Status = status,
             Title = title,
             Detail = detail,
             Instance = context.Request.Path
@@ -71,7 +76,7 @@ public sealed class ExceptionMiddleware
 
         return new ValidationProblemDetails(errors)
         {
-            Status = StatusCodes.Status400BadRequest,
+            Status = 400,
             Title = "Validation failed",
             Instance = context.Request.Path
         };

@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/RentFlow.Domain.csproj",
+      "projectUniqueName": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Domain/RentFlow.Domain.csproj",
       "projectName": "RentFlow.Domain",
-      "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/RentFlow.Domain.csproj",
+      "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Domain/RentFlow.Domain.csproj",
       "packagesPath": "/Users/Anna/.nuget/packages/",
-      "outputPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/obj/",
+      "outputPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Domain/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/Anna/.nuget/NuGet/NuGet.Config"

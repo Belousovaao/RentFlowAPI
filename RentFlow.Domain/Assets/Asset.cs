@@ -59,7 +59,8 @@ public class Asset
 
         if (canDeliver && deliveryPrice is null)
             throw new ArgumentException("DeliveryPrice required id delivery is able");
-
+            
+        Id = Guid.NewGuid();
         Code = code;
         BrandName = brandName;
         Model = model;

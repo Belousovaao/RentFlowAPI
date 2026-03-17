@@ -106,32 +106,7 @@ public class Booking
             asset.CanDeliver,
             asset.DeliveryPrice);
         
-        BookingCustomerSnapshot customerSnapshot = customer switch
-        {
-            Individual individual => new BookingIndividualSnapshot(
-                individual.Name,
-                individual.IndividualPassport,
-                individual.Email,
-                individual.Phone),
-
-            IndividualEntrepreneur entrepreneur => new BookingEntrepreneurSnapshot(
-                entrepreneur.Name,
-                entrepreneur.OrganizationAdress,
-                entrepreneur.FactAdress,
-                entrepreneur.IPBankAccount,
-                entrepreneur.Phone,
-                entrepreneur.Email),
-
-            Organization organization => new BookingOrganizationSnapshot(
-                organization.FullName,
-                organization.ShortName,
-                organization.KPP,
-                organization.OrganizationAddress,
-                organization.FactAddress,
-                organization.OrganizationBankAccount),
-
-            _ => throw new UnsupportedCustomerType()
-        };
+        BookingCustomerSnapshot customerSnapshot = BookingCustomerSnapshot.FromCustomer(customer);
 
         decimal totalPrice = asset.DailyPrice * (decimal)period.TotalDays;
 

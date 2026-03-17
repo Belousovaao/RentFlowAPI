@@ -40,7 +40,8 @@ public class AssetRepository : IAssetRepository
             var s = filter.Search.ToLower();
             query = query.Where(x =>
                 x.Code.ToLower().Contains(s) ||
-                x.Name.ToLower().Contains(s));
+                x.BrandName.ToLower().Contains(s) ||
+                x.Model.ToLower().Contains(s));
         }
 
         if (filter.Category.HasValue)
@@ -59,7 +60,8 @@ public class AssetRepository : IAssetRepository
             query = query.Where(x => x.Status == filter.Status.Value);
 
         return await query
-            .OrderBy(x => x.Name)
+            .OrderBy(x => x.BrandName)
+            .ThenBy(x => x.Model)
             .ToListAsync(ct);
     }
 
@@ -71,7 +73,8 @@ public class AssetRepository : IAssetRepository
                 b.Status != BookingStatus.Cancelled &&
                 b.RentalPeriod.StartDate < rentalPeriod.EndDate &&
                 b.RentalPeriod.EndDate > rentalPeriod.StartDate))
-            .OrderBy(a => a.Name)
+            .OrderBy(a => a.BrandName)
+            .ThenBy(a => a.Model)
             .ToListAsync(ct);
     }
 

@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using Microsoft.Extensions.Logging;
 using RentFlow.Application.Bookings.Commands;
+using RentFlow.Application.Common.Exceptions;
 using RentFlow.Application.Interfaces;
 using RentFlow.Domain.Assets;
 using RentFlow.Domain.Bookings;
@@ -66,6 +67,9 @@ public class CreateBookingHandler
 
             if (cmd.Driver is null && customer is IndividualEntrepreneur)
                 driver = Driver.FromEntrepreneur((IndividualEntrepreneur)customer);
+            
+            if (cmd.Driver is null && customer is Organization)
+                throw new BusinessRuleViolationException("Organization must have a driver");
 
             Booking booking = Booking.Create(asset, customer, driver, period);
 

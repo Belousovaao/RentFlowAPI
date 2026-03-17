@@ -34,9 +34,10 @@ public abstract class Customer
         string organizationAddress,
         string factAdress,
         BankAccount bankAccount,
-        Guid? representativeId)
+        Guid? representativeId,
+        DriverLicense? driverLicense)
     {
-        return new IndividualEntrepreneur(email, phone, name, passport, inn, ogrnip, organizationAddress, factAdress, bankAccount, representativeId);
+        return new IndividualEntrepreneur(email, phone, name, passport, inn, ogrnip, organizationAddress, factAdress, bankAccount, representativeId, driverLicense);
     }
 
     public static Customer CreateOrganization(

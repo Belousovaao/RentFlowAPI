@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Test/RentFlow.Test.csproj": {}
+    "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Test/RentFlow.Test.csproj": {}
   },
   "projects": {
-    "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/RentFlow.Application.csproj": {
+    "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Api/RentFlow.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/RentFlow.Application.csproj",
-        "projectName": "RentFlow.Application",
-        "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/RentFlow.Application.csproj",
+        "projectUniqueName": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Api/RentFlow.Api.csproj",
+        "projectName": "RentFlow.Api",
+        "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Api/RentFlow.Api.csproj",
         "packagesPath": "/Users/Anna/.nuget/packages/",
-        "outputPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/",
+        "outputPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Api/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/Anna/.nuget/NuGet/NuGet.Config"
@@ -27,8 +27,122 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/RentFlow.Domain.csproj": {
-                "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/RentFlow.Domain.csproj"
+              "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Application/RentFlow.Application.csproj": {
+                "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Application/RentFlow.Application.csproj"
+              },
+              "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Persistance/RentFlow.Persistance.csproj": {
+                "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Persistance/RentFlow.Persistance.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "FluentValidation": {
+              "target": "Package",
+              "version": "[12.1.1, )"
+            },
+            "MediatR": {
+              "target": "Package",
+              "version": "[14.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.3, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[9.0.3, )"
+            },
+            "Serilog.AspNetCore": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Serilog.Enrichers.Thread": {
+              "target": "Package",
+              "version": "[4.0.0, )"
+            },
+            "Serilog.Sinks.Async": {
+              "target": "Package",
+              "version": "[2.1.0, )"
+            },
+            "Serilog.Sinks.Console": {
+              "target": "Package",
+              "version": "[6.1.1, )"
+            },
+            "Serilog.Sinks.File": {
+              "target": "Package",
+              "version": "[7.0.0, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[7.3.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.304/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Application/RentFlow.Application.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Application/RentFlow.Application.csproj",
+        "projectName": "RentFlow.Application",
+        "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Application/RentFlow.Application.csproj",
+        "packagesPath": "/Users/Anna/.nuget/packages/",
+        "outputPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Application/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/Anna/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Domain/RentFlow.Domain.csproj": {
+                "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Domain/RentFlow.Domain.csproj"
               }
             }
           }
@@ -82,14 +196,14 @@
         }
       }
     },
-    "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/RentFlow.Domain.csproj": {
+    "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Domain/RentFlow.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/RentFlow.Domain.csproj",
+        "projectUniqueName": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Domain/RentFlow.Domain.csproj",
         "projectName": "RentFlow.Domain",
-        "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/RentFlow.Domain.csproj",
+        "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Domain/RentFlow.Domain.csproj",
         "packagesPath": "/Users/Anna/.nuget/packages/",
-        "outputPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/obj/",
+        "outputPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Domain/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/Anna/.nuget/NuGet/NuGet.Config"
@@ -142,14 +256,14 @@
         }
       }
     },
-    "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Test/RentFlow.Test.csproj": {
+    "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Persistance/RentFlow.Persistance.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Test/RentFlow.Test.csproj",
-        "projectName": "RentFlow.Test",
-        "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Test/RentFlow.Test.csproj",
+        "projectUniqueName": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Persistance/RentFlow.Persistance.csproj",
+        "projectName": "RentFlow.Persistance",
+        "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Persistance/RentFlow.Persistance.csproj",
         "packagesPath": "/Users/Anna/.nuget/packages/",
-        "outputPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Test/obj/",
+        "outputPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Persistance/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/Anna/.nuget/NuGet/NuGet.Config"
@@ -165,8 +279,11 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/RentFlow.Application.csproj": {
-                "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/RentFlow.Application.csproj"
+              "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Application/RentFlow.Application.csproj": {
+                "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Application/RentFlow.Application.csproj"
+              },
+              "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Domain/RentFlow.Domain.csproj": {
+                "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Domain/RentFlow.Domain.csproj"
               }
             }
           }
@@ -187,17 +304,135 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.3, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.3, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[9.0.3, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.304/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Test/RentFlow.Test.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Test/RentFlow.Test.csproj",
+        "projectName": "RentFlow.Test",
+        "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Test/RentFlow.Test.csproj",
+        "packagesPath": "/Users/Anna/.nuget/packages/",
+        "outputPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Test/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/Anna/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0"
+        ],
+        "sources": {
+          "/usr/local/share/dotnet/library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0": {
+            "targetAlias": "net9.0",
+            "projectReferences": {
+              "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Api/RentFlow.Api.csproj": {
+                "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Api/RentFlow.Api.csproj"
+              },
+              "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Application/RentFlow.Application.csproj": {
+                "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Application/RentFlow.Application.csproj"
+              },
+              "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Persistance/RentFlow.Persistance.csproj": {
+                "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Persistance/RentFlow.Persistance.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0": {
+          "targetAlias": "net9.0",
+          "dependencies": {
+            "DotNet.Testcontainers": {
+              "target": "Package",
+              "version": "[1.6.0, )"
+            },
             "FluentAssertions": {
               "target": "Package",
               "version": "[8.8.0, )"
             },
+            "Microsoft.AspNetCore.Mvc.Testing": {
+              "target": "Package",
+              "version": "[9.0.3, )"
+            },
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.3, )"
+            },
+            "Microsoft.EntityFrameworkCore.Relational": {
+              "target": "Package",
+              "version": "[9.0.3, )"
+            },
+            "Microsoft.Extensions.DependencyInjection": {
+              "target": "Package",
+              "version": "[9.0.3, )"
+            },
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",
-              "version": "[17.12.0, )"
+              "version": "[17.13.0, )"
             },
             "Moq": {
               "target": "Package",
               "version": "[4.20.72, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[9.0.3, )"
+            },
+            "Respawn": {
+              "target": "Package",
+              "version": "[7.0.0, )"
+            },
+            "Testcontainers.PostgreSql": {
+              "target": "Package",
+              "version": "[4.3.0, )"
             },
             "coverlet.collector": {
               "target": "Package",
@@ -205,11 +440,13 @@
             },
             "xunit": {
               "target": "Package",
-              "version": "[2.9.2, )"
+              "version": "[2.9.3, )"
             },
             "xunit.runner.visualstudio": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
               "target": "Package",
-              "version": "[2.8.2, )"
+              "version": "[3.0.2, )"
             }
           },
           "imports": [

@@ -31,7 +31,7 @@ namespace RentFlow.Api.Controllers
         public async Task<IActionResult> Create(CreateBookingCommand cmd, CancellationToken ct)
         {
             Booking booking = await _handler.Handle(cmd, ct);
-            return Ok(booking);
+            return CreatedAtAction(nameof(Create), booking);
         }
     }
 }

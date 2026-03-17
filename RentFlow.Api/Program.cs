@@ -11,6 +11,9 @@ using MediatR;
 using RentFlow.Application.Common.Behaviors;
 using RentFlow.Api.Middleware;
 using Serilog;
+using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -54,15 +57,29 @@ builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 builder.Services.AddScoped<CreateBookingHandler>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.UnknownTypeHandling = System.Text.Json.Serialization.JsonUnknownTypeHandling.JsonElement;
+        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddSwaggerGen();
+}
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 app.UseMiddleware<CorrelationMiddleware>();
 app.UseMiddleware<ExceptionMiddleware>();
@@ -71,6 +88,19 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+try
+{
+    app.MapControllers();
+}
+catch (ReflectionTypeLoadException ex)
+{
+    foreach(var loaderException in ex.LoaderExceptions)
+    {
+        Console.WriteLine(loaderException);
+    }
+    throw;
+}
 
-app.MapControllers();
 app.Run();
+
+public partial class Program {}

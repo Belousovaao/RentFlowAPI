@@ -506,11 +506,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/RentFlow.Application.csproj",
+      "projectUniqueName": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Application/RentFlow.Application.csproj",
       "projectName": "RentFlow.Application",
-      "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/RentFlow.Application.csproj",
+      "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Application/RentFlow.Application.csproj",
       "packagesPath": "/Users/Anna/.nuget/packages/",
-      "outputPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Application/obj/",
+      "outputPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Application/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/Anna/.nuget/NuGet/NuGet.Config"
@@ -526,8 +526,8 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/RentFlow.Domain.csproj": {
-              "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow Version 1.0.1/RentFlow.Domain/RentFlow.Domain.csproj"
+            "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Domain/RentFlow.Domain.csproj": {
+              "projectPath": "/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Domain/RentFlow.Domain.csproj"
             }
           }
         }

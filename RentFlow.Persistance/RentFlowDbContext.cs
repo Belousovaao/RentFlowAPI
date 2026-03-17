@@ -4,6 +4,7 @@ using RentFlow.Domain.Locations;
 using RentFlow.Domain.Bookings;
 using RentFlow.Domain.Customers;
 using RentFlow.Domain.Bookings.Snapshots;
+using RentFlow.Domain.Customers.ValueObjects;
 
 namespace RentFlow.Persistance;
 
@@ -22,52 +23,7 @@ public class RentFlowDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Booking>().OwnsOne(b => b.RentalPeriod, rp =>
-        {
-            rp.Property(p => p.StartDate).HasColumnName("StartDate").IsRequired();
-            rp.Property(p => p.EndDate).HasColumnName("EndDate").IsRequired();
-        });
-        modelBuilder.Entity<Booking>().OwnsOne(b => b.AssetSnapshot);
-        modelBuilder.Entity<Booking>()
-                .HasOne(b => b.CustomerSnapshot)
-                .WithOne()
-                .HasForeignKey<BookingCustomerSnapshot>(s => s.BookingId)
-                .OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<BookingCustomerSnapshot>()
-            .HasDiscriminator<string>("CustomerType")
-            .HasValue<BookingIndividualSnapshot>("Individual")
-            .HasValue<BookingEntrepreneurSnapshot>("Entrepreneur")
-            .HasValue<BookingOrganizationSnapshot>("Organization");
-        modelBuilder.Entity<Individual>().OwnsOne(b => b.Name);
-        modelBuilder.Entity<Individual>().OwnsOne(b => b.IndividualPassport);
-        modelBuilder.Entity<Individual>().OwnsOne(b => b.IndividualDriverLicense);
-        modelBuilder.Entity<Individual>().OwnsOne(b => b.IndividualBankAccount);
-        modelBuilder.Entity<IndividualEntrepreneur>().OwnsOne(b => b.Name);
-        modelBuilder.Entity<IndividualEntrepreneur>().OwnsOne(b => b.IPBankAccount);
-        modelBuilder.Entity<IndividualEntrepreneur>().OwnsOne(b => b.IPPassport);
-        modelBuilder.Entity<Organization>().OwnsOne(b => b.SigningBasis);
-        modelBuilder.Entity<Organization>().OwnsOne(b => b.OrganizationBankAccount);
-
-        modelBuilder.Entity<Customer>()
-        .HasDiscriminator<string>("CustomerType")
-        .HasValue<Individual>("Individual")
-        .HasValue<IndividualEntrepreneur>("Entrepreneur")
-        .HasValue<Organization>("Organization");
-
-        modelBuilder.Entity<Asset>().HasMany(a => a.Photos).WithOne()
-        .HasForeignKey(p => p.AssetId)
-        .OnDelete(DeleteBehavior.Cascade);
-
-        var assetId = Guid.Parse("11111111-1111-1111-1111-111111111111");
-        var customerId = Guid.Parse("55555555-5555-5555-5555-555555555555");
-        var rentalPeriodId = Guid.Parse("66666666-6666-6666-6666-666666666666");
-        var locationCityCenter = Guid.Parse("33333333-3333-3333-3333-333333333333");
-        var locationAirport = Guid.Parse("44444444-4444-4444-4444-444444444444");
-
-        modelBuilder.Entity<Location>().HasData(
-            new Location { Id = locationCityCenter, Name = "City Center" },
-            new Location { Id = locationAirport, Name = "Airport" }
-        );
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(RentFlowDbContext).Assembly);
     }
 }
 

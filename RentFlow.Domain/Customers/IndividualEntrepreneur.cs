@@ -28,7 +28,8 @@ public class IndividualEntrepreneur : Customer
         string organizationAddress,
         string factAdress,
         BankAccount bankAccount,
-        Guid? representativeId)
+        Guid? representativeId,
+        DriverLicense? driverLicense)
     {
         Id = Guid.NewGuid();
         IpLegalForm = OrganizationLegalForm.IP;
@@ -42,6 +43,7 @@ public class IndividualEntrepreneur : Customer
         FactAdress = factAdress;
         IPBankAccount = bankAccount;
         RepresentativeId = representativeId;
+        EntrepreneurDriverLicense = driverLicense;
     }
 
     public override Driver ResolveDriver(Driver? provideDriver)

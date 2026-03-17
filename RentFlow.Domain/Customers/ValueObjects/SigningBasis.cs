@@ -8,7 +8,7 @@ public class SigningBasis
     public string? AttorneyNumber { get; set; }
     public DateOnly? AttorneyDate { get; set; }
     private SigningBasis() {}
-    public SigningBasis ByCharter()
+    public static SigningBasis ByCharter()
     {
         return new SigningBasis
         {
@@ -16,7 +16,7 @@ public class SigningBasis
         };
     }
 
-    public SigningBasis ByAttorney(string number, DateOnly date)
+    public static SigningBasis ByAttorney(string number, DateOnly date)
     {
         return new SigningBasis
         {
