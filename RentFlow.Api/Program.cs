@@ -89,25 +89,13 @@ app.UseAuthorization();
 
 try
 {
-    using (var scope = app.Services.CreateScope())
+    if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     {
-        var db = scope.ServiceProvider.GetRequiredService<RentFlowDbContext>();
-
-        var retries = 10;
-        while(retries > 0)
+        using (var scope = app.Services.CreateScope())
         {
-            try
-            {
-                db.Database.Migrate();
-                break;
-            }
-            catch
-            {
-                retries--;
-                Thread.Sleep(2000);
-            }
+            var db = scope.ServiceProvider.GetRequiredService<RentFlowDbContext>();
+            db.Database.Migrate();
         }
-        db.Database.Migrate();
     }
     app.MapControllers();
 }

@@ -35,6 +35,7 @@ public class PostgreSqlContainerFixture : IAsyncLifetime
         var options = new DbContextOptionsBuilder<RentFlowDbContext>().UseNpgsql(ConnectionString).Options;
 
         await using var db = new RentFlowDbContext(options);
+        await db.Database.EnsureDeletedAsync();
         await db.Database.MigrateAsync();
     }
 

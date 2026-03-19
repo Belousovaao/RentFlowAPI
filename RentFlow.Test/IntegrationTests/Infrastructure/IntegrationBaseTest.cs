@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RentFlow.Persistance;
 
@@ -24,7 +25,11 @@ public abstract class IntegrationBaseTest : IClassFixture<PostgreSqlContainerFix
     protected async Task<RentFlowDbContext> CreateDbContextAsync()
     {
 
-        var scope = _factory.Services.CreateScope();
-        return scope.ServiceProvider.GetRequiredService<RentFlowDbContext>();
+        var options = new DbContextOptionsBuilder<RentFlowDbContext>()
+            .UseNpgsql(Fixture.ConnectionString)
+            .Options;
+            
+        return new RentFlowDbContext(options);
+        
     }
 }
