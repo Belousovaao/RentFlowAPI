@@ -12,7 +12,7 @@ env:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    timeout-minures: 10
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
@@ -25,11 +25,11 @@ jobs:
 
       - name: Cache NuGet
         uses: actions/cache@v4
-          with:
-            path: ~/.nuget/packages
-            key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj')}}
-            restore-keys: |
-              nuget-${{ runner.os }}-
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj')}}
+          restore-keys: |
+            nuget-${{ runner.os }}-
 
       - name: Restore
         run: dotnet restore
