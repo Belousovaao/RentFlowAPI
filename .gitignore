@@ -1,0 +1,13 @@
+bin/
+obj/
+.vs/
+.vscode/
+.idea/
+logs/
+*.logs
+.env
+.env.*
+TestResults/
+*.nupkg
+packages/
+docker-data/

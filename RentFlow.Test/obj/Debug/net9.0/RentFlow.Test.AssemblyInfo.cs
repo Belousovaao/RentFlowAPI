@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RentFlow.Test")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+31a8a43f380ff566d31b378f93c37580d1eb76c7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f5832b9441eba93b570bfedf013c673b2dcde26c")]
 [assembly: System.Reflection.AssemblyProductAttribute("RentFlow.Test")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RentFlow.Test")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

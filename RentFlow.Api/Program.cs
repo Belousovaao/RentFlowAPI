@@ -12,7 +12,6 @@ using RentFlow.Application.Common.Behaviors;
 using RentFlow.Api.Middleware;
 using Serilog;
 using System.Reflection;
-using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 Log.Logger = new LoggerConfiguration()
@@ -75,11 +74,11 @@ builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
 
 app.UseMiddleware<CorrelationMiddleware>();
 app.UseMiddleware<ExceptionMiddleware>();
@@ -90,6 +89,26 @@ app.UseAuthorization();
 
 try
 {
+    using (var scope = app.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<RentFlowDbContext>();
+
+        var retries = 10;
+        while(retries > 0)
+        {
+            try
+            {
+                db.Database.Migrate();
+                break;
+            }
+            catch
+            {
+                retries--;
+                Thread.Sleep(2000);
+            }
+        }
+        db.Database.Migrate();
+    }
     app.MapControllers();
 }
 catch (ReflectionTypeLoadException ex)

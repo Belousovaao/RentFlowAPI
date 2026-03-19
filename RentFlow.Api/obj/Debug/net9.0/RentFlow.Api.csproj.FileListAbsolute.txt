@@ -161,3 +161,4 @@
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Api/obj/Debug/net9.0/RentFlow.Api.pdb
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Api/obj/Debug/net9.0/RentFlow.Api.genruntimeconfig.cache
 /Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Api/obj/Debug/net9.0/ref/RentFlow.Api.dll
+/Users/Anna/Desktop/C#/Repos-vscode/RentFlow_Version_1.0.1/RentFlow.Api/bin/Debug/net9.0/logs/log-20260319.json

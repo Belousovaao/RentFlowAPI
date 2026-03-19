@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+env: 
+  DOTNET_VERSION: "8.0.x"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minures: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+          with:
+            path: ~/.nuget/packages
+            key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj')}}
+            restore-keys: |
+              nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=test_results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: "**/*.trx"
+
+      
