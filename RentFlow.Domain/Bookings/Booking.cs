@@ -11,7 +11,7 @@ public class Booking
     public Guid Id { get; private set; }
     public Guid AssetId { get; private set; }
     public Guid CustomerId { get; private set; }
-    public RentalPeriod RentalPeriod { get; private set; }
+    public RentalPeriod RentalPeriod { get; private set; } = null!;
     public decimal TotalPrice { get; private set; }
     public BookingStatus Status { get; private set; }
     private readonly List<BookingRole> _roles = new List<BookingRole>();

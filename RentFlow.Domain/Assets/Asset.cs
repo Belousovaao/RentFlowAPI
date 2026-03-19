@@ -7,11 +7,11 @@ namespace RentFlow.Domain.Assets;
 public class Asset
 {
     public Guid Id { get; private set; }
-    public string Code { get; private set; }
-    public string BrandName { get; private set; }
-    public string Model { get; private set; }
-    public string ShortDescription { get; private set; }
-    public string FullDescription { get; private set; }
+    public string Code { get; private set; } = string.Empty;
+    public string BrandName { get; private set; } = string.Empty;
+    public string Model { get; private set; } = string.Empty;
+    public string ShortDescription { get; private set; } = string.Empty;
+    public string FullDescription { get; private set; } = string.Empty;
 
     public AssetType Type { get; private set; }
     public AssetCategory Category { get; private set; }

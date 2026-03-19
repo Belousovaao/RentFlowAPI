@@ -12,14 +12,8 @@ public record PersonName
 
     public PersonName(string firstName, string lastName, string? middleName)
     {
-        if (string.IsNullOrWhiteSpace(firstName))
-            throw new ArgumentException("First name required");
-
-        if (string.IsNullOrWhiteSpace(lastName))
-            throw new ArgumentException("Last name required");
-
-        FirstName = firstName.Trim();
-        LastName = lastName.Trim();
+        FirstName = firstName.Trim() ?? throw new ArgumentException("First name required");
+        LastName = lastName.Trim() ?? throw new ArgumentException("Last name required");
         MiddleName = string.IsNullOrWhiteSpace(middleName)
             ? null
             : middleName.Trim();
