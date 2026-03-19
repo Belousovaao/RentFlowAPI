@@ -28,13 +28,6 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 services.Remove(descriptor);
 
             services.AddDbContext<RentFlowDbContext>(options => options.UseNpgsql(_connectionString));
-
-            var serviceProvider = services.BuildServiceProvider();
-
-            using var scope = serviceProvider.CreateScope();
-            var db = serviceProvider.GetRequiredService<RentFlowDbContext>();
-            db.Database.Migrate();
-            
         });
     }
 
