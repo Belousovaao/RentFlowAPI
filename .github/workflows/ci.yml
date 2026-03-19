@@ -39,6 +39,8 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=test_results.trx"
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
 
       - name: Upload test results
         if: always()

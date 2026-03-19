@@ -17,7 +17,7 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Testing");
+        builder.UseEnvironment("Development");
 
         builder.ConfigureServices(services => 
         {
@@ -28,7 +28,19 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 services.Remove(descriptor);
 
             services.AddDbContext<RentFlowDbContext>(options => options.UseNpgsql(_connectionString));
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            using var scope = serviceProvider.CreateScope();
+            var db = serviceProvider.GetRequiredService<RentFlowDbContext>();
+            db.Database.Migrate();
+            
         });
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
     }
 
 }
