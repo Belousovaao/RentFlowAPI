@@ -89,14 +89,19 @@ app.UseAuthorization();
 
 try
 {
-    if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
+    if (!app.Environment.IsEnvironment("Testing"))
+{
+    using (var scope = app.Services.CreateScope())
     {
-        using (var scope = app.Services.CreateScope())
+        var db = scope.ServiceProvider.GetRequiredService<RentFlowDbContext>();
+        
+        // Применяем миграции только если БД не создана
+        if (!db.Database.GetAppliedMigrations().Any())
         {
-            var db = scope.ServiceProvider.GetRequiredService<RentFlowDbContext>();
             db.Database.Migrate();
         }
     }
+}
     app.MapControllers();
 }
 catch (ReflectionTypeLoadException ex)
