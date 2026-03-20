@@ -80,38 +80,20 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+if (!app.Environment.IsEnvironment("Testing"))
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<RentFlowDbContext>();
+    db.Database.Migrate();
+}
+
 app.UseMiddleware<CorrelationMiddleware>();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
-try
-{
-    if (!app.Environment.IsEnvironment("Testing"))
-{
-    using (var scope = app.Services.CreateScope())
-    {
-        var db = scope.ServiceProvider.GetRequiredService<RentFlowDbContext>();
-        
-        // Применяем миграции только если БД не создана
-        if (!db.Database.GetAppliedMigrations().Any())
-        {
-            db.Database.Migrate();
-        }
-    }
-}
-    app.MapControllers();
-}
-catch (ReflectionTypeLoadException ex)
-{
-    foreach(var loaderException in ex.LoaderExceptions)
-    {
-        Console.WriteLine(loaderException);
-    }
-    throw;
-}
+app.MapControllers();
 
 app.Run();
 

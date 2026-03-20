@@ -2,11 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: ["main", "develop"]
   pull_request:
-    branches: [ "main", "develop" ]
+    branches: ["main", "develop"]
 
-env: 
+env:
   DOTNET_VERSION: "8.0.x"
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj')}}
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
           restore-keys: |
             nuget-${{ runner.os }}-
 
@@ -39,8 +39,6 @@ jobs:
 
       - name: Test
         run: dotnet test --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=test_results.trx"
-        env:
-          ASPNETCORE_ENVIRONMENT: Development
 
       - name: Upload test results
         if: always()
@@ -48,5 +46,3 @@ jobs:
         with:
           name: test-results
           path: "**/*.trx"
-
-      
