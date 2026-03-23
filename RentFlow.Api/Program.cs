@@ -11,7 +11,6 @@ using MediatR;
 using RentFlow.Application.Common.Behaviors;
 using RentFlow.Api.Middleware;
 using Serilog;
-using System.Reflection;
 using System.Text.Json;
 
 Log.Logger = new LoggerConfiguration()

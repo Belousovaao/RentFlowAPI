@@ -1,6 +1,6 @@
-using System;
-using System.Globalization;
 using RentFlow.Application.Bookings.Dtos;
+using MediatR;
+using RentFlow.Domain.Bookings;
 
 namespace RentFlow.Application.Bookings.Commands;
 public sealed record CreateBookingCommand(
@@ -9,4 +9,4 @@ public sealed record CreateBookingCommand(
     DateTime StartDate,
     DateTime EndDate,
     DriverDto? Driver
-);
+) : IRequest<Booking>;

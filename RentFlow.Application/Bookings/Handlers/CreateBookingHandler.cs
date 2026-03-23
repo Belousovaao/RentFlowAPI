@@ -1,18 +1,16 @@
-using System;
-using System.Data;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using RentFlow.Application.Bookings.Commands;
 using RentFlow.Application.Common.Exceptions;
 using RentFlow.Application.Interfaces;
 using RentFlow.Domain.Assets;
 using RentFlow.Domain.Bookings;
-using RentFlow.Domain.Bookings.Snapshots;
 using RentFlow.Domain.Common;
 using RentFlow.Domain.Customers;
 
 namespace RentFlow.Application.Bookings.Handlers;
 
-public class CreateBookingHandler
+public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Booking>
 {
     private readonly IBookingRepository _bookings;
     private readonly IUnitOfWork _uow;

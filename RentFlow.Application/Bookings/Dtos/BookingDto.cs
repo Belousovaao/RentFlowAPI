@@ -1,14 +1,13 @@
 using System;
+using RentFlow.Domain.Bookings;
 
 namespace RentFlow.Application.Bookings.Dtos;
 
-public class BookingDto
-{
-    public Guid Id { get; set; }
-    public string AssetName { get; set; }
-    public string CustomerName { get; set; }
-    public DateTime StartDate { get; set; }
-    public DateTime EndDate { get; set; }
-    public decimal TotalPrice { get; set; }
-    public string Status { get; set; }
-}
+public sealed record BookingDto(
+    Guid Id,
+    Guid AssetId,
+    Guid CustomerId,
+    RentalPeriod RentalPeriod,
+    decimal TotalPrice,
+    BookingStatus Status
+);

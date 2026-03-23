@@ -1,7 +1,6 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using RentFlow.Application.Interfaces;
 using RentFlow.Application.Assets.Queries;
+using MediatR;
 
 namespace RentFlow.Api.Controllers
 {
@@ -9,24 +8,23 @@ namespace RentFlow.Api.Controllers
     [Route("api/assets")]
     public class AssetsController : ControllerBase
     {
-        private readonly IAssetRepository _repo;
+        private readonly IMediator _mediator;
 
-        public AssetsController(IAssetRepository repo)
+        public AssetsController (IMediator mediator)
         {
-            _repo = repo;
+            _mediator = mediator;
         }
-
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] AssetFilter filter, CancellationToken ct)
         {
-            var result = await _repo.SearchAsync(filter, ct);
+            var result = await _mediator.Send(new SearchAssetsQuery(filter), ct);
             return Ok(result);
         }
 
         [HttpGet("{code}")]
         public async Task<IActionResult> GetByCode(string code, CancellationToken ct)
         {
-            var asset = await _repo.GetByCodeAsync(code, ct);
+            var asset = await _mediator.Send(new GetAssetByCodeQuery(code), ct);
             if (asset == null)
                 return NotFound();
 

@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RentFlow.Application.Interfaces;
-using RentFlow.Domain.Bookings;
 using RentFlow.Application.Bookings.Commands;
-using RentFlow.Application.Bookings.Handlers;
+using MediatR;
+using RentFlow.Application.Bookings.Queries;
 
 namespace RentFlow.Api.Controllers
 {
@@ -11,26 +10,24 @@ namespace RentFlow.Api.Controllers
     [ApiController]
     public class BookingController : ControllerBase
     {
-        private readonly IBookingRepository _repo;
-        private readonly CreateBookingHandler _handler;
+        private readonly IMediator _mediator;
 
-        public BookingController(IBookingRepository repo, CreateBookingHandler handler)
+        public BookingController(IMediator mediator)
         {
-            _repo = repo;
-            _handler = handler;
+            _mediator = mediator;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var bookings = await _repo.GetAllAsync();
+            var bookings = await _mediator.Send(new GetBookingsQuery());
             return Ok(bookings);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateBookingCommand cmd, CancellationToken ct)
         {
-            Booking booking = await _handler.Handle(cmd, ct);
+            var booking = await _mediator.Send(cmd, ct);
             return CreatedAtAction(nameof(Create), booking);
         }
     }
