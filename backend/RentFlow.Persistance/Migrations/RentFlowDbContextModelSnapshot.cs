@@ -29,9 +29,14 @@ namespace RentFlow.Persistance.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("BrandName")
+                    b.Property<string>("Acceleration")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<string>("BrandName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<bool>("CanDeliver")
                         .HasColumnType("boolean");
@@ -41,7 +46,13 @@ namespace RentFlow.Persistance.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<decimal>("DailyPrice")
                         .HasColumnType("numeric");
@@ -52,16 +63,46 @@ namespace RentFlow.Persistance.Migrations
                     b.Property<decimal?>("Deposit")
                         .HasColumnType("numeric");
 
+                    b.Property<int>("Doors")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DriveType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Engine")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Features")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("FuelType")
+                        .HasColumnType("integer");
+
                     b.Property<string>("FullDescription")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("Horsepower")
+                        .HasColumnType("integer");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double precision");
+
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uuid");
 
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double precision");
+
                     b.Property<string>("Model")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<int>("Seats")
+                        .HasColumnType("integer");
 
                     b.Property<string>("ShortDescription")
                         .IsRequired()
@@ -70,32 +111,30 @@ namespace RentFlow.Persistance.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
+                    b.Property<int>("TopSpeed")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Transmission")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Year")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Assets");
-                });
+                    b.HasIndex("Code")
+                        .IsUnique();
 
-            modelBuilder.Entity("RentFlow.Domain.Assets.AssetPhoto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                    b.HasIndex("DailyPrice");
 
-                    b.Property<Guid>("AssetId")
-                        .HasColumnType("uuid");
+                    b.HasIndex("LocationId");
 
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.HasIndex("Status");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssetId");
-
-                    b.ToTable("AssetPhotos");
+                    b.ToTable("Assets", (string)null);
                 });
 
             modelBuilder.Entity("RentFlow.Domain.Bookings.Booking", b =>
@@ -120,6 +159,8 @@ namespace RentFlow.Persistance.Migrations
                         .HasColumnType("numeric");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AssetId");
 
                     b.HasIndex("SignatoryId")
                         .IsUnique();
@@ -201,7 +242,40 @@ namespace RentFlow.Persistance.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<double?>("Latitude")
+                        .HasColumnType("double precision");
+
+                    b.Property<double?>("Longitude")
+                        .HasColumnType("double precision");
+
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PostalCode")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -293,17 +367,43 @@ namespace RentFlow.Persistance.Migrations
                     b.HasDiscriminator().HasValue(3);
                 });
 
-            modelBuilder.Entity("RentFlow.Domain.Assets.AssetPhoto", b =>
+            modelBuilder.Entity("RentFlow.Domain.Assets.Asset", b =>
                 {
-                    b.HasOne("RentFlow.Domain.Assets.Asset", null)
-                        .WithMany("Photos")
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.OwnsMany("RentFlow.Domain.Assets.AssetPhoto", "Photos", b1 =>
+                        {
+                            b1.Property<Guid>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("AssetId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Url")
+                                .IsRequired()
+                                .HasMaxLength(500)
+                                .HasColumnType("character varying(500)");
+
+                            b1.HasKey("Id");
+
+                            b1.HasIndex("AssetId");
+
+                            b1.ToTable("AssetPhotos");
+
+                            b1.WithOwner()
+                                .HasForeignKey("AssetId");
+                        });
+
+                    b.Navigation("Photos");
                 });
 
             modelBuilder.Entity("RentFlow.Domain.Bookings.Booking", b =>
                 {
+                    b.HasOne("RentFlow.Domain.Assets.Asset", null)
+                        .WithMany("Bookings")
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("RentFlow.Domain.Bookings.BookingRole", "Signatory")
                         .WithOne()
                         .HasForeignKey("RentFlow.Domain.Bookings.Booking", "SignatoryId")
@@ -938,7 +1038,7 @@ namespace RentFlow.Persistance.Migrations
 
             modelBuilder.Entity("RentFlow.Domain.Assets.Asset", b =>
                 {
-                    b.Navigation("Photos");
+                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("RentFlow.Domain.Bookings.Booking", b =>

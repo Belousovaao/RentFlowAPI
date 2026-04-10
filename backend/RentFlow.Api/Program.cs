@@ -12,7 +12,7 @@ using RentFlow.Application.Common.Behaviors;
 using RentFlow.Api.Middleware;
 using Serilog;
 using System.Text.Json;
-using System.Diagnostics;
+using RentFlow.Infrastructure.Persistence.Repositories;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -53,6 +53,7 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavi
 builder.Services.AddScoped<IAssetRepository, AssetRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 builder.Services.AddScoped<CreateBookingHandler>();
 
@@ -80,7 +81,8 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins(allowedOrigins!)
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 

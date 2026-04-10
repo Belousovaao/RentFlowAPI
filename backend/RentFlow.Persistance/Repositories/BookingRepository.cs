@@ -38,4 +38,53 @@ public class BookingRepository : IBookingRepository
             b.RentalPeriod.EndDate > period.StartDate)
             .ToListAsync(ct);
     }
+
+    public async Task<IReadOnlyList<Guid>> GetBookedAssetIdsAsync(
+        IEnumerable<Guid> assetIds, 
+        DateTime startDate, 
+        DateTime endDate, 
+        CancellationToken ct = default)
+    {
+        // Получаем бронирования, которые пересекаются с указанным периодом
+        var bookings = await _db.Bookings
+            .Where(b => assetIds.Contains(b.AssetId))
+            .Where(b => b.Status != BookingStatus.Cancelled) // Исключаем отмененные
+            .Where(b => b.RentalPeriod.StartDate < endDate && b.RentalPeriod.EndDate > startDate) // Пересечение периодов
+            .Select(b => b.AssetId)
+            .Distinct()
+            .ToListAsync(ct);
+
+        return bookings;
+    }
+
+    public async Task<bool> IsAssetAvailableAsync(
+        Guid assetId, 
+        DateTime startDate, 
+        DateTime endDate, 
+        CancellationToken ct = default)
+    {
+        // Проверяем, есть ли активные бронирования на этот период
+        var hasConflictingBooking = await _db.Bookings
+            .AnyAsync(b => 
+                b.AssetId == assetId &&
+                b.Status != BookingStatus.Cancelled &&
+                b.RentalPeriod.StartDate < endDate && 
+                b.RentalPeriod.EndDate > startDate,
+                ct);
+
+        return !hasConflictingBooking;
+    }
+
+    public async Task<IReadOnlyList<Booking>> GetBookingsForAssetAsync(
+        Guid assetId, 
+        DateTime startDate, 
+        DateTime endDate, 
+        CancellationToken ct = default)
+    {
+        return await _db.Bookings
+            .Where(b => b.AssetId == assetId)
+            .Where(b => b.Status != BookingStatus.Cancelled)
+            .Where(b => b.RentalPeriod.StartDate < endDate && b.RentalPeriod.EndDate > startDate)
+            .ToListAsync(ct);
+    }
 }

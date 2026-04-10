@@ -8,6 +8,7 @@ using RentFlow.Application.Bookings.Commands;
 using RentFlow.Domain.Bookings;
 using FluentAssertions;
 using RentFlow.Domain.Common;
+using RentFlow.Test.IntegrationTests.Builders;
 
 namespace RentFlow.Test;
 
@@ -34,60 +35,7 @@ public class CreateBookingCommandTests
     [Fact]
     public async Task Should_Create_Booing_If_Data_Is_Valid()
     {
-        Asset asset = Asset.Create(
-            code: "BOYUE-276",
-            brandName: "Geely",
-            model: "Cityray",
-            shortDescription: "Cерый, передний привод, АКПП, Бензин 1,5Т, 174 л.с.",
-            fullDescription: "Основные характеристики:\n" +
-                "Раб. объем двиг., см³│ 5 663\n" +
-                "Тип двигателя        │ Бенз., V8\n" +
-                "Максимальная мощность│ 367 л.с.\n" +
-                "Коробка передач      │ авт., 6 передач\n" +
-                "Тип привода          │ полный (4WD)\n" +
-                "Передняя подвеска    │ Независимая пневма\n" +
-                "Задняя подвеска      │ Зависимая пневма\n" +
-                "Тормозные механизмы  │ дисковые\n" +
-                "Расход в городе      │ 19,6 л/100 км\n" +
-                "Расход по трассе     │ 13,7 л/100 км\n" +
-                "Расход смешанный     │ 14,8 л/100 км\n" +
-                "Максимальная скорость│ 220 км/ч\n" +
-                "Разгон 0-100 км/ч    │ 7,5 с.\n" +
-                "Объем топливного бака│ 110 л\n" +
-                "Руль                 | Левый\n" +
-                "Экологический класс  │ 4\n" +
-                "Экстерьер, интерьер, доп. опции:\n\n" +
-                "•Люк\n" +
-                "•Обивка сидений кожей в коричневом цвете\n" +
-                "•Подогрев передних и задних сидений\n" +
-                "•Подогрев лобового стекла\n" +
-                "•Подогрев руля\n" +
-                "•Вентиляция передних сидений\n" +
-                "•4-х зонный климат-контроль\n" +
-                "•Мультифункциональное рулевое колесо с гидроусилителем\n" +
-                "•Сиденье водителя с электрорегулировкой в 10 направлениях\n" +
-                "•Сиденье переднего пассажира с электрорегулировкой в 8 направлениях\n" +
-                "•Память положения сидения водителя в 2-х вариантах\n" +
-                "•Наружные зеркала заднего вида с электрорегулировкой, подогревом и электроприводом складывания\n" +
-                "•Подстаканники в центральной консоли\n" +
-                "•Задний подлокотник с подстаканниками\n" +
-                "•Система старт/стоп\n" +
-                "•Система интеллектуального управления дальним светом фар (IHBC)\n" +
-                "•Бесключевой доступ со стороны двери водителя и переднего пассажира\n" +
-                "•Система мониторинга давления в шинах (TPMS)\n" +
-                "•Электропривод двери багажника\n\n" +
-                "<b>Безопасность:</b>\n\n" +
-                "•Круиз-контроль (ACC)\n" +
-                "•Камера заднего вида\n" +
-                "•Задние и передние датчики парковки\n",
-            type: AssetType.Auto,
-            category: AssetCategory.Crossover,
-            dailyPrice: 6000,
-            deposit: 10000,
-            locationId: Guid.NewGuid(),
-            canDeliver: true,
-            deliveryPrice: 2000
-        );
+        Asset asset = new AssetBuilder().Build();
 
         asset.AddPhoto("https://freeimage.host/i/fHyQffe");
 
@@ -132,19 +80,7 @@ public class CreateBookingCommandTests
     [Fact]
     public async Task Should_Throw_When_Customer_Not_Found()
     {
-        Asset asset = Asset.Create(
-                code: "BOYUE-276",
-                brandName: "Geely",
-                model: "Cityray",
-                shortDescription: "Cерый, передний привод, АКПП, Бензин 1,5Т, 174 л.с.",
-                fullDescription: "Основные характеристики:\n",
-                type: AssetType.Auto,
-                category: AssetCategory.Crossover,
-                dailyPrice: 6000,
-                deposit: 10000,
-                locationId: Guid.NewGuid(),
-                canDeliver: true,
-                deliveryPrice: 2000);
+        Asset asset = new AssetBuilder().Build();
         _assetRepo.Setup(x => x.GetByIdAsync(asset.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(asset);
         _customerRepo.Setup(x => x.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
@@ -160,19 +96,7 @@ public class CreateBookingCommandTests
     [Fact]
     public async Task Should_Throw_When_Overlapping_Exists()
     {
-        Asset asset = Asset.Create(
-                code: "BOYUE-276",
-                brandName: "Geely",
-                model: "Cityray",
-                shortDescription: "Cерый, передний привод, АКПП, Бензин 1,5Т, 174 л.с.",
-                fullDescription: "Основные характеристики:\n",
-                type: AssetType.Auto,
-                category: AssetCategory.Crossover,
-                dailyPrice: 6000,
-                deposit: 10000,
-                locationId: Guid.NewGuid(),
-                canDeliver: true,
-                deliveryPrice: 2000);
+        Asset asset = new AssetBuilder().Build();
 
         _assetRepo.Setup(x => x.GetByIdAsync(asset.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(asset);
@@ -206,20 +130,7 @@ public class CreateBookingCommandTests
     [Fact]
     public void Should_Throw_When_RentalPeriod_Is_Invalid()
     {
-        Asset asset = Asset.Create(
-            code: "BOYUE-276",
-            brandName: "Geely",
-            model: "Cityray",
-            shortDescription: "Cерый, передний привод, АКПП, Бензин 1,5Т, 174 л.с.",
-            fullDescription: "Основные характеристики:\n",
-            type: AssetType.Auto,
-            category: AssetCategory.Crossover,
-            dailyPrice: 6000,
-            deposit: 10000,
-            locationId: Guid.NewGuid(),
-            canDeliver: true,
-            deliveryPrice: 2000
-        );
+        Asset asset = new AssetBuilder().Build();
 
         asset.AddPhoto("https://freeimage.host/i/fHyQffe");
 
