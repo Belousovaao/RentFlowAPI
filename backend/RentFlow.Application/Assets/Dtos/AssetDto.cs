@@ -32,9 +32,12 @@ public sealed record AssetDto(
     double? Latitude,
     double? Longitude,
     double? DistanceFromUser,
-    IReadOnlyList<string> Photos,
-    bool IsAvailable
+    List<PhotoDto> Photos,
+    List<PhotoDto> ExteriorPhotos,
+    List<PhotoDto> InteriorPhotos
 );
+
+public record PhotoDto(Guid Id, string Url, string Type, int Order);
 
 public sealed record AssetSpecificationsDto(
     string Engine,

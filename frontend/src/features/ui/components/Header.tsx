@@ -1,23 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useUIStore } from '../stores/uiStore';
 import { useI18n } from '../../../app/providers/I18nProvider';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './ThemeToggle';
+import { useAuthStore } from '@/features/auth/stores/authStore';
+import { AuthModal } from '@/features/auth/components/AuthModal';
+import { UserMenu } from '@/features/auth/components/UserMenu';
 
 export const Header = () => {
-    const [isScrolled, setIsScrolled] = useState(false);
+    const [authOpen, setAuthOpen] = useState(false);
+    const { isAuthenticated } = useAuthStore();
     const { isHeaderVisible } = useUIStore();
     const { t, language } = useI18n();
     const location = useLocation();
-    
-    useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 50);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
     
     const navigation = [
         { name: t('nav.exploreCars'), href: '/assets' },
@@ -42,11 +38,11 @@ export const Header = () => {
                         bg-white/40 dark:bg-gray-900/50 backdrop-blur-xl
                         shadow-2xl border-b-0 border-gray-200/50 dark:border-gray-700/50`}
         >
-            <nav className="container mx-auto px-4 h-20 flex items-center justify-between">
+            <nav className="w-full px-2 sm:px-4 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
                 <Link to="/" className="flex-shrink-0">
                     <img 
                             src={getLogoByLanguage()} 
-                            alt="RentFlow"
+                            alt={t('common.name')}
                             className="h-12 w-auto"
                             onError={(e) => {
                                 // Если картинка не загрузилась, показываем текст
@@ -59,7 +55,7 @@ export const Header = () => {
                         />
                 </Link>
                 
-                <div className="hidden md:flex items-center space-x-8">
+                <div className="hidden md:flex items-center space-x-3 lg:space-x-6">
                     {navigation.map((item) => (
                         <Link
                             key={item.name}
@@ -79,12 +75,21 @@ export const Header = () => {
                     <LanguageSwitcher />
                     <ThemeToggle />
                     
-                    <button className="px-4 py-2 bg-primary-600 text-white rounded-lg 
-                                     hover:bg-primary-700 transition-colors whitespace-nowrap">
-                        {t('nav.signIn')}
-                    </button>
+                    {isAuthenticated ? (
+                        <UserMenu />
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={() => setAuthOpen(true)}
+                            className="px-2 sm:px-4 py-1.5 sm:py-2 bg-primary-600 text-white rounded-lg 
+                                     hover:bg-primary-700 transition-colors whitespace-nowrap"
+                        >
+                            {t('nav.signIn')}
+                        </button>
+                    )}
                 </div>
             </nav>
+            <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
         </header>
     );
 };

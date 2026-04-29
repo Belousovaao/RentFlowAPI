@@ -137,6 +137,33 @@ namespace RentFlow.Persistance.Migrations
                     b.ToTable("Assets", (string)null);
                 });
 
+            modelBuilder.Entity("RentFlow.Domain.Assets.AssetPhoto", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssetId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId");
+
+                    b.ToTable("AssetPhotos", (string)null);
+                });
+
             modelBuilder.Entity("RentFlow.Domain.Bookings.Booking", b =>
                 {
                     b.Property<Guid>("Id")
@@ -367,33 +394,13 @@ namespace RentFlow.Persistance.Migrations
                     b.HasDiscriminator().HasValue(3);
                 });
 
-            modelBuilder.Entity("RentFlow.Domain.Assets.Asset", b =>
+            modelBuilder.Entity("RentFlow.Domain.Assets.AssetPhoto", b =>
                 {
-                    b.OwnsMany("RentFlow.Domain.Assets.AssetPhoto", "Photos", b1 =>
-                        {
-                            b1.Property<Guid>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("uuid");
-
-                            b1.Property<Guid>("AssetId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("Url")
-                                .IsRequired()
-                                .HasMaxLength(500)
-                                .HasColumnType("character varying(500)");
-
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("AssetId");
-
-                            b1.ToTable("AssetPhotos");
-
-                            b1.WithOwner()
-                                .HasForeignKey("AssetId");
-                        });
-
-                    b.Navigation("Photos");
+                    b.HasOne("RentFlow.Domain.Assets.Asset", null)
+                        .WithMany("Photos")
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("RentFlow.Domain.Bookings.Booking", b =>
@@ -1039,6 +1046,8 @@ namespace RentFlow.Persistance.Migrations
             modelBuilder.Entity("RentFlow.Domain.Assets.Asset", b =>
                 {
                     b.Navigation("Bookings");
+
+                    b.Navigation("Photos");
                 });
 
             modelBuilder.Entity("RentFlow.Domain.Bookings.Booking", b =>

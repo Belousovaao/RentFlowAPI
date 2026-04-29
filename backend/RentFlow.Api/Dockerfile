@@ -8,7 +8,7 @@ WORKDIR /src
 
 COPY . .
 
-RUN dotnet restore
+RUN dotnet restore RentFlow.Api/RentFlow.Api.csproj
 RUN dotnet publish RentFlow.Api/RentFlow.Api.csproj -c Release -o /app/publish
 
 # Stage 2: runtime

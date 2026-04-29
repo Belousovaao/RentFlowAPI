@@ -1,4 +1,5 @@
 import { DateRangePicker } from '../../booking/components/DateRangePicker';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 interface DateFilterProps {
     startDate: Date | null;
@@ -7,13 +8,14 @@ interface DateFilterProps {
 }
 
 export const DateFilter = ({ startDate, endDate, onChange }: DateFilterProps) => {
+    const { t } = useI18n();
     return (
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 mb-6">
             <div className="flex items-center gap-4 flex-wrap">
                 <div className="flex items-center gap-2">
                     <span className="text-gray-600 dark:text-gray-300">📅</span>
                     <span className="font-medium text-gray-700 dark:text-gray-300">
-                        Период аренды:
+                        {t('booking.selectDates')}
                     </span>
                 </div>
                 <div className="w-80">
@@ -28,7 +30,7 @@ export const DateFilter = ({ startDate, endDate, onChange }: DateFilterProps) =>
                         onClick={() => onChange(null, null)}
                         className="text-sm text-gray-500 hover:text-primary-600 transition-colors"
                     >
-                        Очистить
+                        {t('booking.reset')}
                     </button>
                 )}
             </div>

@@ -9,12 +9,12 @@ namespace RentFlow.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class BookingController : ControllerBase
+    public class CustomerController : ControllerBase
     {
         private readonly IBookingRepository _repo;
         private readonly CreateBookingHandler _handler;
 
-        public BookingController(IBookingRepository repo, CreateBookingHandler handler)
+        public CustomerController(IBookingRepository repo, CreateBookingHandler handler)
         {
             _repo = repo;
             _handler = handler;

@@ -93,30 +93,6 @@ export const Benefits = () => {
                         </motion.div>
                     ))}
                 </div>
-
-                {/* Статистика */}
-                {/* <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-                        <div>
-                            <p className="text-3xl md:text-4xl font-bold text-primary-600 mb-2">
-                                500+
-                            </p>
-                            <p className="text-gray-600 dark:text-gray-300">Luxury Vehicles</p>
-                        </div>
-                        <div>
-                            <p className="text-3xl md:text-4xl font-bold text-primary-600 mb-2">
-                                10k+
-                            </p>
-                            <p className="text-gray-600 dark:text-gray-300">Happy Customers</p>
-                        </div>
-                        <div>
-                            <p className="text-3xl md:text-4xl font-bold text-primary-600 mb-2">
-                                24/7
-                            </p>
-                            <p className="text-gray-600 dark:text-gray-300">Customer Support</p>
-                        </div>
-                    </div>
-                </div> */}
             </div>
         </section>
     );

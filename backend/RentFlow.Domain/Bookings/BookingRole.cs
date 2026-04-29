@@ -21,5 +21,6 @@ public class BookingRole
 public enum BookingRoleType
 {
     Signatory,
-    ContactPerson
+    ContactPerson,
+    Admin
 }

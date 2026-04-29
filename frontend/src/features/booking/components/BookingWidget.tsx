@@ -1,5 +1,5 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
+import { useRef, useState } from 'react';
 import { useBookingStore } from '../stores/bookingStore';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 import { DateRangePicker } from './DateRangePicker';
@@ -9,6 +9,7 @@ import { Button } from '@/features/ui/components/Button';
 import type { Asset } from '@/entities/asset/asset.types';
 import { useI18n } from '@/app/providers/I18nProvider';
 import { formatPrice } from '@/shared/utils/formatters';
+import { useAuthModalStore } from '@/features/auth/stores/authModalStore';
 
 interface DateRange {
     start: Date | null;
@@ -19,11 +20,12 @@ interface BookingWidgetProps {
     presetAsset?: Asset | null; 
 }
 
-export const BookingWidget = ({ presetAsset }: BookingWidgetProps) => {
+export const BookingWidget = ({ presetAsset, }: BookingWidgetProps) => {
     const [selectedAsset, setSelectedAsset] = useState<Asset | null>(presetAsset || null);
     const [dateRange, setDateRange] = useState<DateRange>({ start: null, end: null });
     const { setBookingDetails } = useBookingStore();
     const { isAuthenticated } = useAuthStore();
+    const { open: onOpenAuthModal } = useAuthModalStore(); 
 
     const widgetRef = useRef<HTMLDivElement>(null);
     
@@ -31,7 +33,7 @@ export const BookingWidget = ({ presetAsset }: BookingWidgetProps) => {
         // Проверяем, что все данные есть и пользователь авторизован
         if (!isAuthenticated) {
             // Открыть модалку авторизации
-            console.log('Please login first');
+            onOpenAuthModal();
             return;
         }
         

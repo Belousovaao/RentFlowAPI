@@ -57,6 +57,9 @@ public sealed class SearchAssetsHandler : IRequestHandler<SearchAssetsQuery, Pag
         var dtos = new List<AssetDto>();
         foreach (var asset in pagedAssets)
         {
+            var exteriorPhotos = asset.GetExteriorPhotos().Select(p => new PhotoDto(p.Id, p.Url, "exterior", p.Order)).ToList();
+            var interiorPhotos = asset.GetInteriorPhotos().Select(p => new PhotoDto(p.Id, p.Url, "interior", p.Order)).ToList();
+            var allPhotos = asset.Photos.Select(p => new PhotoDto(p.Id, p.Url, p.Type.ToString().ToLower(), p.Order)).ToList();
             var location = locationDict.GetValueOrDefault(asset.LocationId);
             var distance = CalculateDistance(
                 filter.Latitude, filter.Longitude,
@@ -105,9 +108,10 @@ public sealed class SearchAssetsHandler : IRequestHandler<SearchAssetsQuery, Pag
                 location?.Name ?? "Unknown Location",
                 asset.Latitude,
                 asset.Longitude,
-                distance,
-                photos,
-                isAvailable
+                null,
+                allPhotos,
+                exteriorPhotos,
+                interiorPhotos
             ));
         }
         

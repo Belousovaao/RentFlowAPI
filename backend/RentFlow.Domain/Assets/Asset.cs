@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using RentFlow.Domain.Bookings;
 using RentFlow.Domain.Locations;
 
@@ -39,7 +40,7 @@ public class Asset
     public double? Latitude { get; private set; }
     public double? Longitude { get; private set; }
 
-    public AssetStatus Status { get; private set; }
+    public AssetStatus Status { get; set; }
 
     private readonly List<AssetPhoto> _photos = new();
     public IReadOnlyCollection<AssetPhoto> Photos => _photos;
@@ -106,9 +107,12 @@ public class Asset
 
         if (canDeliver && deliveryPrice is null)
             throw new ArgumentException("DeliveryPrice required id delivery is able");
+        
+        Console.WriteLine($"Asset constructor - BEFORE: Code = {code}");
             
         Id = Guid.NewGuid();
         Code = code;
+        Console.WriteLine($"Asset constructor - AFTER: Code = {Code}");
         BrandName = brandName;
         Model = model;
         ShortDescription = shortDescription;
@@ -172,13 +176,43 @@ public class Asset
             locationId, canDeliver, deliveryPrice, latitude, longitude);
     }
 
-        public void AddPhoto(string url)
+    public void UpdateBasicInfo(
+    string brandName,
+    string model,
+    int year,
+    decimal dailyPrice,
+    FuelType fuelType,
+    TransmissionType transmission,
+    DriveType driveType,
+    int seats,
+    int horsepower,
+    AssetStatus status)
+    {
+        BrandName = brandName;
+        Model = model;
+        Year = year;
+        DailyPrice = dailyPrice;
+        FuelType = fuelType;
+        Transmission = transmission;
+        DriveType = driveType;
+        Seats = seats;
+        Horsepower = horsepower;
+        Status = status;
+    }
+
+    public void AddPhoto(string url, PhotoType type, int order = 0)
     {
         if (string.IsNullOrWhiteSpace(url))
             throw new ArgumentException("Photo url required");
-
-        _photos.Add(new AssetPhoto(Id, url));
+        
+        _photos.Add(new AssetPhoto(Id, url, type, order));
     }
+
+    public IReadOnlyCollection<AssetPhoto> GetExteriorPhotos() 
+        => _photos.Where(p => p.Type == PhotoType.Exterior).OrderBy(p => p.Order).ToList();
+    
+    public IReadOnlyCollection<AssetPhoto> GetInteriorPhotos() 
+        => _photos.Where(p => p.Type == PhotoType.Interior).OrderBy(p => p.Order).ToList();
 
     public void UpdateStatus(AssetStatus newStatus)
     {

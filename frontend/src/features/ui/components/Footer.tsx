@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useI18n } from '../../../app/providers/I18nProvider';
 import { motion } from 'framer-motion';
-import { Instagram, Send, Phone, Mail, PhoneIncoming, MapPin, MessageCircle} from 'lucide-react';
+import { Instagram, Mail, PhoneIncoming, MapPin, MessageCircle} from 'lucide-react';
 import { BsTelegram, BsWhatsapp } from 'react-icons/bs';
 
 export const Footer = () => {

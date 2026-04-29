@@ -1,4 +1,4 @@
-import { differenceInDays, isAfter, isBefore, isValid } from 'date-fns';
+import { differenceInDays, isAfter, isValid } from 'date-fns';
 
 export const calculateTotalPrice = (
     dailyPrice: number,

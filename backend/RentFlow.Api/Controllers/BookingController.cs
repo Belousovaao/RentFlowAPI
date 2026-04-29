@@ -3,6 +3,7 @@ using RentFlow.Application.Interfaces;
 using RentFlow.Application.Bookings.Commands;
 using MediatR;
 using RentFlow.Application.Bookings.Queries;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RentFlow.Api.Controllers
 {
@@ -22,6 +23,14 @@ namespace RentFlow.Api.Controllers
         {
             var bookings = await _mediator.Send(new GetBookingsQuery());
             return Ok(bookings);
+        }
+
+        [Authorize(Roles = "admin")]
+        [HttpPost("admin")]
+        public async Task<IActionResult> CreateByAdmin([FromBody] CreateBookingCommand cmd, CancellationToken ct)
+        {
+            var booking = await _mediator.Send(cmd, ct);
+            return Ok(booking);
         }
 
         [HttpPost]

@@ -1,33 +1,45 @@
-// frontend/src/features/auth/stores/authStore.ts
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-
-interface User {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    role: 'user' | 'admin';
-}
+import type { User } from '../types';
+import type { EmailRegisterPayload, PhoneRegisterPayload } from '../types';
+import { normalizePhone } from '../validation';
 
 interface AuthState {
     user: User | null;
     token: string | null;
     isAuthenticated: boolean;
     isLoading: boolean;
-    
-    login: (email: string, password: string) => Promise<void>;
+
+    /** Демо: «отправка» SMS — в проде заменить на API */
+    loginWithEmail: (email: string, password: string) => Promise<void>;
+    registerWithEmail: (data: EmailRegisterPayload) => Promise<void>;
+    sendSmsCode: (phone: string) => Promise<void>;
+    loginWithPhone: (phone: string, code: string) => Promise<void>;
+    registerWithPhone: (data: PhoneRegisterPayload) => Promise<void>;
+
     logout: () => void;
-    register: (userData: RegisterData) => Promise<void>;
     setUser: (user: User | null) => void;
     setToken: (token: string | null) => void;
 }
 
-interface RegisterData {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
+const ADMIN_EMAIL = 'admin@rentflow.local';
+const ADMIN_PASSWORD = 'admin123';
+const DEMO_SMS_CODE = '000000';
+const ADMIN_PHONE = '+79000000000';
+
+function mockToken(): string {
+    return `mock-jwt-${Date.now()}`;
+}
+
+function buildUser(partial: Partial<User> & Pick<User, 'id' | 'firstName' | 'lastName' | 'role'>): User {
+    return {
+        id: partial.id,
+        email: partial.email,
+        phone: partial.phone,
+        firstName: partial.firstName,
+        lastName: partial.lastName,
+        role: partial.role,
+    };
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -37,36 +49,124 @@ export const useAuthStore = create<AuthState>()(
             token: null,
             isAuthenticated: false,
             isLoading: false,
-            
-            login: async (email: string, password: string) => {
+
+            sendSmsCode: async (_phone: string) => {
                 set({ isLoading: true });
                 try {
-                    // Здесь будет реальный API запрос
-                    // const response = await apiClient.post('/auth/login', { email, password });
-                    // const { user, token } = response;
-                    
-                    // Временная заглушка
-                    const mockUser: User = {
-                        id: '1',
-                        email,
-                        firstName: 'John',
-                        lastName: 'Doe',
-                        role: 'user',
-                    };
-                    const mockToken = 'mock-jwt-token';
-                    
+                    await new Promise((r) => setTimeout(r, 600));
+                    // В проде: POST /auth/sms/send { phone: _phone }
+                } finally {
+                    set({ isLoading: false });
+                }
+            },
+
+            loginWithEmail: async (email: string, password: string) => {
+                set({ isLoading: true });
+                try {
+                    await new Promise((r) => setTimeout(r, 500));
+                    const normalizedEmail = email.trim().toLowerCase();
+                    const isAdmin = normalizedEmail === ADMIN_EMAIL && password === ADMIN_PASSWORD;
+                    const user = buildUser({
+                        id: isAdmin ? 'admin-1' : 'user-email-1',
+                        email: normalizedEmail,
+                        firstName: isAdmin ? 'Admin' : 'Пользователь',
+                        lastName: isAdmin ? 'RentFlow' : 'Тестовый',
+                        role: isAdmin ? 'admin' : 'user',
+                    });
                     set({
-                        user: mockUser,
-                        token: mockToken,
+                        user,
+                        token: mockToken(),
                         isAuthenticated: true,
                         isLoading: false,
                     });
-                } catch (error) {
+                } catch (e) {
                     set({ isLoading: false });
-                    throw error;
+                    throw e;
                 }
             },
-            
+
+            registerWithEmail: async (data: EmailRegisterPayload) => {
+                set({ isLoading: true });
+                try {
+                    await new Promise((r) => setTimeout(r, 500));
+                    const user = buildUser({
+                        id: `user-${Date.now()}`,
+                        email: data.email.trim().toLowerCase(),
+                        firstName: data.firstName.trim(),
+                        lastName: data.lastName.trim(),
+                        role: 'user',
+                    });
+                    set({
+                        user,
+                        token: mockToken(),
+                        isAuthenticated: true,
+                        isLoading: false,
+                    });
+                } catch (e) {
+                    set({ isLoading: false });
+                    throw e;
+                }
+            },
+
+            loginWithPhone: async (phone: string, code: string) => {
+                set({ isLoading: true });
+                try {
+                    await new Promise((r) => setTimeout(r, 500));
+                    const n = normalizePhone(phone);
+                    if (!n) throw new Error('Invalid phone');
+                    if (code.trim() !== DEMO_SMS_CODE) {
+                        set({ isLoading: false });
+                        throw new Error('Invalid SMS code');
+                    }
+                    const isAdmin = n === ADMIN_PHONE;
+                    const user = buildUser({
+                        id: isAdmin ? 'admin-phone-1' : `user-phone-${n}`,
+                        phone: n,
+                        firstName: isAdmin ? 'Admin' : 'Пользователь',
+                        lastName: isAdmin ? 'RentFlow' : 'Телефон',
+                        role: isAdmin ? 'admin' : 'user',
+                    });
+                    set({
+                        user,
+                        token: mockToken(),
+                        isAuthenticated: true,
+                        isLoading: false,
+                    });
+                } catch (e) {
+                    set({ isLoading: false });
+                    throw e;
+                }
+            },
+
+            registerWithPhone: async (data: PhoneRegisterPayload) => {
+                set({ isLoading: true });
+                try {
+                    await new Promise((r) => setTimeout(r, 500));
+                    const n = normalizePhone(data.phone);
+                    if (!n) throw new Error('Invalid phone');
+                    if (data.code.trim() !== DEMO_SMS_CODE) {
+                        set({ isLoading: false });
+                        throw new Error('Invalid SMS code');
+                    }
+                    const user = buildUser({
+                        id: `user-phone-${Date.now()}`,
+                        phone: n,
+                        firstName: data.firstName.trim(),
+                        lastName: data.lastName.trim(),
+                        role: 'user',
+                    });
+                    set({
+                        user,
+                        token: mockToken(),
+                        isAuthenticated: true,
+                        isLoading: false,
+                    });
+                } catch (e) {
+                    set({ isLoading: false });
+                    throw e;
+                }
+            },
+
             logout: () => {
                 set({
                     user: null,
@@ -76,35 +176,7 @@ export const useAuthStore = create<AuthState>()(
                 });
                 localStorage.removeItem('auth-storage');
             },
-            
-            register: async (userData: RegisterData) => {
-                set({ isLoading: true });
-                try {
-                    // Здесь будет реальный API запрос
-                    // const response = await apiClient.post('/auth/register', userData);
-                    
-                    // Временная заглушка
-                    const mockUser: User = {
-                        id: '1',
-                        email: userData.email,
-                        firstName: userData.firstName,
-                        lastName: userData.lastName,
-                        role: 'user',
-                    };
-                    const mockToken = 'mock-jwt-token';
-                    
-                    set({
-                        user: mockUser,
-                        token: mockToken,
-                        isAuthenticated: true,
-                        isLoading: false,
-                    });
-                } catch (error) {
-                    set({ isLoading: false });
-                    throw error;
-                }
-            },
-            
+
             setUser: (user) => set({ user }),
             setToken: (token) => set({ token }),
         }),

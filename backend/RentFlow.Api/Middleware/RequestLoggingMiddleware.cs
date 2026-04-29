@@ -4,6 +4,7 @@ using MediatR;
 namespace RentFlow.Api.Middleware;
 
 public sealed class RequestLoggingMiddleware<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : notnull
 {
     private readonly ILogger<RequestLoggingMiddleware<TRequest, TResponse>> _logger;
 

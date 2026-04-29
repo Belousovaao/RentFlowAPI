@@ -6,16 +6,18 @@ import { DateFilter } from '../../features/assets/components/DateFilter';
 import { AssetFilters as AssetFiltersType } from '../../entities/asset/asset.types';
 import { useBookingModal } from '@/features/booking/hooks/useBookingModal';
 import { BookingModal } from '../../features/booking/components/BookingModal';
+import { SlidersHorizontal } from 'lucide-react';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 export const AssetsPage = () => {
-    console.log('🔥 AssetsPage MOUNTED');
+    const [isFiltersOpen, setIsFiltersOpen] = useState(false);
     const [filters, setFilters] = useState<AssetFiltersType>({
         page: 1,
         limit: 12,
         sortBy: 'popular'
     });
 
-    console.log('🔍 Current filters:', filters);
+    const { t } = useI18n();
     
     const [dateRange, setDateRange] = useState<{ start: Date | null; end: Date | null }>({
         start: null,
@@ -27,8 +29,6 @@ export const AssetsPage = () => {
         startDate: dateRange.start?.toISOString(),
         endDate: dateRange.end?.toISOString(),
     });
-    
-    console.log('📦 useAssets response:', { response, isLoading, error }); 
     
     const { isOpen, selectedAsset, openBookingModal, closeBookingModal } = useBookingModal();
     
@@ -47,15 +47,6 @@ export const AssetsPage = () => {
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-24 pb-12">
             <div className="container mx-auto px-4">
-                {/* Заголовок */}
-                <div className="mb-6">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                        Наш автопарк
-                    </h1>
-                    <p className="text-gray-600 dark:text-gray-400 mt-1">
-                        {total} автомобилей в наличии
-                    </p>
-                </div>
                 
                 {/* Фильтр по датам */}
                 <DateFilter
@@ -64,9 +55,21 @@ export const AssetsPage = () => {
                     onChange={handleDateChange}
                 />
                 
-                <div className="flex flex-col lg:flex-row gap-6">
+                <div className="mb-4">
+                    <button
+                        onClick={() => setIsFiltersOpen(prev => !prev)}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600
+                                   bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200
+                                   hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    >
+                        <SlidersHorizontal className="w-4 h-4" />
+                        {isFiltersOpen ? t('asset.filter.hide') : t('asset.filter.show')}
+                    </button>
+                </div>
+
+                <div className="flex flex-col xl:flex-row gap-4">
                     {/* Боковая панель с фильтрами */}
-                    <div className="lg:w-80 flex-shrink-0">
+                    <div className={`${isFiltersOpen ? 'block' : 'hidden'} xl:block xl:w-72 2xl:w-80 flex-shrink-0`}>
                         <AssetFilters
                             filters={filters}
                             onFilterChange={setFilters}
@@ -74,11 +77,11 @@ export const AssetsPage = () => {
                     </div>
                     
                     {/* Основной контент */}
-                    <div className="flex-1">
+                    <div className="min-w-0 flex-1">
                         {/* Сортировка */}
                         <div className="flex justify-between items-center mb-6">
                             <p className="text-sm text-gray-500">
-                                Показано: {assets.length} из {total}
+                                {t('common.showed')} {assets.length} / {total}
                             </p>
                             <select
                                 value={filters.sortBy || 'popular'}
@@ -87,10 +90,10 @@ export const AssetsPage = () => {
                                            rounded-lg bg-white dark:bg-gray-800 text-sm
                                            text-gray-700 dark:text-gray-300"
                             >
-                                <option value="popular">Сначала популярные</option>
-                                <option value="price_asc">Сначала дешевле</option>
-                                <option value="price_desc">Сначала дороже</option>
-                                <option value="year_desc">Сначала новее</option>
+                                <option value="popular">{t('asset.sort.popular')}</option>
+                                <option value="price_asc">{t('asset.sort.priceAsc')}</option>
+                                <option value="price_desc">{t('asset.sort.priceDesc')}</option>
+                                <option value="year_desc">{t('asset.sort.new')}</option>
                             </select>
                         </div>
                         
@@ -105,13 +108,13 @@ export const AssetsPage = () => {
                             </div>
                         ) : assets.length === 0 ? (
                             <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl">
-                                <p className="text-gray-500">Автомобили не найдены</p>
+                                <p className="text-gray-500">{t('asset.notfound')}</p>
                                 <p className="text-sm text-gray-400 mt-2">
                                     Попробуйте изменить параметры поиска
                                 </p>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-5">
                                 {assets.map((asset, index) => (
                                     <AssetCard
                                         key={asset.id}
@@ -133,10 +136,10 @@ export const AssetsPage = () => {
                                              hover:bg-gray-100 dark:hover:bg-gray-700
                                              text-gray-700 dark:text-gray-300"
                                 >
-                                    ← Назад
+                                    ← {t('common.prev')}
                                 </button>
                                 <span className="px-4 py-2 text-gray-600 dark:text-gray-400">
-                                    Страница {response.page} из {response.totalPages}
+                                    {t('common.page')} {response.page} / {response.totalPages}
                                 </span>
                                 <button
                                     onClick={() => setFilters(prev => ({ ...prev, page: prev.page! + 1 }))}
@@ -145,7 +148,7 @@ export const AssetsPage = () => {
                                              hover:bg-gray-100 dark:hover:bg-gray-700
                                              text-gray-700 dark:text-gray-300"
                                 >
-                                    Вперед →
+                                    {t('coomon.next')} →
                                 </button>
                             </div>
                         )}

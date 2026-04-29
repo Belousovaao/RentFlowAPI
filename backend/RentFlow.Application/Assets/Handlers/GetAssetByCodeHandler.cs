@@ -34,8 +34,24 @@ public sealed class GetAssetByCodeHandler : IRequestHandler<GetAssetByCodeQuery,
         
         // Проверяем доступность (нет активных бронирований)
         var isAvailable = asset.Status == AssetStatus.Available;
+
+        var exteriorPhotos = asset.Photos
+            .Where(p => p.Type == PhotoType.Exterior)
+            .OrderBy(p => p.Order)
+            .Select(p => new PhotoDto(p.Id, p.Url, "exterior", p.Order))
+            .ToList();
+            
+        var interiorPhotos = asset.Photos
+            .Where(p => p.Type == PhotoType.Interior)
+            .OrderBy(p => p.Order)
+            .Select(p => new PhotoDto(p.Id, p.Url, "interior", p.Order))
+            .ToList();
         
-        // Если нужно проверить на конкретные даты, можно добавить параметры в запрос
+        var allPhotos = asset.Photos
+            .OrderBy(p => p.Type)
+            .ThenBy(p => p.Order)
+            .Select(p => new PhotoDto(p.Id, p.Url, p.Type.ToString().ToLower(), p.Order))
+            .ToList();
 
         return new AssetDto(
             asset.Id,
@@ -66,8 +82,9 @@ public sealed class GetAssetByCodeHandler : IRequestHandler<GetAssetByCodeQuery,
             asset.Latitude,
             asset.Longitude,
             null, // DistanceFromUser - будет рассчитано позже, если есть координаты пользователя
-            photos,
-            isAvailable
+            allPhotos,
+            exteriorPhotos,
+            interiorPhotos
         );
     }
 }

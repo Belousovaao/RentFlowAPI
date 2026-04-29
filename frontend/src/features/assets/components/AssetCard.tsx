@@ -1,9 +1,11 @@
-import type { Asset, FuelType, TransmissionType, DriveType } from '../../../entities/asset/asset.types';
-import { getFuelTypeLabel, getTransmissionLabel, getDriveTypeLabel } from '../../../entities/asset/asset.utils';
+import { AssetStatus, type Asset } from '../../../entities/asset/asset.types';
+import { useFuelTypeLabel, useTransmissionLabel, useDriveTypeLabel } from '@/entities/asset/asset.hooks';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Fuel, Settings, Users, Gauge, Calendar, ChevronLeft, ChevronRight, Car } from 'lucide-react';
+import { useI18n } from '@/app/providers/I18nProvider';
+import { useNavigate } from 'react-router-dom';
 
 interface AssetCardProps {
   asset: Asset;
@@ -14,14 +16,38 @@ interface AssetCardProps {
 export const AssetCard = ({ asset, index, onBookClick }: AssetCardProps) => {
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
     const [isHovered, setIsHovered] = useState(false);
+
+    const { t } = useI18n();
+
+    const getFuelTypeLabel = useFuelTypeLabel();
+    const getTransmissionLabel = useTransmissionLabel();
+    const getDriveTypeLabel = useDriveTypeLabel();
+    const navigate = useNavigate();
+
+    console.log('Asset in card:', asset.id, asset.brandName);
+    console.log('Photos in card:', asset.photos);
+
+    // Функция для формирования полного URL фото
+    const getFullImageUrl = (url: string) => {
+        return `http://localhost:9000/rentflow-photos${url}`;
+    };
+
+    const photos = (asset.photos || []).sort((a, b) => {
+        if (a.type === 'Exterior' && b.type !== 'Exterior') return -1;
+        if (a.type !== 'Exterior' && b.type === 'Exterior') return 1;
+        return a.order - b.order;
+    });
+
+    console.log('Sorted photos:', photos);
+    console.log('Current photo URL:', photos[currentPhotoIndex]?.url);
     
-    const hasMultiplePhotos = asset.photos && asset.photos.length > 1;
+    const hasMultiplePhotos = photos.length > 1;
     
     const nextPhoto = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
         if (hasMultiplePhotos) {
-            setCurrentPhotoIndex((prev) => (prev + 1) % asset.photos.length);
+            setCurrentPhotoIndex((prev) => (prev + 1) % photos.length);
         }
     };
     
@@ -29,14 +55,16 @@ export const AssetCard = ({ asset, index, onBookClick }: AssetCardProps) => {
         e.preventDefault();
         e.stopPropagation();
         if (hasMultiplePhotos) {
-            setCurrentPhotoIndex((prev) => (prev - 1 + asset.photos.length) % asset.photos.length);
+            setCurrentPhotoIndex((prev) => (prev - 1 + photos.length) % photos.length);
         }
     };
 
-    const currentPhoto = asset.photos && asset.photos.length > 0 
-        ? asset.photos[currentPhotoIndex] 
-        : '/car-placeholder.jpg';
+    const currentPhoto = photos.length > 0 ? getFullImageUrl(photos[currentPhotoIndex]?.url) : '/car-placeholder.jpg';
     
+    const handleCardClick = () => {
+        navigate(`/assets/${asset.id}`);
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -45,6 +73,7 @@ export const AssetCard = ({ asset, index, onBookClick }: AssetCardProps) => {
             viewport={{ once: true }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onClick={handleCardClick}
             className="group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden 
                        shadow-sm hover:shadow-xl transition-all duration-300
                        border border-gray-100 dark:border-gray-700"
@@ -84,7 +113,7 @@ export const AssetCard = ({ asset, index, onBookClick }: AssetCardProps) => {
                 {hasMultiplePhotos && (
                     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 
                                   flex gap-1">
-                        {asset.photos.map((_, idx) => (
+                        {photos.map((_, idx) => (
                             <div
                                 key={idx}
                                 className={`w-1.5 h-1.5 rounded-full transition-all
@@ -99,7 +128,7 @@ export const AssetCard = ({ asset, index, onBookClick }: AssetCardProps) => {
                 {/* Цена */}
                 <div className="absolute top-2 right-2 bg-primary-600 text-white 
                               px-3 py-1 rounded-lg text-sm font-bold">
-                    {asset.dailyPrice.toLocaleString()} ₽/сут
+                    {asset.dailyPrice.toLocaleString()} ₽/{t('asset.perDay')}
                 </div>
             </div>
             {/* Информация */}
@@ -114,7 +143,7 @@ export const AssetCard = ({ asset, index, onBookClick }: AssetCardProps) => {
                             <span>{asset.year}</span>
                             <span className="w-1 h-1 bg-gray-400 rounded-full" />
                             <Users className="w-3 h-3" />
-                            <span>{asset.seats} мест</span>
+                            <span>{asset.seats} {t('asset.seats')}</span>
                         </div>
                     </div>
                 </div>
@@ -131,7 +160,7 @@ export const AssetCard = ({ asset, index, onBookClick }: AssetCardProps) => {
                     </div>
                     <div className="flex items-center gap-2">
                         <Gauge className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm">{asset.horsepower} л.с.</span>
+                        <span className="text-sm">{asset.horsepower} {t('common.hp')} </span>
                     </div>
                     <div className="flex items-center gap-2">
                         <Car className="w-4 h-4 text-gray-400" />
@@ -148,18 +177,18 @@ export const AssetCard = ({ asset, index, onBookClick }: AssetCardProps) => {
                                    dark:hover:bg-primary-900/20 transition-colors
                                    font-medium text-xs sm:text-sm whitespace-nowrap"
                     >
-                        Подробнее
+                        {t('asset.details')}
                     </Link>
                     <button
                         onClick={() => onBookClick?.(asset)}
-                        disabled={!asset.isAvailable}
+                        disabled={asset.status === AssetStatus.Disabled}
                         className="px-3 py-2 bg-primary-600 text-white rounded-lg 
                                    hover:bg-primary-700 transition-colors font-medium text-xs sm:text-sm
                                    whitespace-nowrap
                                    disabled:bg-gray-300 disabled:cursor-not-allowed
                                    dark:disabled:bg-gray-700"
                     >
-                        Забронировать
+                        {t('booking.bookNow')}
                     </button>
                 </div>
             </div>

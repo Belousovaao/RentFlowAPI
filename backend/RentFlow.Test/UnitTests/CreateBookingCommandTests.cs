@@ -37,8 +37,6 @@ public class CreateBookingCommandTests
     {
         Asset asset = new AssetBuilder().Build();
 
-        asset.AddPhoto("https://freeimage.host/i/fHyQffe");
-
         Customer customer = Customer.CreateIndividual(
             email: "vasyapupkin@mail.ru",
             phone: "+7 (800) 0000-00-00",
@@ -131,8 +129,6 @@ public class CreateBookingCommandTests
     public void Should_Throw_When_RentalPeriod_Is_Invalid()
     {
         Asset asset = new AssetBuilder().Build();
-
-        asset.AddPhoto("https://freeimage.host/i/fHyQffe");
 
         Customer customer = Customer.CreateIndividual(
             email: "vasyapupkin@mail.ru",

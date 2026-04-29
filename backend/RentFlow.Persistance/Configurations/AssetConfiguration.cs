@@ -50,13 +50,6 @@ public class AssetConfiguration : IEntityTypeConfiguration<Asset>
                 v => string.Join(',', v),
                 v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
             );
-            
-        builder.OwnsMany(a => a.Photos, photo =>
-        {
-            photo.WithOwner().HasForeignKey("AssetId");
-            photo.Property(p => p.Url).IsRequired().HasMaxLength(500);
-            photo.HasKey(p => p.Id);
-        });
         
         builder.HasIndex(a => a.LocationId);
         builder.HasIndex(a => a.Status);

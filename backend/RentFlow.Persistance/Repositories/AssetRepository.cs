@@ -20,7 +20,7 @@ public class AssetRepository : IAssetRepository
         var query = _context.Assets
             .Include(a => a.Photos)
             .Include(a => a.Bookings) // Включаем бронирования для проверки доступности
-            .AsQueryable();
+            .AsQueryable().Where(a => a.Status != AssetStatus.Disabled);
 
         // Поиск по тексту
         if (!string.IsNullOrWhiteSpace(filter.Search))
@@ -159,10 +159,13 @@ public class AssetRepository : IAssetRepository
 
     public async Task<Asset?> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
-        return await _context.Assets
+        Console.WriteLine($"GetByIdAsync: Fetching asset {id}");
+        var asset = await _context.Assets
             .Include(a => a.Photos)
-            .Include(a => a.Bookings)
             .FirstOrDefaultAsync(a => a.Id == id, ct);
+        
+        Console.WriteLine($"GetByIdAsync: Asset found = {asset != null}, Photos count = {asset?.Photos.Count ?? 0}");
+        return asset;
     }
 
     public async Task<IReadOnlyList<Asset>> GetPopularAssetsAsync(int limit, CancellationToken ct = default)
@@ -176,11 +179,7 @@ public class AssetRepository : IAssetRepository
             .ToListAsync(ct);
     }
 
-    public async Task<IReadOnlyList<Asset>> GetNearbyAssetsAsync(
-        double latitude, 
-        double longitude, 
-        double radiusKm, 
-        CancellationToken ct = default)
+    public async Task<IReadOnlyList<Asset>> GetNearbyAssetsAsync(double latitude, double longitude, double radiusKm, CancellationToken ct = default)
     {
         var assets = await _context.Assets
             .Include(a => a.Photos)
@@ -204,5 +203,25 @@ public class AssetRepository : IAssetRepository
         return R * c;
     }
 
+    public async Task<IEnumerable<Asset>> GetAllAsync()
+    {
+        return  _context.Assets.Include(a => a.Photos).AsNoTracking().ToList();
+    }
+
+    public async Task AddAsync(Asset asset, CancellationToken ct)
+    {
+        await _context.Assets.AddAsync(asset, ct);
+    }
+
     private double ToRad(double degrees) => degrees * Math.PI / 180;
+
+    public Task UpdateAsync(Asset asset, CancellationToken ct)
+    {
+        _context.Assets.Update(asset);
+        return Task.CompletedTask;
+    }
+    public void Attach(Asset asset)
+    {
+        _context.Assets.Attach(asset);
+    }
 }

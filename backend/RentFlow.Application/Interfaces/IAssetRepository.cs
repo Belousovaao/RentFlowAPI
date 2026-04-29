@@ -11,4 +11,9 @@ public interface IAssetRepository
     Task<Asset?> GetByIdAsync(Guid id, CancellationToken ct = default);
     Task<IReadOnlyList<Asset>> GetPopularAssetsAsync(int limit, CancellationToken ct = default);
     Task<IReadOnlyList<Asset>> GetNearbyAssetsAsync(double latitude, double longitude, double radiusKm, CancellationToken ct = default);
+    Task<IEnumerable<Asset>> GetAllAsync();
+    Task AddAsync(Asset asset, CancellationToken ct);
+    Task UpdateAsync(Asset asset, CancellationToken ct);
+    void Attach(Asset asset);
+    
 }

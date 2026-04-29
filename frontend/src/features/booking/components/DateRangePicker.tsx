@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { DayPicker, DateRange } from 'react-day-picker';
-import { format } from 'date-fns';
 import { useI18n } from '@/app/providers/I18nProvider';
 import 'react-day-picker/dist/style.css';
 import { formatDate } from '@/shared/utils/formatters';
@@ -13,7 +12,6 @@ interface DateRangePickerProps {
 
 export const DateRangePicker = ({ value, onChange, minDate }: DateRangePickerProps) => {
     const [isOpen, setIsOpen] = useState(false);
-    const [calendarKey, setCalendarKey] = useState(0);
 
     const pickerRef = useRef<HTMLDivElement>(null);
 
@@ -95,7 +93,7 @@ export const DateRangePicker = ({ value, onChange, minDate }: DateRangePickerPro
                 <div className="absolute top-full mt-2 z-50 bg-white dark:bg-gray-800 
                                 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700">
                     <DayPicker
-                        key={calendarKey}
+                        key="range"
                         mode="range"
                         selected={selectedRange}
                         onSelect={handleSelect}

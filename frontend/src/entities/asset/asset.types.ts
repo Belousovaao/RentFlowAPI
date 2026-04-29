@@ -7,6 +7,15 @@ export enum AssetType {
     Bike = 6
 }
 
+export const AssetTypeLabels: Record<AssetType, string> = {
+    [AssetType.Auto]: "Автомобиль",
+    [AssetType.Moto]: "Мотоцикл",
+    [AssetType.Truck]: "Грузовик",
+    [AssetType.Scooter]: "Скутер",
+    [AssetType.Equipment]: "Спецтехника",
+    [AssetType.Bike]: "Велосипед"
+};
+
 export enum AssetCategory {
     Limousine = 1,
     Sedan = 2,
@@ -19,6 +28,18 @@ export enum AssetCategory {
     Crossover = 9
 }
 
+export const AssetCategoryLabels: Record<AssetCategory, string> = {
+    [AssetCategory.Limousine]: "Лимузин",
+    [AssetCategory.Sedan]: "Седан",
+    [AssetCategory.Hatchback]: "Хэтчбек",
+    [AssetCategory.Liftback]: "Лифтбек",
+    [AssetCategory.Universal]: "Универсал",
+    [AssetCategory.Coupe]: "Купе",
+    [AssetCategory.Minivan]: "Минивэн",
+    [AssetCategory.Pickup]: "Пикап",
+    [AssetCategory.Crossover]: "Кроссовер"
+};
+
 export enum FuelType {
     Petrol = 1,
     Diesel = 2,
@@ -27,6 +48,14 @@ export enum FuelType {
     LPG = 5
 }
 
+export const FuelTypeLabels: Record<FuelType, string> = {
+    [FuelType.Petrol]: "Бензин",
+    [FuelType.Diesel]: "Дизель",
+    [FuelType.Electric]: "Электро",
+    [FuelType.Hybrid]: "Гибрид",
+    [FuelType.LPG]: "Газ"
+};
+
 export enum TransmissionType {
     Manual = 1,
     Automatic = 2,
@@ -34,19 +63,48 @@ export enum TransmissionType {
     CVT = 4
 }
 
+export const TransmissionTypeLabels: Record<TransmissionType, string> = {
+    [TransmissionType.Manual]: "Механика",
+    [TransmissionType.Automatic]: "Автомат",
+    [TransmissionType.Robotic]: "Робот",
+    [TransmissionType.CVT]: "Вариатор"
+};
+
 export enum DriveType {
     FrontWheelDrive = 1, //передний привод
     RearWheelDrive = 2,  //задний привод
     AllWheelDrive = 3,  // полный привод
 }
 
+export const DriveTypeLabels: Record<DriveType, string> = {
+    [DriveType.FrontWheelDrive]: "Передний",
+    [DriveType.RearWheelDrive]: "Задний",
+    [DriveType.AllWheelDrive]: "Полный"
+};
+
 export enum AssetStatus {
-    Available = 1,
-    Reserved = 2,
-    InRent = 3,
-    Service = 4,
-    Disabled = 5
+    Available = "Available",
+    Reserved = "Reserved", 
+    InRent = "InRent",
+    Service = "Service",
+    Disabled = "Disabled"
 }
+
+export const AssetStatusLabels: Record<AssetStatus, string> = {
+    [AssetStatus.Available]: "Доступен",
+    [AssetStatus.Reserved]: "Зарезервирован",
+    [AssetStatus.InRent]: "В аренде",
+    [AssetStatus.Service]: "На обслуживании",
+    [AssetStatus.Disabled]: "Отключен"
+};
+
+export const AssetStatusColors: Record<AssetStatus, string> = {
+    [AssetStatus.Available]: "bg-green-100 text-green-800",
+    [AssetStatus.Reserved]: "bg-yellow-100 text-yellow-800",
+    [AssetStatus.InRent]: "bg-blue-100 text-blue-800",
+    [AssetStatus.Service]: "bg-orange-100 text-orange-800",
+    [AssetStatus.Disabled]: "bg-red-100 text-red-800"
+};
 
 // Основной DTO
 export type Asset = {
@@ -78,8 +136,18 @@ export type Asset = {
     latitude: number | null;
     longitude: number | null;
     distanceFromUser: number | null;
-    photos: string[];
-    isAvailable: boolean;
+    canDeliver: boolean;
+    deliveryPrice: number;
+    photos: Photo[];
+    exteriorPhotos: Photo[];
+    interiorPhotos: Photo[];
+};
+
+export interface Photo {
+    id: string;
+    url: string;
+    type: 'Exterior' | 'Interior';
+    order: number;
 };
 
 export type AssetFilters = {

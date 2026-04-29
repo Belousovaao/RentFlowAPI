@@ -45,7 +45,7 @@ export const searchAssets = async (filters?: AssetFilters): Promise<PaginatedRes
 };
 
 // Получение популярных активов
-export const getPopularAssets = async (limit: number = 6): Promise<Asset[]> => {
+export const getPopularAssets = async (limit: number = 4): Promise<Asset[]> => {
     const allAssets = await getAssets();
     
     const randomAssets = [...allAssets].sort(() => 0.5 - Math.random());
