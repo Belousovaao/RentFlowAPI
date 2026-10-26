@@ -190,7 +190,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
         }
     };
 
-    const submitPayment = async (event: React.FormEvent<HTMLFormElement>) => {
+    const submitPayment = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const amount = Number(paymentAmount);
         if (!Number.isFinite(amount) || amount <= 0 || Number(amount.toFixed(2)) !== amount) {
@@ -228,7 +228,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
         }), "Возврат зарегистрирован.");
     };
 
-    const submitAllocations = async (event: React.FormEvent<HTMLFormElement>) => {
+    const submitAllocations = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (!allocationPayment) return;
         const allocations = Object.entries(allocationAmounts)
