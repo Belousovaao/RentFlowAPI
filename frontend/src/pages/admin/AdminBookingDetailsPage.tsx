@@ -12,6 +12,7 @@ import { ServiceModal } from "@/features/booking/components/ServiceModal";
 import { formatDate, formatDateTime, formatPrice, } from "@/shared/utils/formatters";
 import { travelZones } from "@/entities/destination/destination.constants";
 import { RouteReviewStatus } from "@/entities/destination/destination.type";
+import { BookingFinancesSection } from "@/features/admin/components/BookingFinancesSection";
 
 export const AdminBookingDetailsPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -591,90 +592,8 @@ export const AdminBookingDetailsPage = () => {
                                 </div>
                             </div>
                         </section>
-                        {/* Стоимость */}
-                        <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
-                            <div className="mb-6">
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    Стоимость
-                                </h2>
-                            </div>
-                            <div className="space-y-3">
-                                {/* Аренда */}
-                                <div className="flex items-center justify-between gap-4">
-                                    <span className="text-gray-600 dark:text-gray-300">
-                                        Аренда
-                                    </span>
-                                    <span className="shrink-0 font-medium text-gray-900 dark:text-white">
-                                        {formatPrice(rentalPrice)}
-                                    </span>
-                                </div>
-                                {/* Услуги */}
-                                {servicesPrice > 0 && (
-                                    <div className="flex items-center justify-between gap-4">
-                                        <span className="text-gray-600 dark:text-gray-300">
-                                            Дополнительные услуги
-                                        </span>
-                                        <span className="shrink-0 font-medium text-gray-900 dark:text-white">
-                                            {formatPrice(servicesPrice)}
-                                        </span>
-                                    </div>
-                                )}
-                                {/* Маршрут */}
-                                {routeSurcharge > 0 && (
-                                    <div className="flex items-center justify-between gap-4">
-                                        <span className="text-gray-600 dark:text-gray-300">
-                                            Доплата за маршрут
-                                        </span>
-                                        <span className="shrink-0 font-medium text-gray-900 dark:text-white">
-                                            {formatPrice(routeSurcharge)}
-                                        </span>
-                                    </div>
-                                )}
-                                {/* Штрафы */}
-                                {penaltiesPrice > 0 && (
-                                    <div className="flex items-center justify-between gap-4">
-                                        <div className="min-w-0">
-                                            <p className="text-gray-600 dark:text-gray-300">
-                                                Штрафы
-                                            </p>
-                                            {booking.price.penalties.length > 0 && (
-                                                <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
-                                                    {booking.price.penalties.length}{" "}
-                                                    {booking.price.penalties.length === 1
-                                                        ? "начисление"
-                                                        : "начисления"}
-                                                </p>
-                                            )}
-                                        </div>
-                                        <span className="shrink-0 font-medium text-red-600 dark:text-red-400">
-                                            {formatPrice(penaltiesPrice)}
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-                            {/* Итог аренды без депозита */}
-                            <div className="my-5 border-t border-gray-200 pt-5 dark:border-gray-700">
-                                <div className="flex items-center justify-between gap-4">
-                                    <span className="font-semibold text-gray-900 dark:text-white">
-                                        Итого за аренду
-                                    </span>
-                                    <span className="shrink-0 text-lg font-semibold text-gray-900 dark:text-white">
-                                        {formatPrice(total)}
-                                    </span>
-                                </div>
-                            </div>
-                            {/* Депозит */}
-                            <div className="flex items-center justify-between gap-4">
-                                <div>
-                                    <p className="text-gray-600 dark:text-gray-300">
-                                        Депозит
-                                    </p>
-                                </div>
-                                <span className="shrink-0 font-medium text-gray-900 dark:text-white">
-                                    {formatPrice(deposit)}
-                                </span>
-                            </div>
-                        </section>
+                        {/* Единая финансовая история */}
+                        <BookingFinancesSection bookingId={booking.id} price={booking.price} services={booking.services} />
                     </div>
                 </div>
 
