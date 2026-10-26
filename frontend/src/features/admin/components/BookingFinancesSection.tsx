@@ -132,7 +132,7 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
         }
     };
 
-    const submitCharge = async (event: React.FormEvent<HTMLFormElement>) => {
+    const submitCharge = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const amount = chargeForm.amount.trim() ? Number(chargeForm.amount) : undefined;
         const quantity = chargeForm.quantity.trim() ? Number(chargeForm.quantity) : undefined;
