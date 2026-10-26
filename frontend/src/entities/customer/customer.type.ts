@@ -92,7 +92,7 @@ export interface CreateCustomerRequest {
     shortName?: string;
     fullName?: string;
 
-    dateOfBirth?: string;
+    dateOfBirth?: string | null;
 
     passport?: PassportDto;
 
@@ -159,15 +159,15 @@ export interface PassportDto{
     serial: string;
     number: string;
     issuedBy: string;
-    issuedDate: string;
+    issuedDate: string | null;
     registrationAddress: string;
 }
 
 export interface DriverLicenseDto{
     number: string;
     categories: string[];
-    issuedDate: string;
-    expirationDate: string;
+    issuedDate: string | null;
+    expirationDate: string | null;
     experienceFrom: number;
 }
 

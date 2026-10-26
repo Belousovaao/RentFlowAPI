@@ -6,6 +6,8 @@ import { IndividualForm } from './forms/IndividualForm';
 import { EntrepreneurForm } from './forms/EntrepreneurForm';
 import { OrganizationForm } from './forms/OrganizationForm';
 import { createPortal } from 'react-dom';
+import { adminCustomersApi } from '@/features/admin/api/adminCustomers.api';
+import axios from '@/shared/api/axios';
 
 interface CreateCustomerModalProps {
     open: boolean;
@@ -45,8 +47,15 @@ export const CreateCustomerModal = ({
     if (!open) return null;
 
     const handleSubmit = async (data: CreateCustomerRequest) => {
-        const response = await customerApi.create(data);
-        onCreated(response.data);
+        try {
+            const response = await adminCustomersApi.create(data);
+            onCreated(response.data);
+        } catch (error: any) {
+            console.error('Статус:', error?.response?.status);
+            console.error('Ответ сервера:', error?.response?.data);
+            console.error('Отправленные данные:', data);
+            throw error;
+        }
     };
 
     const modalRoot = document.getElementById('modal-root');

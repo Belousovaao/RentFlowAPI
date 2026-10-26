@@ -1,5 +1,5 @@
 import api from '@/shared/api/axios';
-import { CustomerDetailsDto, CustomerShortDto, CustomerType, UpdateCustomerRequest, VerificationStatus } from '@/entities/customer/customer.type';
+import { CreateCustomerRequest, CustomerDetailsDto, CustomerShortDto, CustomerType, UpdateCustomerRequest, VerificationStatus } from '@/entities/customer/customer.type';
 
 export const adminCustomersApi = {
   // Получить список всех клиентов (включая чс)
@@ -10,7 +10,7 @@ export const adminCustomersApi = {
   getById: (id: string) => api.get<CustomerDetailsDto>(`/admin/customers/${id}`),
   
   // Создать клиента
-  create: (data: Partial<CustomerDetailsDto>) => api.post<CustomerDetailsDto>('/admin/customers', data),
+  create: (data: CreateCustomerRequest) => api.post('/admin/customers', data),
   
   // Обновить клиента
   update: (id: string, data: UpdateCustomerRequest) => api.put<CustomerDetailsDto>(`/admin/customers/${id}`, data),

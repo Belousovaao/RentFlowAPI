@@ -67,6 +67,38 @@ export const IndividualForm = ({
             driverLicenseExperienceFrom
         );
         const handleSave = async () => {
+            if (!isEditMode) {
+                const missingFields: string[] = [];
+
+                if (!firstName.trim()) {
+                    missingFields.push('firstName');
+                }
+
+                if (!lastName.trim()) {
+                    missingFields.push('lastName');
+                }
+
+                if (!phone.trim()) {
+                    missingFields.push('phone');
+                }
+
+                setInvalidFields(missingFields);
+
+                if (missingFields.length > 0) {
+                    const labels: Record<string, string> = {
+                        firstName: 'имя',
+                        lastName: 'фамилию',
+                        phone: 'номер телефона',
+                    };
+
+                    toast.error(
+                        `Заполните обязательные поля: ${missingFields
+                            .map(field => labels[field])
+                            .join(', ')}`
+                    );
+                    return;
+                }
+            }
             const passportFields = [
                 { key: 'passportSerial', label: 'Серия паспорта', value: passportSerial },
                 { key: 'passportNumber', label: 'Номер паспорта', value: passportNumber },
@@ -159,8 +191,8 @@ export const IndividualForm = ({
                                     .split(',')
                                     .map(x => x.trim())
                                     .filter(Boolean),
-                                issuedDate: driverLicenseIssuedDate,
-                                expirationDate: driverLicenseValidUntil,
+                                issuedDate: driverLicenseIssuedDate || null,
+                                expirationDate: driverLicenseValidUntil || null,
                                 experienceFrom: driverLicenseExperienceFrom
                                     ? Number(driverLicenseExperienceFrom)
                                     : 0,
@@ -180,19 +212,19 @@ export const IndividualForm = ({
                     firstName: firstName,
                     lastName: lastName,
                     middleName: middleName,          
-                    dateOfBirth: birthDate,
+                    dateOfBirth: birthDate || null,
                     passport: {
                         serial: passportSerial,
                         number: passportNumber,
                         issuedBy: passportIssuedBy,
-                        issuedDate: passportIssuedDate,
+                        issuedDate: passportIssuedDate || null,
                         registrationAddress: registrationAddress
                     },
                     driverLicense: {
                         number: driverLicenseNumber,
                         categories: driverLicenseCategories.split(',').map(x => x.trim()).filter(Boolean),
-                        issuedDate: driverLicenseIssuedDate,
-                        expirationDate: driverLicenseValidUntil,
+                        issuedDate: driverLicenseIssuedDate || null,
+                        expirationDate: driverLicenseValidUntil || null,
                         experienceFrom: driverLicenseExperienceFrom
                             ? Number(driverLicenseExperienceFrom)
                             : 0
@@ -213,26 +245,46 @@ export const IndividualForm = ({
                 onToggle={() => setShowPersonalInfo(prev => !prev)}
             >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                    <CustomerFormField label="Фамилия">
-                        <input
-                            className={customerInputClass}
-                            placeholder="Фамилия"
-                            value={lastName}
-                            readOnly={readOnly}
-                            onChange={e => setLastName(e.target.value)}
-                        />
-                    </CustomerFormField>
-
-                    <CustomerFormField label="Имя">
-                        <input
-                            className={customerInputClass}
-                            placeholder="Имя"
-                            value={firstName}
-                            readOnly={readOnly}
-                            onChange={e => setFirstName(e.target.value)}
-                        />
-                    </CustomerFormField>
+                    <div id="customer-field-lastName">
+                        <CustomerFormField label="Фамилия *">
+                            <input
+                                className={`${customerInputClass} ${
+                                    invalidFields.includes('lastName')
+                                        ? 'border-red-500 ring-1 ring-red-500'
+                                        : ''
+                                }`}
+                                placeholder="Фамилия"
+                                value={lastName}
+                                readOnly={readOnly}
+                                onChange={e => {
+                                    setLastName(e.target.value);
+                                    setInvalidFields(prev =>
+                                        prev.filter(field => field !== 'lastName')
+                                    );
+                                }}
+                            />
+                        </CustomerFormField>
+                    </div>
+                        <div id="customer-field-firstName">
+                            <CustomerFormField label="Имя *">
+                                <input
+                                    className={`${customerInputClass} ${
+                                        invalidFields.includes('firstName')
+                                            ? 'border-red-500 ring-1 ring-red-500'
+                                            : ''
+                                    }`}
+                                    placeholder="Имя"
+                                    value={firstName}
+                                    readOnly={readOnly}
+                                    onChange={e => {
+                                        setFirstName(e.target.value);
+                                        setInvalidFields(prev =>
+                                            prev.filter(field => field !== 'firstName')
+                                        );
+                                    }}
+                                />
+                            </CustomerFormField>
+                        </div>
 
                     <CustomerFormField label="Отчество">
                         <input
@@ -255,15 +307,26 @@ export const IndividualForm = ({
                         </div>
                     </CustomerFormField>
 
-                    <CustomerFormField label="Телефон">
-                        <PhoneInput
-                            className={customerInputClass}
-                            placeholder="+7 (___) ___-__-__"
-                            value={phone}
-                            readOnly={readOnly}
-                            onChange={setPhone}
-                        />
-                    </CustomerFormField>
+                    <div id="customer-field-phone">
+                        <CustomerFormField label="Телефон *">
+                            <PhoneInput
+                                className={`${customerInputClass} ${
+                                    invalidFields.includes('phone')
+                                        ? 'border-red-500 ring-1 ring-red-500'
+                                        : ''
+                                }`}
+                                placeholder="+7 (___) ___-__-__"
+                                value={phone}
+                                readOnly={readOnly}
+                                onChange={value => {
+                                    setPhone(value);
+                                    setInvalidFields(prev =>
+                                        prev.filter(field => field !== 'phone')
+                                    );
+                                }}
+                            />
+                        </CustomerFormField>
+                    </div>
 
                     <CustomerFormField label="Email">
                         <EmailInput

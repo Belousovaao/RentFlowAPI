@@ -16,8 +16,12 @@ export const CustomerSearch = ({
     const [createModalOpen, setCreateModalOpen] = useState(false);
 
     const search = async () => {
-        const response = await customerApi.search(type, query);
-        setResults(response.data);
+        try {
+            const customers = await customerApi.search(type, query);
+            setResults(customers);
+        } catch (error) {
+            console.error('Не удалось выполнить поиск клиентов:', error);
+        }
     };
 
     return (

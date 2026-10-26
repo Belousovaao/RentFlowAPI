@@ -1,16 +1,29 @@
 import api from '@/shared/api/axios';
-import type {CustomerDetailsDto, CreateCustomerRequest, CustomerDocumentDto, CustomerLookup, CustomerType, DocumentType, UpdateCustomerRequest } from '@/entities/customer/customer.type';
+import type {CustomerDetailsDto, CreateCustomerRequest, CustomerDocumentDto, CustomerLookup, CustomerType, DocumentType, UpdateCustomerRequest, CustomerShortDto } from '@/entities/customer/customer.type';
 
 export const customerApi = {
-    search: (type: CustomerType, query: string) => api.get<CustomerLookup[]>(
-            '/customer/search',
+    search: async (type: CustomerType, query: string): Promise<CustomerLookup[]> => {
+        const { data } = await api.get<{ data: CustomerShortDto[] }>(
+            '/admin/customers',
             {
                 params: {
+                    page: 1,
+                    pageSize: 20,
                     type,
-                    q: query,
+                    search: query,
                 },
             }
-        ),
+        );
+
+        return data.data.map(customer => ({
+            id: customer.id,
+            type: customer.type,
+            displayName: customer.displayName ?? '',
+            phone: customer.phone ?? '',
+            email: customer.email ?? undefined,
+            verificationStatus: customer.verificationStatus,
+        }));
+    },
     
     create: (data: CreateCustomerRequest) => api.post<CustomerLookup>('/customer', data),
 

@@ -89,4 +89,35 @@ public class AdminCustomerController : ControllerBase
 
         return NoContent();
     }
+    
+    [HttpPost]
+    public async Task<ActionResult<CustomerLookupDto>> Create(
+        [FromBody] CreateCustomerRequest request,
+        CancellationToken ct)
+    {
+        var customer = await _mediator.Send(
+            new CreateCustomerCommand(
+                request.Type,
+                request.Email,
+                request.Phone,
+                request.FirstName,
+                request.LastName,
+                request.MiddleName,
+                request.DateOfBirth,
+                request.Passport,
+                request.DriverLicense,
+                request.Inn,
+                request.Ogrnip,
+                request.FullName,
+                request.ShortName,
+                request.Kpp,
+                request.Ogrn,
+                request.OrganizationAddress,
+                request.FactAddress,
+                request.BankInfo,
+                request.LegalForm),
+            ct);
+
+        return Ok(customer);
+    }
 }
