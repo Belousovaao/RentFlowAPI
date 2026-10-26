@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { FormEvent, ReactNode } from "react";
 import { Check, CircleDollarSign, Loader2, Plus, RefreshCw, X } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { formatDateTime, formatPrice } from "@/shared/utils/formatters";
@@ -115,15 +116,17 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
         void loadFinance();
     }, [loadFinance]);
 
-    const runAction = async (key: string, action: () => Promise<unknown>, success: string) => {
+    const runAction = async (key: string, action: () => Promise<unknown>, success: string): Promise<boolean> => {
         try {
             setBusyId(key);
             await action();
             toast.success(success);
             await loadFinance();
+            return true;
         } catch (error) {
             console.error("Booking finance action failed:", error);
             toast.error("Не удалось выполнить финансовую операцию. Проверьте данные и статус бронирования.");
+            return false;
         } finally {
             setBusyId(null);
         }
@@ -153,28 +156,32 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
             ...(chargeForm.referenceNumber.trim() ? { referenceNumber: chargeForm.referenceNumber.trim() } : {}),
         };
 
-        await runAction("create-charge", () => bookingFinanceApi.createCharge(bookingId, request), "Начисление создано и отправлено на согласование.");
-        setChargeModalOpen(false);
-        setChargeForm(emptyChargeForm);
+        const succeeded = await runAction("create-charge", () => bookingFinanceApi.createCharge(bookingId, request), "Начисление создано и отправлено на согласование.");
+        if (succeeded) {
+            setChargeModalOpen(false);
+            setChargeForm(emptyChargeForm);
+        }
     };
 
     const submitPayment = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const amount = Number(paymentAmount);
-        if (!Number.isFinite(amount) || amount <= 0 || Math.round(amount * 100) !== amount * 100) {
+        if (!Number.isFinite(amount) || amount <= 0 || Number(amount.toFixed(2)) !== amount) {
             toast.error("Введите положительную сумму не более чем с двумя знаками после запятой.");
             return;
         }
-        await runAction("register-payment", () => bookingFinanceApi.registerIncoming({
+        const succeeded = await runAction("register-payment", () => bookingFinanceApi.registerIncoming({
             bookingId,
             amount,
             type: paymentType,
             method: paymentMethod,
             note: paymentNote.trim() || null,
         }), "Платёж зарегистрирован.");
-        setPaymentModalOpen(false);
-        setPaymentAmount("");
-        setPaymentNote("");
+        if (succeeded) {
+            setPaymentModalOpen(false);
+            setPaymentAmount("");
+            setPaymentNote("");
+        }
     };
 
     const createRefund = async (payment: PaymentTransactionDto) => {
@@ -245,6 +252,9 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
                 kind: "price",
             });
         }
+        if (price.deposit > 0) {
+            result.push({ id: "deposit", date: null, operation: "Депозит", details: "Обеспечительный платёж; не входит в стоимость аренды", status: "Условие аренды", amount: price.deposit, kind: "price" });
+        }
         for (const penalty of price.penalties ?? []) {
             result.push({
                 id: `legacy-penalty-${penalty.id}`,
@@ -296,7 +306,7 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
     const pendingCharges = charges.filter(charge => charge.status === "PendingApproval");
 
     return (
-        <section className="rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-800 sm:p-6">
+        <section className="rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-800 sm:p-6 lg:col-span-2">
             <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Финансы бронирования</h2>
@@ -488,7 +498,7 @@ function SummaryCard({ label, value, hint }: { label: string; value: string; hin
     );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, children }: { label: string; children: ReactNode }) {
     return <label className="block space-y-1.5"><span className="text-sm font-medium text-gray-700 dark:text-gray-200">{label}</span>{children}</label>;
 }
 
