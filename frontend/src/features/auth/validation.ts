@@ -23,10 +23,6 @@ export function isValidEmail(email: string): boolean {
     return EMAIL_RE.test(email.trim());
 }
 
-export function isValidPassword(password: string, minLength = 8): boolean {
-    return password.length >= minLength;
-}
-
-export function isValidSmsCode(code: string): boolean {
-    return /^\d{4,6}$/.test(code.trim());
+export function isValidOtpCode(code: string): boolean {
+    return /^\d{6}$/.test(code.trim());
 }

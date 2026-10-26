@@ -14,7 +14,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://lpcalhost:5102',
+        target: 'http://localhost:5102',
         changeOrigin: true,
       },
     },

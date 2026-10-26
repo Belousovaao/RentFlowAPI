@@ -3,6 +3,7 @@ import { useI18n } from '../../../app/providers/I18nProvider';
 import { motion } from 'framer-motion';
 import { Instagram, Mail, PhoneIncoming, MapPin, MessageCircle} from 'lucide-react';
 import { BsTelegram, BsWhatsapp } from 'react-icons/bs';
+import { contactDetails } from '@/shared/types/contacts';
 
 export const Footer = () => {
     const { t } = useI18n();
@@ -11,28 +12,62 @@ export const Footer = () => {
     const quickLinks = [
         { name: t('nav.home'), href: '/' },
         { name: t('nav.exploreCars'), href: '/assets' },
-        { name: t('nav.aboutUs'), href: '/about' },
-        { name: t('nav.rentalTerms'), href: '/how-it-works' },
+        { name: t('nav.aboutUs'), href: '/about-us' },
+        { name: t('nav.rentalTerms'), href: '/rental-terms' },
         { name: t('nav.contact'), href: '/contact' },
     ];
 
     const supportLinks = [
         { name: t('footer.faq'), href: '/faq' },
         { name: t('footer.privacy'), href: '/privacy' },
-        { name: t('footer.supportCenter'), href: '/support' },
     ];
 
     const socialLinks = [
-        { icon: Instagram, href: 'https://instagram.com', label: 'Instagram' },
-        { icon: BsTelegram, href: 'https://instagram.com', label: 'Telegram' },
-        { icon: BsWhatsapp, href: 'https://instagram.com', label: 'What\'s up' },
-        { icon: MessageCircle, href: 'https://instagram.com', label: 'MAX' },
+        ...(contactDetails.instagram.trim()
+            ? [{
+                icon: Instagram,
+                href: contactDetails.instagram,
+                label: 'Instagram',
+            }]
+            : []),
+        ...(contactDetails.telegram.trim()
+            ? [{
+                icon: BsTelegram,
+                href: contactDetails.telegram,
+                label: 'Telegram',
+            }]
+            : []),
+        ...(contactDetails.max.trim()
+            ? [{
+                icon: MessageCircle,
+                href: contactDetails.max,
+                label: 'MAX',
+            }]
+            : []),
     ];
 
     const contactInfo = [
-        { icon: PhoneIncoming, text: '7 (963) 565-28-17', href: 'tel:+79635652817' },
-        { icon: Mail, text: 'info@volnamidrive.ru', href: 'mailto:info@volnamidrive.ru' },
-        { icon: MapPin, text: t('address'), href: '#' },
+        ...(contactDetails.phone.trim()
+            ? [{
+                icon: PhoneIncoming,
+                text: contactDetails.phone,
+                href: `tel:${contactDetails.phone.replace(/[\s()-]/g, '')}`,
+            }]
+            : []),
+        ...(contactDetails.email.trim()
+            ? [{
+                icon: Mail,
+                text: contactDetails.email,
+                href: `mailto:${contactDetails.email}`,
+            }]
+            : []),
+        ...(contactDetails.city.trim()
+            ? [{
+                icon: MapPin,
+                text: contactDetails.city,
+                href: '#',
+            }]
+            : []),
     ];
 
     return (

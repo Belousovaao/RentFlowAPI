@@ -1,18 +1,30 @@
 import { apiClient } from "../../shared/api/client";
 import type { Asset, AssetFilters, PaginatedResponse } from "./asset.types";
 
+const buildAssetQuery = (filters?: AssetFilters): string => {
+    const params = new URLSearchParams();
+    if (!filters) {
+        return '';
+    }
+    Object.entries(filters).forEach(([key, value]) => {
+        if (value === undefined || value === null || value === '') {
+            return;
+        }
+        if (Array.isArray(value)) {
+            value.forEach(item => {params.append(key, item.toString());});
+            return;
+        }
+        params.append(key, value.toString());
+    });
+    return params.toString();
+};
+
 // Получение всех активов
 export const getAssets = async (filters?: AssetFilters): Promise<Asset[]> => {
-    const params = new URLSearchParams();
-    if (filters) {
-        Object.entries(filters).forEach(([key, value]) => {
-            if (value !== undefined && value !== null && value != '') {
-                params.append(key, value.toString());
-            }
-        });
-    }
-    const queryString = params.toString();
-    const url = queryString ? `/api/assets?${queryString}` : "/api/assets";
+    const queryString = buildAssetQuery(filters);
+    const url = queryString
+        ? `/api/assets?${queryString}`
+        : '/api/assets';
     const response = await apiClient.get<PaginatedResponse<Asset>>(url);
     
     return response.data || [];
@@ -30,17 +42,10 @@ export const getAssetByCode = async (code: string): Promise<Asset> => {
 
 // Поиск активов с пагинацией
 export const searchAssets = async (filters?: AssetFilters): Promise<PaginatedResponse<Asset>> => {
-    const params = new URLSearchParams();
-    if (filters) {
-        Object.entries(filters).forEach(([key, value]) => {
-            if (value !== undefined && value !== null && value != '') {
-                params.append(key, value.toString());
-            }
-        });
-    }
-    const queryString = params.toString();
-    const url = queryString ? `/api/assets?${queryString}` : "/api/assets";
-    
+    const queryString = buildAssetQuery(filters);
+    const url = queryString
+        ? `/api/assets?${queryString}`
+        : '/api/assets';
     return apiClient.get<PaginatedResponse<Asset>>(url);
 };
 

@@ -1,0 +1,95 @@
+.date-input-calendar {
+    position: fixed;
+
+    z-index: 99999;
+
+    min-width: 320px;
+
+    overflow: hidden;
+
+    border: 1px solid rgb(229 231 235);
+    border-radius: 0.75rem;
+
+    background: white;
+
+    box-shadow:
+        0 20px 25px -5px rgb(0 0 0 / 0.15),
+        0 8px 10px -6px rgb(0 0 0 / 0.15);
+}
+
+.dark .date-input-calendar {
+    border-color: rgb(55 65 81);
+    background: rgb(31 41 55);
+}
+
+.date-input-calendar .rdp {
+    margin: 0;
+
+    --rdp-accent-color: rgb(37 99 235);
+    --rdp-accent-background-color: rgb(239 246 255);
+}
+
+.date-input-calendar .rdp-dropdown {
+    border: 1px solid rgb(209 213 219);
+    border-radius: 0.5rem;
+
+    background: white;
+    color: rgb(17 24 39);
+
+    padding: 0.35rem 0.5rem;
+
+    font-size: 0.875rem;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+.date-input-calendar .rdp-dropdown:hover {
+    border-color: rgb(59 130 246);
+}
+
+.dark .date-input-calendar .rdp-dropdown {
+    border-color: rgb(75 85 99);
+    background: rgb(31 41 55);
+    color: white;
+}
+
+.date-input-calendar .rdp-button_previous,
+.date-input-calendar .rdp-button_next {
+    border-radius: 0.5rem;
+}
+
+.date-input-calendar .rdp-button_previous:hover,
+.date-input-calendar .rdp-button_next:hover {
+    background: rgb(243 244 246);
+}
+
+.dark .date-input-calendar .rdp-button_previous:hover,
+.dark .date-input-calendar .rdp-button_next:hover {
+    background: rgb(55 65 81);
+}
+
+.date-input-calendar .rdp-today:not(.rdp-selected) {
+    font-weight: 700;
+    color: rgb(37 99 235);
+}
+
+.date-input-calendar .rdp-selected {
+    font-weight: 600;
+}
+
+.date-input-calendar .rdp-day_button {
+    border-radius: 0.5rem;
+}
+
+.date-input-calendar .rdp-day_button:hover {
+    background: rgb(239 246 255);
+}
+
+.dark .date-input-calendar .rdp-day_button:hover {
+    background: rgb(55 65 81);
+}
+
+.date-input-calendar .rdp-disabled {
+    opacity: 0.35;
+}

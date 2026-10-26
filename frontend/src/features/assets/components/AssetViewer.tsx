@@ -21,15 +21,38 @@ export const AssetViewer = ({ exterior, interior }: Props) => {
         return (
             <div className="relative">
                 <div className="flex gap-2 mb-6 justify-center">
-                    <button className="px-5 py-2 rounded-full text-sm bg-black text-white">
+                    <button 
+                        onClick={() => {
+                            setMode('exterior');
+                            setCurrentIndex(0);
+                        }}
+                        className={`px-5 py-2 rounded-full text-sm transition ${
+                        mode === 'exterior'
+                            ? 'bg-primary-600 text-white'
+                            : 'bg-white/90 text-gray-900 backdrop-blur border'
+                        }`}
+                    >
                         {t('asset.exterior')}
                     </button>
-                    <button className="px-5 py-2 rounded-full text-sm bg-white/60 backdrop-blur border">
+                    <button
+                        onClick={() => {
+                            setMode('interior');
+                            setCurrentIndex(0);
+                        }}
+                        className={`px-5 py-2 rounded-full text-sm transition ${
+                            mode === 'interior'
+                                ? 'bg-primary-600 text-white'
+                                : 'bg-white/90 text-gray-900 backdrop-blur border'
+                        }`}
+                    >
                         {t('asset.interior')}
                     </button>
                 </div>
+
                 <div className="h-[420px] flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-xl">
-                    <p className="text-gray-500">Нет фото для 360° обзора</p>
+                    <p className="text-gray-500">
+                        Нет фото для 360° обзора
+                    </p>
                 </div>
             </div>
         );
@@ -63,14 +86,18 @@ export const AssetViewer = ({ exterior, interior }: Props) => {
                 <button
                     onClick={() => { setMode('exterior'); setCurrentIndex(0); }}
                     className={`px-5 py-2 rounded-full text-sm transition
-                        ${mode === 'exterior' ? 'bg-black text-white' : 'bg-white/60 backdrop-blur border'}`}
+                        ${mode === 'exterior' 
+                            ? 'bg-primary-600 text-white' 
+                            : 'bg-white/90 text-gray-900 backdrop-blur border'}`}
                 >
                     {t('asset.exterior')}
                 </button>
                 <button
                     onClick={() => { setMode('interior'); setCurrentIndex(0); }}
                     className={`px-5 py-2 rounded-full text-sm transition
-                        ${mode === 'interior' ? 'bg-black text-white' : 'bg-white/60 backdrop-blur border'}`}
+                        ${mode === 'interior' 
+                            ? 'bg-primary-600 text-white' 
+                            : 'bg-white/90 text-gray-900 backdrop-blur border'}`}
                 >
                     {t('asset.interior')}
                 </button>

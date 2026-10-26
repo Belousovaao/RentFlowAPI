@@ -58,26 +58,32 @@ export const AssetsPage = () => {
                 <div className="mb-4">
                     <button
                         onClick={() => setIsFiltersOpen(prev => !prev)}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600
-                                   bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200
-                                   hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                     >
                         <SlidersHorizontal className="w-4 h-4" />
                         {isFiltersOpen ? t('asset.filter.hide') : t('asset.filter.show')}
                     </button>
                 </div>
 
-                <div className="flex flex-col xl:flex-row gap-4">
+                <div
+                    className={`grid gap-4 ${
+                        isFiltersOpen
+                            ? 'grid-cols-[18rem_minmax(0,1fr)]'
+                            : 'grid-cols-1'
+                    }`}
+                >
                     {/* Боковая панель с фильтрами */}
-                    <div className={`${isFiltersOpen ? 'block' : 'hidden'} xl:block xl:w-72 2xl:w-80 flex-shrink-0`}>
-                        <AssetFilters
-                            filters={filters}
-                            onFilterChange={setFilters}
-                        />
-                    </div>
-                    
+                    {isFiltersOpen && (
+                        <div>
+                            <AssetFilters
+                                filters={filters}
+                                onFilterChange={setFilters}
+                            />
+                        </div>
+                    )}
+
                     {/* Основной контент */}
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-0">
                         {/* Сортировка */}
                         <div className="flex justify-between items-center mb-6">
                             <p className="text-sm text-gray-500">
@@ -86,9 +92,7 @@ export const AssetsPage = () => {
                             <select
                                 value={filters.sortBy || 'popular'}
                                 onChange={(e) => handleSortChange(e.target.value)}
-                                className="px-3 py-2 border border-gray-300 dark:border-gray-600 
-                                           rounded-lg bg-white dark:bg-gray-800 text-sm
-                                           text-gray-700 dark:text-gray-300"
+                                className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-300"
                             >
                                 <option value="popular">{t('asset.sort.popular')}</option>
                                 <option value="price_asc">{t('asset.sort.priceAsc')}</option>
@@ -114,7 +118,7 @@ export const AssetsPage = () => {
                                 </p>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-4 lg:gap-5">
+                            <div className="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-4 lg:gap-5">
                                 {assets.map((asset, index) => (
                                     <AssetCard
                                         key={asset.id}
@@ -148,7 +152,7 @@ export const AssetsPage = () => {
                                              hover:bg-gray-100 dark:hover:bg-gray-700
                                              text-gray-700 dark:text-gray-300"
                                 >
-                                    {t('coomon.next')} →
+                                    {t('common.next')} →
                                 </button>
                             </div>
                         )}

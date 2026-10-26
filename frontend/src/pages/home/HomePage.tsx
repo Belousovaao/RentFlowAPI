@@ -85,7 +85,7 @@ export const HomePage = () => {
                     </motion.div>
                     
                     {/* Виджет бронирования */}
-                    <div className='absolute top-20 sm:top-24 md:top-28 lg:top-32 left-8 z-20'>
+                    <div className='absolute z-40 top-20 sm:top-24 md:top-24 lg:top-24 left-8'>
                         <BookingWidget/>
                     </div>
                     
@@ -103,9 +103,9 @@ export const HomePage = () => {
                 </section>
                 
                 {/* Popular Assets */}
-                <section className="py-20 bg-gray-50 dark:bg-gray-800/50">
+                <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
                     <div className="container mx-auto px-4">
-                        <p className="text-xl text-gray-600 dark:text-gray-300 text-center mb-12">
+                        <p className="text-3xl md:text-2xl font-bold text-gray-900 dark:text-white text-center mb-12">
                             {t('popular.vehicles')}
                         </p>
                         

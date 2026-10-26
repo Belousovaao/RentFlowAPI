@@ -6,7 +6,7 @@ interface ProtectedRouteProps {
   redirectTo?: string;
 }
 
-export const ProtectedRoute = ({ requiredRole, redirectTo = '/account' }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({ requiredRole, redirectTo = '/' }: ProtectedRouteProps) => {
   const { isAuthenticated, user } = useAuthStore();
 
   if (!isAuthenticated) {

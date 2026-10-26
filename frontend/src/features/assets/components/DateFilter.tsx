@@ -22,13 +22,12 @@ export const DateFilter = ({ startDate, endDate, onChange }: DateFilterProps) =>
                     <DateRangePicker
                         value={{ start: startDate, end: endDate }}
                         onChange={(range) => onChange(range.start, range.end)}
-                        minDate={new Date()}
                     />
                 </div>
                 {(startDate || endDate) && (
                     <button
                         onClick={() => onChange(null, null)}
-                        className="text-sm text-gray-500 hover:text-primary-600 transition-colors"
+                        className="text-sm text-gray-900 dark:text-gray-300 hover:text-primary-600 transition-colors"
                     >
                         {t('booking.reset')}
                     </button>

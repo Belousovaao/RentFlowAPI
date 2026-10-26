@@ -17,15 +17,15 @@ export const AssetTypeLabels: Record<AssetType, string> = {
 };
 
 export enum AssetCategory {
-    Limousine = 1,
-    Sedan = 2,
-    Hatchback = 3,
-    Liftback = 4,
-    Universal = 5,
-    Coupe = 6,
-    Minivan = 7,
-    Pickup = 8,
-    Crossover = 9
+    Limousine = "Limousine",
+    Sedan = "Sedan",
+    Hatchback = "Hatchback",
+    Liftback = "Liftback",
+    Universal = "Universal",
+    Coupe = "Coupe",
+    Minivan = "Minivan",
+    Pickup = "Pickup",
+    Crossover = "Crossover"
 }
 
 export const AssetCategoryLabels: Record<AssetCategory, string> = {
@@ -136,8 +136,6 @@ export type Asset = {
     latitude: number | null;
     longitude: number | null;
     distanceFromUser: number | null;
-    canDeliver: boolean;
-    deliveryPrice: number;
     photos: Photo[];
     exteriorPhotos: Photo[];
     interiorPhotos: Photo[];
@@ -162,9 +160,9 @@ export type AssetFilters = {
     // Технические характеристики
     yearFrom?: number;
     yearTo?: number;
-    fuelType?: FuelType;
-    transmission?: TransmissionType;
-    driveType?: DriveType;
+    fuelTypes?: FuelType[];
+    transmissions?: TransmissionType[];
+    driveTypes?: DriveType[];
     minSeats?: number;
     maxSeats?: number;
     minDoors?: number;
@@ -228,11 +226,17 @@ export type CreateAssetDto = {
     dailyPrice: number;
     deposit?: number | null;
     locationId: string;
-    canDeliver: boolean;
-    deliveryPrice?: number | null;
     latitude?: number | null;
     longitude?: number | null;
 };
 
 // Для обновления
 export type UpdateAssetDto = Partial<CreateAssetDto>;
+
+export interface AssetShortDto {
+    id: string;
+    brandName: string;
+    model: string;
+    year: number;
+    coverPhotoUrl: string | null;
+}

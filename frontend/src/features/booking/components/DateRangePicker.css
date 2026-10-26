@@ -1,0 +1,22 @@
+.date-range-middle {
+    background-color: rgb(170 59 255 / 0.1);
+    color: inherit;
+}
+
+.date-range-start {
+    background-color: theme('colors.primary.500');
+    color: white;
+    border-radius: 9999px 0 0 9999px;
+}
+
+.date-range-end {
+    background-color: theme('colors.primary.500');
+    color: white;
+    border-radius: 0 9999px 9999px 0;
+}
+
+.date-range-single {
+    background-color: theme('colors.primary.500');
+    color: white;
+    border-radius: 9999px;
+}

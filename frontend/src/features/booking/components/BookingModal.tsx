@@ -3,9 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { Asset } from '../../../entities/asset/asset.types';
 import { BookingWidget } from './BookingWidget';
-import { AssetDetailPreview } from '@/features/assets/components/AssetDetailPreview';
-import { useAuthStore } from '@/features/auth/stores/authStore';
-import { AuthModal } from '@/features/auth/components/AuthModal';
 
 interface BookingModalProps {
     isOpen: boolean;
@@ -14,7 +11,6 @@ interface BookingModalProps {
 }
 
 export const BookingModal = ({ isOpen, asset, onClose }: BookingModalProps) => {
-    const { isAuthenticated } = useAuthStore();
     
     // Блокировка прокрутки при открытии модалки
     useEffect(() => {
@@ -93,7 +89,6 @@ export const BookingModal = ({ isOpen, asset, onClose }: BookingModalProps) => {
                                                    border border-gray-200/80 dark:border-gray-700 p-4 sm:p-5 shadow-xl"
                                         onClick={(e) => e.stopPropagation()}
                                     >
-                                        <AssetDetailPreview asset={asset} />
                                     </div>
                                 </div>
                             </div>

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/features/auth/stores/authStore';
 
 
@@ -34,14 +34,16 @@ axiosClient.interceptors.response.use(
   });
 
 export const apiClient = {
-  async get<T>(url: string): Promise<T> {
-    const response = await axiosClient.get<T>(url);
+  async get<T>(
+    url: string,
+    config?: AxiosRequestConfig): Promise<T> {
+    const response = await axiosClient.get<T>(url, config);
 
     return response.data;
   },
 
-  async post<T>(url: string, body: unknown): Promise<T> {
-    const response = await axiosClient.post<T>(url, body);
+  async post<T>(url: string, body?: unknown, config?: AxiosRequestConfig): Promise<T> {
+    const response = await axiosClient.post<T>(url, body, config);
 
     return response.data;
   },
@@ -51,4 +53,10 @@ export const apiClient = {
     
     return response.data;
   },
+
+  async patch<T>(url: string, body?: unknown, config?: AxiosRequestConfig): Promise<T> {
+        const response = await axiosClient.patch<T>(url, body, config);
+        return response.data;
+    },
+
 };

@@ -1,191 +1,277 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { authApi, RegisterRequest, type OtpChannel, } from '../api/auth.api';
+import type { RegisterFormData, } from '../types';
 import type { User } from '../types';
-import type { EmailRegisterPayload, PhoneRegisterPayload } from '../types';
-import { normalizePhone } from '../validation';
+
+interface OtpSession {
+    challengeId: string;
+    channel: OtpChannel;
+    destination: string;
+    expiresAt: number;
+    retryAvailableAt: number | null;
+}
+
+interface PendingRegistration {
+    registrationTicket: string;
+    channel: OtpChannel;
+    destination: string;
+}
 
 interface AuthState {
     user: User | null;
     token: string | null;
     isAuthenticated: boolean;
     isLoading: boolean;
+    otpSession: OtpSession | null;
+    pendingRegistration: PendingRegistration | null;
 
-    /** Демо: «отправка» SMS — в проде заменить на API */
-    loginWithEmail: (email: string, password: string) => Promise<void>;
-    registerWithEmail: (data: EmailRegisterPayload) => Promise<void>;
-    sendSmsCode: (phone: string) => Promise<void>;
-    loginWithPhone: (phone: string, code: string) => Promise<void>;
-    registerWithPhone: (data: PhoneRegisterPayload) => Promise<void>;
+    sendOtp: (
+        channel: OtpChannel,
+        destination: string
+    ) => Promise<void>;
+
+    verifyOtp: (
+        code: string
+    ) => Promise<'authenticated' | 'registration'>;
+
+    register: (
+        data: RegisterFormData
+    ) => Promise<void>;
+
+    loadCurrentUser: () => Promise<void>;
 
     logout: () => void;
-    setUser: (user: User | null) => void;
-    setToken: (token: string | null) => void;
-}
 
-const ADMIN_EMAIL = 'admin@rentflow.local';
-const ADMIN_PASSWORD = 'admin123';
-const DEMO_SMS_CODE = '000000';
-const ADMIN_PHONE = '+79000000000';
-
-function mockToken(): string {
-    return `mock-jwt-${Date.now()}`;
-}
-
-function buildUser(partial: Partial<User> & Pick<User, 'id' | 'firstName' | 'lastName' | 'role'>): User {
-    return {
-        id: partial.id,
-        email: partial.email,
-        phone: partial.phone,
-        firstName: partial.firstName,
-        lastName: partial.lastName,
-        role: partial.role,
-    };
+    resetOtpFlow: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             user: null,
             token: null,
             isAuthenticated: false,
             isLoading: false,
 
-            sendSmsCode: async (_phone: string) => {
+            otpSession: null,
+            pendingRegistration: null,
+
+            sendOtp: async (channel, destination) => {
                 set({ isLoading: true });
+
                 try {
-                    await new Promise((r) => setTimeout(r, 600));
-                    // В проде: POST /auth/sms/send { phone: _phone }
+                    const response = await authApi.sendOtp(
+                        channel,
+                        destination
+                    );
+
+                    const now = Date.now();
+
+                    set({
+                        otpSession: {
+                            challengeId: response.challengeId,
+                            channel,
+                            destination,
+                            expiresAt: now + response.expiresIn * 1000,
+                            retryAvailableAt: response.retryAfter > 0
+                                ? now + response.retryAfter * 1000
+                                : null,
+                        },
+                        pendingRegistration: null,
+                    });
                 } finally {
                     set({ isLoading: false });
                 }
             },
 
-            loginWithEmail: async (email: string, password: string) => {
-                set({ isLoading: true });
-                try {
-                    await new Promise((r) => setTimeout(r, 500));
-                    const normalizedEmail = email.trim().toLowerCase();
-                    const isAdmin = normalizedEmail === ADMIN_EMAIL && password === ADMIN_PASSWORD;
-                    const user = buildUser({
-                        id: isAdmin ? 'admin-1' : 'user-email-1',
-                        email: normalizedEmail,
-                        firstName: isAdmin ? 'Admin' : 'Пользователь',
-                        lastName: isAdmin ? 'RentFlow' : 'Тестовый',
-                        role: isAdmin ? 'admin' : 'user',
-                    });
-                    set({
-                        user,
-                        token: mockToken(),
-                        isAuthenticated: true,
-                        isLoading: false,
-                    });
-                } catch (e) {
-                    set({ isLoading: false });
-                    throw e;
-                }
-            },
+            verifyOtp: async (code) => {
+                const { otpSession, } = get();
 
-            registerWithEmail: async (data: EmailRegisterPayload) => {
-                set({ isLoading: true });
-                try {
-                    await new Promise((r) => setTimeout(r, 500));
-                    const user = buildUser({
-                        id: `user-${Date.now()}`,
-                        email: data.email.trim().toLowerCase(),
-                        firstName: data.firstName.trim(),
-                        lastName: data.lastName.trim(),
-                        role: 'user',
-                    });
-                    set({
-                        user,
-                        token: mockToken(),
-                        isAuthenticated: true,
-                        isLoading: false,
-                    });
-                } catch (e) {
-                    set({ isLoading: false });
-                    throw e;
+                if (!otpSession) {
+                    throw new Error(
+                        'OTP session is not initialized.'
+                    );
                 }
-            },
 
-            loginWithPhone: async (phone: string, code: string) => {
+                if (Date.now() >= otpSession.expiresAt) {
+                    throw new Error(
+                        'OTP challenge has expired.'
+                    );
+                }
+
                 set({ isLoading: true });
+
                 try {
-                    await new Promise((r) => setTimeout(r, 500));
-                    const n = normalizePhone(phone);
-                    if (!n) throw new Error('Invalid phone');
-                    if (code.trim() !== DEMO_SMS_CODE) {
-                        set({ isLoading: false });
-                        throw new Error('Invalid SMS code');
+                    const response =
+                        await authApi.verifyOtp(
+                            otpSession.challengeId,
+                            otpSession.channel,
+                            otpSession.destination,
+                            code
+                        );
+
+                    if (
+                        response.status === 'Authenticated'
+                    ) {
+                        if (!response.token)
+                            throw new Error('Authentication token was not returned.');
+                        set({
+                            token: response.token,
+                            isAuthenticated: true,
+                            otpSession: null,
+                            pendingRegistration: null,
+                        });
+
+                        await get().loadCurrentUser();
+
+                        return 'authenticated';
                     }
-                    const isAdmin = n === ADMIN_PHONE;
-                    const user = buildUser({
-                        id: isAdmin ? 'admin-phone-1' : `user-phone-${n}`,
-                        phone: n,
-                        firstName: isAdmin ? 'Admin' : 'Пользователь',
-                        lastName: isAdmin ? 'RentFlow' : 'Телефон',
-                        role: isAdmin ? 'admin' : 'user',
-                    });
-                    set({
-                        user,
-                        token: mockToken(),
-                        isAuthenticated: true,
-                        isLoading: false,
-                    });
-                } catch (e) {
+
+                    if (
+                        response.status ===
+                        'RegistrationRequired'
+                    ) {
+                        if (
+                            !response.registrationTicket
+                        ) {
+                            throw new Error(
+                                'Registration ticket was not returned.'
+                            );
+                        }
+
+                        set({
+                            pendingRegistration: {
+                                registrationTicket:
+                                    response.registrationTicket,
+                                channel:
+                                    otpSession.channel,
+                                destination:
+                                    otpSession.destination,
+                            },
+                            otpSession: null,
+                        });
+
+                        return 'registration';
+                    }
+
+                    throw new Error(
+                        'Unexpected OTP authentication status.'
+                    );
+                } finally {
                     set({ isLoading: false });
-                    throw e;
                 }
             },
 
-            registerWithPhone: async (data: PhoneRegisterPayload) => {
+            register: async (data) => {
+                const {pendingRegistration,} = get();
+
+                if (!pendingRegistration)
+                    throw new Error('Registration session is not initialized.');
+
+                if (!data.phone?.trim())
+                    throw new Error('Phone is required.');
+
+                if (!data.consentDocumentId || !data.personalDataConsentAccepted) 
+                {
+                    throw new Error('Personal data processing consent is required.');
+                }
+
+                const request : RegisterRequest = {
+                    registrationTicket: pendingRegistration.registrationTicket,
+                    customerType: data.customerType,
+                    email: data.email?.trim() || undefined,
+                    phone: data.phone.trim(),
+                    firstName: data.firstName?.trim() || undefined,
+                    lastName: data.lastName?.trim() || undefined,
+                    inn: data.inn?.trim() || undefined,
+                    consentDocumentId: data.consentDocumentId,
+                    personalDataConsentAccepted: data.personalDataConsentAccepted,
+                };
+
                 set({ isLoading: true });
+
                 try {
-                    await new Promise((r) => setTimeout(r, 500));
-                    const n = normalizePhone(data.phone);
-                    if (!n) throw new Error('Invalid phone');
-                    if (data.code.trim() !== DEMO_SMS_CODE) {
-                        set({ isLoading: false });
-                        throw new Error('Invalid SMS code');
-                    }
-                    const user = buildUser({
-                        id: `user-phone-${Date.now()}`,
-                        phone: n,
-                        firstName: data.firstName.trim(),
-                        lastName: data.lastName.trim(),
-                        role: 'user',
+                    const response = await authApi.register(request);
+                    
+                    if (!response.token) 
+                        throw new Error('Authentication token was not returned.');
+
+                    set({
+                        token: response.token,
+                        isAuthenticated: true,
+                        pendingRegistration: null,
+                        otpSession: null,
                     });
+
+                    await get().loadCurrentUser();
+                } finally {
+                    set({ isLoading: false });
+                }
+            },
+
+            loadCurrentUser: async () => {
+                const {token,} = get();
+
+                if (!token) {
+                    set({
+                        user: null,
+                        isAuthenticated: false,
+                    });
+                    return;
+                }
+
+                try {
+                    const response = await authApi.getMe();
+                    const user: User = {
+                        id: response.userId,
+                        firstName: response.firstName,
+                        lastName: response.lastName,
+                        email: response.email,
+                        phone: response.phone,
+                        role: response.role,
+                        customerId: response.customerId,
+                    };
+
                     set({
                         user,
-                        token: mockToken(),
                         isAuthenticated: true,
-                        isLoading: false,
                     });
-                } catch (e) {
-                    set({ isLoading: false });
-                    throw e;
+                } catch {
+                    get().logout();
+                    throw new Error('Failed to load current user.');
                 }
             },
 
             logout: () => {
+                localStorage.removeItem('token');
+
                 set({
                     user: null,
                     token: null,
                     isAuthenticated: false,
                     isLoading: false,
+                    otpSession: null,
+                    pendingRegistration: null,
                 });
-                localStorage.removeItem('auth-storage');
             },
 
-            setUser: (user) => set({ user }),
-            setToken: (token) => set({ token }),
+            resetOtpFlow: () => {
+                set({
+                    otpSession: null,
+                    pendingRegistration: null,
+                });
+            },
         }),
+
         {
             name: 'auth-storage',
+
             partialize: (state) => ({
                 user: state.user,
                 token: state.token,
-                isAuthenticated: state.isAuthenticated,
+                isAuthenticated:
+                    state.isAuthenticated,
             }),
         }
     )

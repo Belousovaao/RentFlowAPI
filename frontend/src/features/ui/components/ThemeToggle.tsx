@@ -1,15 +1,15 @@
-import { useTheme } from '../../../app/providers/ThemeProvider';
 import { motion } from 'framer-motion';
+import { useUIStore } from '../stores/uiStore';
 
 export const ThemeToggle = () => {
-    const { theme, toggleTheme } = useTheme();
+    const theme = useUIStore(state => state.theme);
+    const toggleTheme = useUIStore(state => state.toggleTheme);
     
     return (
         <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={toggleTheme}
-            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 
-                       transition-colors relative"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors relative"
             aria-label="Toggle theme"
         >
             {theme === 'dark' ? (

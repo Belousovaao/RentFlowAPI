@@ -1,18 +1,17 @@
-import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useUIStore } from '../stores/uiStore';
 import { useI18n } from '../../../app/providers/I18nProvider';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuthStore } from '@/features/auth/stores/authStore';
-import { AuthModal } from '@/features/auth/components/AuthModal';
 import { UserMenu } from '@/features/auth/components/UserMenu';
+import { useAuthModalStore } from '@/features/auth/stores/authModalStore';
 
 export const Header = () => {
-    const [authOpen, setAuthOpen] = useState(false);
     const { isAuthenticated } = useAuthStore();
     const { isHeaderVisible } = useUIStore();
     const { t, language } = useI18n();
+    const { open } = useAuthModalStore();
     const location = useLocation();
     
     const navigation = [
@@ -34,8 +33,7 @@ export const Header = () => {
     
     return (
         <header
-            className={`fixed top-0 w-full z-50 transition-all duration-300
-                        bg-white/40 dark:bg-gray-900/50 backdrop-blur-xl
+            className={`fixed top-0 w-full z-50 transition-all duration-300 bg-white/40 dark:bg-gray-900/50 backdrop-blur-xl
                         shadow-2xl border-b-0 border-gray-200/50 dark:border-gray-700/50`}
         >
             <nav className="w-full px-2 sm:px-4 h-16 sm:h-20 flex items-center justify-between gap-2 sm:gap-4">
@@ -80,16 +78,14 @@ export const Header = () => {
                     ) : (
                         <button
                             type="button"
-                            onClick={() => setAuthOpen(true)}
-                            className="px-2 sm:px-4 py-1.5 sm:py-2 bg-primary-600 text-white rounded-lg 
-                                     hover:bg-primary-700 transition-colors whitespace-nowrap"
+                            onClick={() => open()}
+                            className="px-2 sm:px-4 py-1.5 sm:py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors whitespace-nowrap"
                         >
                             {t('nav.signIn')}
                         </button>
                     )}
                 </div>
             </nav>
-            <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
         </header>
     );
 };

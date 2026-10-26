@@ -1,21 +1,20 @@
-// features/booking/components/AssetSelector.tsx
 import { useEffect, useRef, useState } from 'react';
-import { useAssets } from '../../../entities/asset/asset.hooks';
 import type { Asset } from '../../../entities/asset/asset.types';
 import { useI18n } from '../../../app/providers/I18nProvider';
 import { formatPrice } from '@/shared/utils/formatters';
+import { calculateMaxDiscountDailyPrice } from '../utils/priceCalculator';
 
 interface AssetSelectorProps {
+    assets?: Asset[];
+    isLoading?: boolean;
     value: Asset | null;
-    onChange: (asset: Asset) => void;
+    onChange: (asset: Asset | null) => void;
 }
 
-export const AssetSelector = ({ value, onChange }: AssetSelectorProps) => {
+export const AssetSelector = ({ assets, isLoading=false, value, onChange }: AssetSelectorProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const { data: assetsResponse, isLoading } = useAssets();
     const { t } = useI18n();
-
     const selectorRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -28,7 +27,6 @@ export const AssetSelector = ({ value, onChange }: AssetSelectorProps) => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
     
-    const assets = assetsResponse?.data || [];
     const filteredAssets = assets?.filter(asset =>
         `${asset.brandName} ${asset.model}`.toLowerCase().includes(searchTerm.toLowerCase())
     ) || [];
@@ -37,12 +35,10 @@ export const AssetSelector = ({ value, onChange }: AssetSelectorProps) => {
         <div ref={selectorRef} className="relative">
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 
-                           rounded-lg cursor-pointer bg-white dark:bg-gray-800
-                           hover:border-primary-500 transition-colors"
+                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer bg-white dark:bg-gray-800 hover:border-primary-500 transition-colors"
             >
                 <div className="flex justify-between items-center">
-                    <span className={!value ? 'text-gray-400' : 'text-gray-900 dark:text-white'}>
+                    <span className={!value ? 'text-gray-900 dark:text-white' : 'text-gray-900 dark:text-white'}>
                         {value ? `${value.brandName} ${value.model}` : t('booking.selectCar')}
                     </span>
                     <svg
@@ -57,17 +53,14 @@ export const AssetSelector = ({ value, onChange }: AssetSelectorProps) => {
             </div>
             
             {isOpen && (
-                <div className="absolute top-full mt-2 w-full z-50 bg-white dark:bg-gray-800 
-                                rounded-lg shadow-xl border border-gray-200 dark:border-gray-700">
+                <div className="absolute top-full mt-2 w-full z-50 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700">
                     <div className="p-2">
                         <input
                             type="text"
                             placeholder="Search cars..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full p-2 border border-gray-300 dark:border-gray-600 
-                                       rounded-lg bg-white dark:bg-gray-700
-                                       focus:outline-none focus:border-primary-500"
+                            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:outline-none focus:border-primary-500"
                         />
                     </div>
                     
@@ -84,16 +77,15 @@ export const AssetSelector = ({ value, onChange }: AssetSelectorProps) => {
                                         onChange(asset);
                                         setIsOpen(false);
                                     }}
-                                    className="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 
-                                               cursor-pointer transition-colors"
+                                    className="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                                 >
                                     <div className="flex justify-between items-center">
                                         <div>
                                             <p className="font-semibold text-gray-900 dark:text-white">
                                                 {asset.brandName} {asset.model}
                                             </p>
-                                            <p className="text-sm text-gray-500">
-                                                {formatPrice(asset.dailyPrice)} {t('asset.perDay')}
+                                            <p className="text-sm text-gray-900 dark:text-white">
+                                                от {formatPrice(calculateMaxDiscountDailyPrice(asset.dailyPrice))} {t('asset.perDay')}
                                             </p>
                                         </div>
                                         {value?.id === asset.id && (

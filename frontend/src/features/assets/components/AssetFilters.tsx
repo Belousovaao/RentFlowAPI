@@ -97,15 +97,72 @@ export const AssetFilters = ({
         { value: AssetStatus.InRent, label: getStatusLabel(AssetStatus.InRent) },
     ];
 
-    const activeCount = Object.keys(localFilters).filter((key) => {
-        if (key === 'page' || key === 'limit' || key === 'sortBy') {
+    const activeCount = Object.entries(localFilters).filter(([key, value]) => {
+        if (
+            key === 'page' ||
+            key === 'limit' ||
+            key === 'sortBy'
+        ) {
             return false;
         }
-        return Boolean(localFilters[key as keyof AssetFiltersType]);
+        if (Array.isArray(value)) {
+            return value.length > 0;
+        }
+        return value !== undefined &&
+            value !== null &&
+            value !== '';
     }).length;
 
     const toggleSection = (key: keyof typeof sections) => {
         setSections((prev) => ({ ...prev, [key]: !prev[key] }));
+    };
+
+    const toggleFuelType = (value: FuelType) => {
+        setLocalFilters(prev => {
+            const current = prev.fuelTypes ?? [];
+
+            const updated = current.includes(value)
+                ? current.filter(x => x !== value)
+                : [...current, value];
+
+            return {
+                ...prev,
+                fuelTypes: updated.length ? updated : undefined,
+                page: 1
+            };
+        });
+    };
+
+    const toggleTransmission = (value: TransmissionType) => {
+        setLocalFilters(prev => {
+            const current = prev.transmissions ?? [];
+
+            const updated = current.includes(value)
+                ? current.filter(x => x !== value)
+                : [...current, value];
+
+            return {
+                ...prev,
+                transmissions: updated.length ? updated : undefined,
+                page: 1
+            };
+        });
+    };
+
+    const toggleDriveType = (value: DriveType) => {
+        setLocalFilters(prev => {
+            const current = prev.driveTypes ?? [];
+
+            const updated = current.includes(value)
+                ? current.filter(x => x !== value)
+                : [...current, value];
+
+            return {
+                ...prev,
+                driveTypes: updated.length ? updated : undefined,
+                page: 1
+            };
+        });
     };
 
     const SectionHeader = ({ title, sectionKey }: { title: string; sectionKey: keyof typeof sections }) => (
@@ -169,9 +226,7 @@ export const AssetFilters = ({
                                         value={localFilters.search || ''}
                                         onChange={(e) => updateFilter('search', e.target.value)}
                                         placeholder="Поиск по марке, модели..."
-                                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 
-                                                   rounded-lg bg-white dark:bg-gray-700 
-                                                   focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        className="w-full px-3 py-2 text-sm border border-gray-700 dark:border-gray-300 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     />
                                 )}
                             </div>
@@ -186,14 +241,14 @@ export const AssetFilters = ({
                                             value={localFilters.priceFrom || ''}
                                             onChange={(e) => updateFilter('priceFrom', e.target.value ? Number(e.target.value) : undefined)}
                                             placeholder="От"
-                                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
+                                            className="w-full px-3 py-2 text-sm border border-gray-700 dark:border-gray-300 rounded-lg bg-white dark:bg-gray-700"
                                         />
                                         <input
                                             type="number"
                                             value={localFilters.priceTo || ''}
                                             onChange={(e) => updateFilter('priceTo', e.target.value ? Number(e.target.value) : undefined)}
                                             placeholder="До"
-                                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
+                                            className="w-full px-3 py-2 text-sm border border-gray-700 dark:border-gray-300 rounded-lg bg-white dark:bg-gray-700"
                                         />
                                     </div>
                                 )}
@@ -209,14 +264,14 @@ export const AssetFilters = ({
                                             value={localFilters.yearFrom || ''}
                                             onChange={(e) => updateFilter('yearFrom', e.target.value ? Number(e.target.value) : undefined)}
                                             placeholder="От"
-                                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
+                                            className="w-full px-3 py-2 text-sm border border-gray-700 dark:border-gray-300 rounded-lg bg-white dark:bg-gray-700"
                                         />
                                         <input
                                             type="number"
                                             value={localFilters.yearTo || ''}
                                             onChange={(e) => updateFilter('yearTo', e.target.value ? Number(e.target.value) : undefined)}
                                             placeholder="До"
-                                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
+                                            className="w-full px-3 py-2 text-sm border border-gray-700 dark:border-gray-300 rounded-lg bg-white dark:bg-gray-700"
                                         />
                                     </div>
                                 )}
@@ -227,21 +282,23 @@ export const AssetFilters = ({
                                 <SectionHeader title="Тип топлива" sectionKey="fuel" />
                                 {sections.fuel && (
                                     <div className="grid grid-cols-2 gap-2">
-                                        {fuelTypeOptions.map(option => (
-                                            <button
-                                                key={option.value}
-                                                onClick={() => updateFilter('fuelType', 
-                                                    localFilters.fuelType === option.value ? undefined : option.value
-                                                )}
-                                                className={`px-2.5 py-2 text-xs rounded-lg border transition-all
-                                                    ${localFilters.fuelType === option.value
-                                                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
-                                                        : 'border-gray-300 dark:border-gray-600 hover:border-primary-300'
-                                                    }`}
-                                            >
-                                                {option.label}
-                                            </button>
-                                        ))}
+                                        {fuelTypeOptions.map(option => {
+                                            const selected = localFilters.fuelTypes?.includes(option.value) ?? false;
+                                            return (
+                                                <button
+                                                    type='button'
+                                                    key={option.value}
+                                                    onClick={() => toggleFuelType(option.value)}
+                                                    className={`px-2.5 py-2 text-sm rounded-lg border transition-all text-gray-700 dark:text-gray-300
+                                                        ${selected
+                                                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
+                                                            : 'border-gray-700 dark:border-gray-300 hover:border-primary-300'
+                                                        }`}
+                                                >
+                                                    {option.label}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </div>
@@ -251,21 +308,23 @@ export const AssetFilters = ({
                                 <SectionHeader title={t('asset.transmission')} sectionKey="transmission" />
                                 {sections.transmission && (
                                     <div className="grid grid-cols-2 gap-2">
-                                        {transmissionOptions.map(option => (
-                                            <button
-                                                key={option.value}
-                                                onClick={() => updateFilter('transmission', 
-                                                    localFilters.transmission === option.value ? undefined : option.value
-                                                )}
-                                                className={`px-2.5 py-2 text-xs rounded-lg border transition-all
-                                                    ${localFilters.transmission === option.value
-                                                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
-                                                        : 'border-gray-300 dark:border-gray-600 hover:border-primary-300'
-                                                    }`}
-                                            >
-                                                {option.label}
-                                            </button>
-                                        ))}
+                                        {transmissionOptions.map(option => {
+                                            const selected = localFilters.transmissions?.includes(option.value) ?? false;
+                                            return (
+                                                <button
+                                                    type='button'
+                                                    key={option.value}
+                                                    onClick={() => toggleTransmission(option.value)}
+                                                    className={`px-2.5 py-2 text-sm rounded-lg border transition-all text-gray-700 dark:text-gray-300
+                                                        ${selected
+                                                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
+                                                            : 'border-gray-700 dark:border-gray-300 hover:border-primary-300'
+                                                        }`}
+                                                >
+                                                    {option.label}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </div>
@@ -275,21 +334,24 @@ export const AssetFilters = ({
                                 <SectionHeader title="Привод" sectionKey="drive" />
                                 {sections.drive && (
                                     <div className="grid grid-cols-1 gap-2">
-                                        {driveTypeOptions.map(option => (
-                                            <button
-                                                key={option.value}
-                                                onClick={() => updateFilter('driveType',
-                                                    localFilters.driveType === option.value ? undefined : option.value
-                                                )}
-                                                className={`px-2.5 py-2 text-xs rounded-lg border transition-all
-                                                    ${localFilters.driveType === option.value
-                                                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
-                                                        : 'border-gray-300 dark:border-gray-600 hover:border-primary-300'
-                                                    }`}
-                                            >
-                                                {option.label}
-                                            </button>
-                                        ))}
+                                        {driveTypeOptions.map(option => {
+                                            const selected = localFilters.driveTypes?.includes(option.value) ?? false;
+
+                                            return (
+                                                <button
+                                                    type='button'
+                                                    key={option.value}
+                                                    onClick={() => toggleDriveType(option.value)}
+                                                    className={`px-2.5 py-2 text-sm rounded-lg border transition-all text-gray-700 dark:text-gray-300
+                                                        ${selected
+                                                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
+                                                            : 'border-gray-700 dark:border-gray-300 hover:border-primary-300'
+                                                        }`}
+                                                >
+                                                    {option.label}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </div>
@@ -302,10 +364,10 @@ export const AssetFilters = ({
                                         <select
                                             value={localFilters.minSeats || ''}
                                             onChange={(e) => updateFilter('minSeats', e.target.value ? Number(e.target.value) : undefined)}
-                                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
+                                            className="w-full px-3 py-2 text-m border border-gray-700 dark:border-gray-300 rounded-lg bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
                                         >
                                             <option value=""></option>
-                                            {[2, 4, 5, 6, 7, 8].map(seats => (
+                                            {[2, 5, 6, 7, 8].map(seats => (
                                                 <option key={seats} value={seats}>{seats}+</option>
                                             ))}
                                         </select>
@@ -323,43 +385,18 @@ export const AssetFilters = ({
                                             value={localFilters.minHorsepower || ''}
                                             onChange={(e) => updateFilter('minHorsepower', e.target.value ? Number(e.target.value) : undefined)}
                                             placeholder="От л.с."
-                                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
+                                            className="w-full px-3 py-2 text-sm border border-gray-700 dark:border-gray-300 rounded-lg bg-white dark:bg-gray-700"
                                         />
                                         <input
                                             type="number"
                                             value={localFilters.maxHorsepower || ''}
                                             onChange={(e) => updateFilter('maxHorsepower', e.target.value ? Number(e.target.value) : undefined)}
                                             placeholder="До л.с."
-                                            className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"
+                                            className="w-full px-3 py-2 text-sm border border-gray-700 dark:border-gray-300 rounded-lg bg-white dark:bg-gray-700"
                                         />
                                     </div>
                                 )}
                             </div>
-
-                            {/* Статус доступности */}
-                            <div>
-                                <SectionHeader title="Статус" sectionKey="status" />
-                                {sections.status && (
-                                    <div className="flex flex-wrap gap-2">
-                                        {statusOptions.map(option => (
-                                            <button
-                                                key={option.value}
-                                                onClick={() => updateFilter('status', 
-                                                    localFilters.status === option.value ? undefined : option.value
-                                                )}
-                                                className={`px-2.5 py-2 text-xs rounded-lg border transition-all
-                                                    ${localFilters.status === option.value
-                                                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
-                                                        : 'border-gray-300 dark:border-gray-600 hover:border-primary-300'
-                                                    }`}
-                                            >
-                                                {option.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
                             {/* Кнопки действий */}
                             <div className="grid grid-cols-2 gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
                                 <button

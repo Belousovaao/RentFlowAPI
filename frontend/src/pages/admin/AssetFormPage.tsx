@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { adminAssetsApi } from '@/shared/api/adminAssetApi';
+import { adminAssetsApi } from '@/features/admin/api/adminAsset.api';
 import { Asset, AssetCategory, AssetCategoryLabels, AssetStatus, AssetType, AssetTypeLabels, DriveType, DriveTypeLabels, FuelType, FuelTypeLabels, TransmissionType, TransmissionTypeLabels } from '@/entities/asset/asset.types';
 import { ArrowLeft, Save, X, Plus, Upload, Trash2, GripVertical } from 'lucide-react';
 import api from '@/shared/api/axios';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent, } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable, } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { getPhotoUrl } from '@/shared/utils/photoUrl';
 
 const SortablePhotoItem = ({ photo, index, onDelete, type, getFullImageUrl }: { 
     photo: { id: string; url: string }; 
@@ -31,13 +32,15 @@ const SortablePhotoItem = ({ photo, index, onDelete, type, getFullImageUrl }: {
         cursor: 'grab',
     };
 
+    
+
     return (
         <div
             ref={setNodeRef}
             style={style}
             className="relative group"
             {...attributes}
-            {...listeners}
+            //{...listeners}
         >
             <img 
                 src={getFullImageUrl(photo.url)} 
@@ -46,7 +49,12 @@ const SortablePhotoItem = ({ photo, index, onDelete, type, getFullImageUrl }: {
             />
             <button
                 type="button"
-                onClick={() => onDelete(photo.id)}
+                onClick={(e) => 
+                    {
+                        e.stopPropagation();
+                        console.log('🖱️ Кнопка корзины НАЖАТА! photo.id:', photo.id);
+                        onDelete(photo.id)
+                    }}
                 className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
             >
                 <Trash2 className="w-3 h-3" />
@@ -54,7 +62,9 @@ const SortablePhotoItem = ({ photo, index, onDelete, type, getFullImageUrl }: {
             <div className="absolute bottom-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
                 {index + 1}
             </div>
-            <div className="absolute top-1 left-1 bg-black/50 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+            <div 
+                {...listeners}
+                className="absolute top-1 left-1 bg-black/50 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                 <GripVertical className="w-3 h-3" />
             </div>
         </div>
@@ -95,8 +105,6 @@ export const AssetFormPage = () => {
         color: '',
         features: [],
         deposit: 5000,
-        canDeliver: false,
-        deliveryPrice: 0,
         latitude: null,
         longitude: null
       });
@@ -112,9 +120,7 @@ export const AssetFormPage = () => {
     const fetchAsset = async () => {
         setLoading(true);
         try {
-            console.log('Fetching asset with id:', id);
             const res = await adminAssetsApi.getById(id!);
-            console.log('Fetched asset response:', res.data);
             setFormData({
                 brandName: res.data.brandName,
                 model: res.data.model,
@@ -122,7 +128,7 @@ export const AssetFormPage = () => {
                 dailyPrice: res.data.dailyPrice,
                 fuelType: res.data.fuelType as FuelType,
                 transmission: res.data.transmission as TransmissionType,
-                driveType: res.data.driveType as DriveType,
+                driveType: Number(res.data.driveType) as DriveType,
                 seats: res.data.seats,
                 horsepower: res.data.horsepower,
                 status: res.data.status as AssetStatus,
@@ -137,10 +143,9 @@ export const AssetFormPage = () => {
                 topSpeed: res.data.topSpeed || 0,
                 color: res.data.color || '',
                 deposit: res.data.deposit || 5000,
-                canDeliver: res.data.canDeliver || false,
-                deliveryPrice: res.data.deliveryPrice || 0
             });
-
+            console.log("API:", res.data.driveType, typeof res.data.driveType);
+    
             const photos = res.data.photos || [];
             const exterior = photos.filter(p => p.type == 'Exterior').sort((a, b) => a.order - b.order).map(p => ({ id: p.id, url: p.url }));
             const interior = photos.filter(p => p.type === 'Interior').sort((a, b) => a.order - b.order).map(p => ({ id: p.id, url: p.url }));
@@ -159,11 +164,31 @@ export const AssetFormPage = () => {
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, value, type } = e.target;
+    const numericFields = new Set([
+        "year",
+        "dailyPrice",
+        "deposit",
+        "horsepower",
+        "doors",
+        "seats",
+        "topSpeed",
+        "fuelType",
+        "transmission",
+        "driveType",
+        "category",
+        "type"
+    ]);
+
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    ) => {
+        const { name, value } = e.target;
+
         setFormData(prev => ({
-        ...prev,
-        [name]: type === 'number' ? parseFloat(value) : value
+            ...prev,
+            [name]: numericFields.has(name)
+                ? Number(value)
+                : value
         }));
     };
 
@@ -243,9 +268,10 @@ export const AssetFormPage = () => {
 
     // Удаление фото экстерьера
     const deleteExteriorPhoto = async (photoId: string) => {
+        console.log('🔥 deleteExteriorPhoto ВЫЗВАНА! photoId:', photoId);
         if (!confirm('Удалить это фото?')) return;
         try {
-            await api.delete(`/admin/assets/${id}/photos/exterior/${photoId}`);
+            await adminAssetsApi.deletePhoto(id!, photoId);
             setExteriorPhotos(prev => prev.filter(p => p.id !== photoId));
             alert('Фото удалено');
         } catch (err) {
@@ -254,24 +280,19 @@ export const AssetFormPage = () => {
         }
     };
 
-    const getFullImageUrl = (url: string) => {
-        if (!url) return '';
-        if (url.startsWith('http')) return url;
-        return `http://localhost:9000/rentflow-photos${url}`;
-    };
-
     // Удаление фото интерьера
     const deleteInteriorPhoto = async (photoId: string) => {
         if (!confirm('Удалить это фото?')) return;
         try {
-            await api.delete(`/admin/assets/${id}/photos/interior/${photoId}`);
+            await adminAssetsApi.deletePhoto(id!, photoId);
             setInteriorPhotos(prev => prev.filter(p => p.id !== photoId));
             alert('Фото удалено');
-        } catch (err) {
+        } 
+        catch (err) {
             console.error(err);
             alert('Ошибка удаления фото');
-        }
-    };
+    }
+};
 
     const reorderPhotos = async (type: 'exterior' | 'interior', photoIds: string[]) => {
         try {
@@ -284,6 +305,9 @@ export const AssetFormPage = () => {
 
     const handleDragEnd = (event: DragEndEvent, type: 'exterior' | 'interior') => {
         const { active, over } = event;
+        console.log('DragEnd');
+        console.log('active', active.id);
+        console.log('over', over?.id);
         
         if (active.id !== over?.id) {
             const oldIndex = type === 'exterior' 
@@ -385,172 +409,282 @@ export const AssetFormPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Марка *
+                                Марка*
                             </label>
                             <input
-                            type="text"
-                            name="brandName"
-                            value={formData.brandName || ''}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                                    bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                type="text"
+                                name="brandName"
+                                value={formData.brandName || ''}
+                                onChange={handleChange}
+                                required
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                             />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Модель *
+                                Модель*
                             </label>
                             <input
-                            type="text"
-                            name="model"
-                            value={formData.model || ''}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                                    bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                type="text"
+                                name="model"
+                                value={formData.model || ''}
+                                onChange={handleChange}
+                                required
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                             />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Год выпуска *
+                                Год выпуска*
                             </label>
                             <input
-                            type="number"
-                            name="year"
-                            value={formData.year || ''}
-                            onChange={handleChange}
-                            required
-                            min="1900"
-                            max={new Date().getFullYear() + 1}
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                                    bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                type="number"
+                                name="year"
+                                value={formData.year || ''}
+                                onChange={handleChange}
+                                required
+                                min="1900"
+                                max={new Date().getFullYear() + 1}
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                             />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                            Цена за день (₽) *
+                                Цена за день (₽)*
                             </label>
                             <input
-                            type="number"
-                            name="dailyPrice"
-                            value={formData.dailyPrice || ''}
-                            onChange={handleChange}
-                            required
-                            min="0"
-                            step="100"
-                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                                    bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                type="number"
+                                name="dailyPrice"
+                                value={formData.dailyPrice || ''}
+                                onChange={handleChange}
+                                required
+                                min="0"
+                                step="100"
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Залог (₽)</label>
-                            <input type="number" name="deposit" value={formData.deposit || ''} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg"/>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Залог (₽)
+                            </label>
+                            <input 
+                                type="number" 
+                                name="deposit" 
+                                value={formData.deposit || ''} 
+                                onChange={handleChange} 
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"/>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Цвет</label>
-                            <input type="text" name="color" value={formData.color || ''} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg"/>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Цвет*
+                            </label>
+                            <input 
+                                type="text" 
+                                name="color" 
+                                value={formData.color || ''} 
+                                onChange={handleChange} 
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"/>
                         </div>
                     </div>
                 </div>
                 {/* Тип и категория */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                    <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Тип и категория</h2>
+                    <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+                        Тип и категория
+                    </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Тип ТС</label>
-                        <select name="type" value={formData.type || AssetType.Auto} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg">
-                        {Object.entries(AssetTypeLabels).map(([value, label]) => (
-                            <option key={value} value={Number(value)}>{label}</option>
-                        ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Категория</label>
-                        <select name="category" value={formData.category || AssetCategory.Crossover} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg">
-                        {Object.entries(AssetCategoryLabels).map(([value, label]) => (
-                            <option key={value} value={Number(value)}>{label}</option>
-                        ))}
-                        </select>
-                    </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Тип ТС
+                            </label>
+                            <select
+                                value={formData.type || AssetType.Auto} 
+                                onChange={handleChange} 
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                {Object.entries(AssetTypeLabels).map(([value, label]) => (
+                                    <option key={value} value={Number(value)}>{label}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Категория
+                            </label>
+                            <select
+                                value={formData.category || AssetCategory.Crossover} 
+                                onChange={handleChange} 
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                {Object.entries(AssetCategoryLabels).map(([value, label]) => (
+                                    <option key={value} value={Number(value)}>{label}</option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
                 </div>
                 {/* Технические характеристики */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                    <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Технические характеристики</h2>
+                    <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+                        Технические характеристики
+                    </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Топливо</label>
-                        <select name="fuelType" value={formData.fuelType || FuelType.Petrol} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg">
-                        {Object.entries(FuelTypeLabels).map(([value, label]) => (
-                            <option key={value} value={Number(value)}>{label}</option>
-                        ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">КПП</label>
-                        <select name="transmission" value={formData.transmission || TransmissionType.Automatic} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg">
-                            {Object.entries(TransmissionTypeLabels).map(([value, label]) => (
-                                <option key={value} value={Number(value)}>{label}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Привод</label>
-                        <select name="driveType" value={formData.driveType || DriveType.FrontWheelDrive} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg">
-                        {Object.entries(DriveTypeLabels).map(([value, label]) => (
-                            <option key={value} value={Number(value)}>{label}</option>
-                        ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Мощность (л.с.)</label>
-                        <input type="number" name="horsepower" value={formData.horsepower || ''} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg"/>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Кол-во мест</label>
-                        <input type="number" name="seats" value={formData.seats || ''} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg"/>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Кол-во дверей</label>
-                        <input type="number" name="doors" value={formData.doors || ''} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg"/>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Двигатель</label>
-                        <input type="text" name="engine" value={formData.engine || ''} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg"/>
-                    </div>
-                    <div> 
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Разгон (сек)</label>
-                        <input type="text" name="acceleration" value={formData.acceleration || ''} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg"/>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Макс. скорость (км/ч)</label>
-                        <input type="number" name="topSpeed" value={formData.topSpeed || ''} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg"/>
-                    </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Топливо
+                            </label>
+                            <select 
+                                name="fuelType" 
+                                value={formData.fuelType || FuelType.Petrol} 
+                                onChange={handleChange} 
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                {Object.entries(FuelTypeLabels).map(([value, label]) => (
+                                    <option key={value} value={Number(value)}>{label}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                КПП
+                            </label>
+                            <select 
+                                name="transmission" 
+                                value={formData.transmission || TransmissionType.Automatic} 
+                                onChange={handleChange} 
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                {Object.entries(TransmissionTypeLabels).map(([value, label]) => (
+                                    <option key={value} value={Number(value)}>{label}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Привод
+                            </label>
+                            <select 
+                                name="driveType" 
+                                value={formData.driveType || DriveType.FrontWheelDrive} 
+                                onChange={handleChange} 
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                                {Object.entries(DriveTypeLabels).map(([value, label]) => (
+                                    <option key={value} value={Number(value)}>{label}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Мощность (л.с.)
+                            </label>
+                            <input 
+                                type="number" 
+                                name="horsepower" 
+                                value={formData.horsepower || ''} 
+                                onChange={handleChange} 
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"/>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Кол-во мест
+                            </label>
+                            <input 
+                                type="number" 
+                                name="seats" 
+                                value={formData.seats || ''} 
+                                onChange={handleChange} 
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"/>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Кол-во дверей
+                            </label>
+                            <input 
+                                type="number" 
+                                name="doors" 
+                                value={formData.doors || ''} 
+                                onChange={handleChange} 
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"/>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Двигатель
+                            </label>
+                            <input 
+                                type="text" 
+                                name="engine" 
+                                value={formData.engine || ''} 
+                                onChange={handleChange} 
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"/>
+                        </div>
+                        <div> 
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Разгон (сек)
+                            </label>
+                            <input 
+                                type="text" 
+                                name="acceleration" 
+                                value={formData.acceleration || ''} 
+                                onChange={handleChange} 
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"/>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Макс. скорость (км/ч)
+                            </label>
+                            <input 
+                                type="number" 
+                                name="topSpeed" 
+                                value={formData.topSpeed || ''} 
+                                onChange={handleChange} 
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"/>
+                        </div>
                     </div>
                 </div>
                 {/* Описания */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                    <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Описания</h2>
+                    <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+                        Описания
+                    </h2>
                     <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Краткое описание</label>
-                        <textarea name="shortDescription" value={formData.shortDescription || ''} onChange={handleChange} rows={2} className="w-full px-3 py-2 border rounded-lg"/>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Полное описание</label>
-                        <textarea name="fullDescription" value={formData.fullDescription || ''} onChange={handleChange} rows={4} className="w-full px-3 py-2 border rounded-lg"/>
-                    </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Краткое описание
+                            </label>
+                            <textarea 
+                                name="shortDescription" 
+                                value={formData.shortDescription || ''} 
+                                onChange={handleChange} 
+                                rows={2} 
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"/>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                Полное описание
+                            </label>
+                            <textarea 
+                                name="fullDescription" 
+                                value={formData.fullDescription || ''} 
+                                onChange={handleChange} 
+                                rows={4} 
+                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"/>
+                        </div>
                     </div>
                 </div>
                 {/* Особенности */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                    <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Особенности</h2>
+                    <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
+                        Особенности
+                    </h2>
                     <div className="flex gap-2 mb-4">
-                    <input type="text" value={newFeature} onChange={(e) => setNewFeature(e.target.value)} placeholder="Добавить особенность" className="flex-1 px-3 py-2 border rounded-lg"/>
-                    <button type="button" onClick={addFeature} className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
-                        <Plus className="w-4 h-4" />
-                    </button>
+                        <input 
+                            type="text" 
+                            value={newFeature} 
+                            onChange={(e) => setNewFeature(e.target.value)} 
+                            placeholder="Добавить особенность" 
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"/>
+                        <button 
+                            type="button" 
+                            onClick={addFeature} 
+                            className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                            <Plus className="w-4 h-4" />
+                        </button>
                     </div>
                     <div className="flex flex-wrap gap-2">
                     {formData.features?.map((feature, index) => (
@@ -561,22 +695,6 @@ export const AssetFormPage = () => {
                         </button>
                         </span>
                     ))}
-                    </div>
-                </div>
-                {/* Доставка */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
-                    <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Доставка</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <label className="flex items-center gap-3">
-                        <input type="checkbox" name="canDeliver" checked={formData.canDeliver || false} onChange={handleCheckboxChange} className="w-4 h-4"/>
-                        <span>Возможна доставка</span>
-                    </label>
-                    {formData.canDeliver && (
-                        <div>
-                        <label className="block text-sm font-medium mb-1">Цена доставки (₽)</label>
-                        <input type="number" name="deliveryPrice" value={formData.deliveryPrice || ''} onChange={handleChange} className="w-full px-3 py-2 border rounded-lg"/>
-                        </div>
-                    )}
                     </div>
                 </div>
 
@@ -625,7 +743,7 @@ export const AssetFormPage = () => {
                                                 index={idx}
                                                 onDelete={deleteExteriorPhoto}
                                                 type='Экстерьер'
-                                                getFullImageUrl={getFullImageUrl}
+                                                getFullImageUrl={getPhotoUrl}
                                             />
                                         ))}
                                     </div>
@@ -656,23 +774,29 @@ export const AssetFormPage = () => {
                                     />
                                 </label>
                             </div>
-                            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
-                                {interiorPhotos.map((photo, idx) => (
-                                    <div key={photo.id} className="relative group">
-                                        <img src={photo.url} alt={`Интерьер ${idx + 1}`} className="w-full h-20 object-cover rounded-lg" />
-                                        <button
-                                            type="button"
-                                            onClick={() => deleteInteriorPhoto(photo.id)}
-                                            className="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                            <Trash2 className="w-3 h-3" />
-                                        </button>
-                                        <span className="absolute bottom-1 left-1 bg-black/60 text-white text-xs px-1 rounded">
-                                            {idx + 1}
-                                        </span>
+                            <DndContext
+                                sensors={sensors}
+                                collisionDetection={closestCenter}
+                                onDragEnd={(event) => handleDragEnd(event, 'interior')}
+                            >
+                                <SortableContext
+                                    items={interiorPhotos.map(p => p.id)}
+                                    strategy={verticalListSortingStrategy}
+                                >
+                                    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+                                        {interiorPhotos.map((photo, idx) => (
+                                            <SortablePhotoItem
+                                                key={photo.id}
+                                                photo={photo}
+                                                index={idx}
+                                                onDelete={deleteInteriorPhoto}
+                                                type="Интерьер"
+                                                getFullImageUrl={getPhotoUrl}
+                                            />
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
+                                </SortableContext>
+                            </DndContext>
                         </div>
                     </>
                 )}

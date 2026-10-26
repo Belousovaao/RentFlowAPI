@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { adminAssetsApi } from '@/shared/api/adminAssetApi';
+import { Link, useNavigate } from 'react-router-dom';
+import { adminAssetsApi } from '@/features/admin/api/adminAsset.api';
 import { Asset, AssetStatus, AssetStatusColors, AssetStatusLabels } from '@/entities/asset/asset.types';
-import { Pencil, Plus, Image, } from 'lucide-react';
+import { Pencil, Plus, Image, ArrowLeft, } from 'lucide-react';
+import { getPhotoUrl } from '@/shared/utils/photoUrl';
 
 export const AdminAssetsListPage = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -11,6 +12,7 @@ export const AdminAssetsListPage = () => {
   const [total, setTotal] = useState(0);
   const [showDisabled, setShowDisabled] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
 
   const fetchAssets = async () => {
     setLoading(true);
@@ -21,8 +23,6 @@ export const AdminAssetsListPage = () => {
         showDisabled,
         search: searchTerm || undefined
       });
-      console.log('API response:', res.data);
-      console.log('First asset photos:', res.data.data[0]?.photos);
       setAssets(res.data.data);
       setTotal(res.data.totalCount);
     } catch (err) {
@@ -41,36 +41,9 @@ export const AdminAssetsListPage = () => {
     // Ищем фото с типом Exterior
     const exteriorPhoto = asset.photos?.find(p => p.type === 'Exterior');
     if (exteriorPhoto) {
-        return `http://localhost:9000/rentflow-photos${exteriorPhoto.url}`;
+        return getPhotoUrl(exteriorPhoto.url);
     }
     return '/car-placeholder.jpg';
-};
-
-  const handleToggleStatus = async (asset: Asset) => {
-    try {
-      if (asset.status !== AssetStatus.Disabled) {
-        await adminAssetsApi.disable(asset.id);
-        alert(`Автомобиль ${asset.brandName} ${asset.model} отключен`);
-      } else {
-        await adminAssetsApi.enable(asset.id);
-        alert(`Автомобиль ${asset.brandName} ${asset.model} включен`);
-      }
-      fetchAssets();
-    } catch (err) {
-        alert('Ошибка при изменении статуса');
-    }
-  };
-
-  const handleDeletePhoto = async (assetId: string, photoId: string, photoUrl: string) => {
-    if (confirm('Удалить это фото?')) {
-      try {
-        await adminAssetsApi.deletePhoto(assetId, photoId);
-        alert('Фото удалено');
-        fetchAssets();
-      } catch (err) {
-        alert('Ошибка при удалении фото');
-      }
-    }
   };
 
   const handleStatusChange = async (assetId: string, newStatus: AssetStatus) => {
@@ -90,7 +63,13 @@ export const AdminAssetsListPage = () => {
       <div className="container mx-auto px-4">
         {/* Заголовок и кнопка добавления */}
         <div className="flex justify-between items-center mb-6">
-          <div>
+          <div className="flex items-center gap-4">
+            <button
+                onClick={() => navigate('/admin/')}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+            >
+                <ArrowLeft className="w-5 h-5" />
+            </button>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Управление автомобилями
             </h1>
@@ -144,26 +123,26 @@ export const AdminAssetsListPage = () => {
             </Link>
           </div>
         ) : (
-          <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-xl shadow-sm">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
+            <table className="w-full table-auto divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-2 text-sm font-medium text-gray-500 tracking-wider">
                     Фото
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Марка / Модель
+                  <th className="px-4 py-2 text-sm font-medium text-gray-500 tracking-wider">
+                    Автомобиль
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-2 text-sm font-medium text-gray-500 tracking-wider">
                     Год
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-500 tracking-wider">
                     Цена/день
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-2 text-sm font-medium text-gray-500 tracking-wider">
                     Статус
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-2 text-sm font-medium text-gray-500 tracking-wider">
                     Действия
                   </th>
                 </tr>
@@ -195,9 +174,6 @@ export const AdminAssetsListPage = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900 dark:text-white">
                         {asset.brandName} {asset.model}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        ID: {asset.id.slice(0, 8)}...
                       </div>
                       {asset.status == AssetStatus.Disabled && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 mt-1">

@@ -1,9 +1,8 @@
 import { RouterProvider } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from './app/providers/ThemeProvider';
 import { I18nProvider } from './app/providers/I18nProvider';
 import { router } from './app/router';
-import './App.css';
+import { ThemeSync } from './features/ui/components/ThemeSync';
 
 // Создаем queryClient вне компонента
 const queryClient = new QueryClient({
@@ -20,11 +19,10 @@ const queryClient = new QueryClient({
 function App() {
     return (
         <QueryClientProvider client={queryClient}>
-            <ThemeProvider>
                 <I18nProvider>
+                    <ThemeSync />
                     <RouterProvider router={router} />
                 </I18nProvider>
-            </ThemeProvider>
         </QueryClientProvider>
     );
 }
