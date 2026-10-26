@@ -97,6 +97,15 @@ export const bookingFinanceApi = {
     getCharges: (bookingId: string) =>
         apiClient.get<BookingChargeDto[]>(`/api/booking-charges/booking/${bookingId}`),
 
+    getChargeSettings: () =>
+        apiClient.get<BookingChargeSettingsDto>("/api/booking-charges/admin/settings"),
+
+    updateChargeSettings: (lateCancellationTariff: number, refuelingPricePerLiter: number) =>
+        apiClient.put<BookingChargeSettingsDto>("/api/booking-charges/admin/settings", {
+            lateCancellationTariff,
+            refuelingPricePerLiter,
+        }),
+
     createCharge: (bookingId: string, request: CreateBookingChargeRequest) =>
         apiClient.post<{ id: string }>(`/api/booking-charges/admin/booking/${bookingId}`, request),
 
