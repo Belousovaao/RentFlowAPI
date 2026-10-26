@@ -164,12 +164,12 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
         const amount = chargeForm.amount.trim() ? Number(chargeForm.amount) : undefined;
         const quantity = chargeForm.quantity.trim() ? Number(chargeForm.quantity) : undefined;
 
-        if (amount !== undefined && (!Number.isFinite(amount) || amount <= 0)) {
-            toast.error("Введите положительную сумму начисления.");
+        if (amount !== undefined && (!Number.isFinite(amount) || amount <= 0 || Number(amount.toFixed(2)) !== amount)) {
+            toast.error("Введите положительную сумму начисления с двумя знаками после запятой.");
             return;
         }
-        if (quantity !== undefined && (!Number.isFinite(quantity) || quantity <= 0)) {
-            toast.error("Введите положительное количество литров.");
+        if (quantity !== undefined && (!Number.isFinite(quantity) || quantity <= 0 || Number(quantity.toFixed(3)) !== quantity)) {
+            toast.error("Введите положительное количество литров с точностью до 0,001.");
             return;
         }
 
@@ -217,7 +217,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
         );
         if (raw === null) return;
         const amount = Number(raw.replace(",", "."));
-        if (!Number.isFinite(amount) || amount <= 0 || Math.round(amount * 100) !== amount * 100) {
+        if (!Number.isFinite(amount) || amount <= 0 || Number(amount.toFixed(2)) !== amount) {
             toast.error("Введите положительную сумму не более чем с двумя знаками после запятой.");
             return;
         }
@@ -358,8 +358,9 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                 </div>
             </div>
 
-            <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
                 <SummaryCard label="Стоимость аренды" value={formatPrice(price.total)} hint="Без депозита" />
+                <SummaryCard label="К оплате с депозитом" value={formatPrice(price.totalToPay)} hint="Аренда и обеспечительный платёж" />
                 <SummaryCard label="Поступило" value={formatPrice(summary?.totalReceived ?? 0)} hint="Подтверждённые платежи" />
                 <SummaryCard label="Возвращено" value={formatPrice(summary?.totalRefunded ?? 0)} hint={summary ? `Ожидает возврата: ${formatPrice(summary.pendingRefunds)}` : "Загрузка…"} />
                 <SummaryCard label="Чистая оплата" value={formatPrice(summary?.netPaid ?? 0)} hint={summary ? `Доступно к возврату: ${formatPrice(summary.availableToRefund)}` : "Загрузка…"} />
@@ -474,7 +475,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                         {chargeForm.type === "Other" && <Field label="Название"><input className={inputClass} required value={chargeForm.title} onChange={event => setChargeForm(prev => ({ ...prev, title: event.target.value }))} /></Field>}
                         {(chargeForm.type === "TrafficFine" || chargeForm.type === "Cleaning" || chargeForm.type === "PropertyLossOrDamage" || chargeForm.type === "Other") && (
                             <Field label={chargeForm.type === "TrafficFine" ? "Описание или номер постановления" : "Описание"}>
-                                <textarea className={inputClass} required={chargeForm.type !== "TrafficFine"} rows={3} value={chargeForm.description} onChange={event => setChargeForm(prev => ({ ...prev, description: event.target.value }))} />
+                                <textarea className={inputClass} required={chargeForm.type === "Cleaning" || chargeForm.type === "PropertyLossOrDamage"} rows={3} value={chargeForm.description} onChange={event => setChargeForm(prev => ({ ...prev, description: event.target.value }))} />
                             </Field>
                         )}
                         {chargeForm.type === "TrafficFine" && <Field label="Номер постановления (если есть)"><input className={inputClass} value={chargeForm.referenceNumber} onChange={event => setChargeForm(prev => ({ ...prev, referenceNumber: event.target.value }))} /></Field>}
@@ -534,7 +535,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
 };
 
 function valueIsPositive(value: number) {
-    return Number.isFinite(value) && value > 0 && Math.round(value * 100) === value * 100;
+    return Number.isFinite(value) && value > 0 && Number(value.toFixed(2)) === value;
 }
 
 function SummaryCard({ label, value, hint }: { label: string; value: string; hint: string }) {
