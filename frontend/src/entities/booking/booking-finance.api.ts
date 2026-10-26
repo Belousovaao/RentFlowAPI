@@ -125,5 +125,5 @@ export const bookingFinanceApi = {
         apiClient.post<void>(`/api/payments/refunds/${paymentId}/complete`, { externalOperationId: externalOperationId ?? null }),
 
     allocatePayment: (paymentId: string, allocations: PaymentAllocationItem[]) =>
-        apiClient.patch<void>(`/api/payments/${paymentId}/allocations`, { allocations }),
+        apiClient.put<void>(`/api/payments/${paymentId}/allocations`, { allocations }),
 };
