@@ -3,7 +3,7 @@ import type { FormEvent, ReactNode } from "react";
 import { Check, CircleDollarSign, Loader2, Plus, RefreshCw, X } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { formatDateTime, formatPrice } from "@/shared/utils/formatters";
-import type { BookingPriceDto, BookingServiceDto } from "@/entities/booking/booking.types";
+import type { BookingPriceDto, BookingServiceDto, BookingStatus } from "@/entities/booking/booking.types";
 import {
     bookingFinanceApi,
     type BookingChargeDto,
@@ -20,6 +20,7 @@ interface Props {
     bookingId: string;
     price: BookingPriceDto;
     services: BookingServiceDto[];
+    bookingStatus: BookingStatus;
 }
 
 type FinanceRow = {
@@ -78,7 +79,7 @@ const emptyChargeForm = {
     referenceNumber: "",
 };
 
-export const BookingFinancesSection = ({ bookingId, price, services }: Props) => {
+export const BookingFinancesSection = ({ bookingId, price, services, bookingStatus }: Props) => {
     const [charges, setCharges] = useState<BookingChargeDto[]>([]);
     const [payments, setPayments] = useState<PaymentTransactionDto[]>([]);
     const [summary, setSummary] = useState<BookingPaymentSummaryDto | null>(null);
@@ -86,7 +87,6 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
     const [busyId, setBusyId] = useState<string | null>(null);
     const [chargeModalOpen, setChargeModalOpen] = useState(false);
     const [settingsModalOpen, setSettingsModalOpen] = useState(false);
-    const [chargeSettings, setChargeSettings] = useState<BookingChargeSettingsDto | null>(null);
     const [lateCancellationTariff, setLateCancellationTariff] = useState("");
     const [refuelingPricePerLiter, setRefuelingPricePerLiter] = useState("");
     const [paymentModalOpen, setPaymentModalOpen] = useState(false);
@@ -110,7 +110,6 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
             setCharges(chargesResult);
             setPayments(paymentsResult);
             setSummary(summaryResult);
-            setChargeSettings(settingsResult);
             setLateCancellationTariff(String(settingsResult.lateCancellationTariff));
             setRefuelingPricePerLiter(String(settingsResult.refuelingPricePerLiter));
         } catch (error) {
@@ -331,6 +330,7 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
         });
     }, [price, services, charges, payments]);
 
+    const canRegisterPayment = bookingStatus === "Confirmed" || bookingStatus === "Active";
     const confirmedCharges = charges.filter(charge => charge.status === "Confirmed" && charge.balance > 0);
     const pendingCharges = charges.filter(charge => charge.status === "PendingApproval");
 
@@ -344,7 +344,7 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
                     </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                    <button type="button" onClick={() => setPaymentModalOpen(true)} className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>
+                    <button type="button" onClick={() => setPaymentModalOpen(true)} disabled={!canRegisterPayment} title={!canRegisterPayment ? "Платежи доступны только для подтверждённого или активного бронирования" : undefined} className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>
                         <CircleDollarSign className="h-4 w-4" /> Добавить платёж
                     </button>
                     <button type="button" onClick={() => setChargeModalOpen(true)} className={`${buttonClass} border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700`}>
@@ -458,7 +458,7 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
                     <form className="space-y-4" onSubmit={submitCharge}>
                         <Field label="Тип начисления">
                             <select className={inputClass} value={chargeForm.type} onChange={event => setChargeForm(prev => ({ ...prev, type: event.target.value as BookingChargeType }))}>
-                                {Object.entries(chargeTypeLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                                {Object.entries(chargeTypeLabels).map(([value, label]) => <option key={value} value={value} disabled={value === "LateCancellation" && bookingStatus !== "Cancelled"}>{label}</option>)}
                             </select>
                         </Field>
                         {chargeForm.type === "Refueling" ? (
@@ -493,7 +493,7 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
                     <form className="space-y-4" onSubmit={submitPayment}>
                         <Field label="Тип платежа">
                             <select className={inputClass} value={paymentType} onChange={event => setPaymentType(event.target.value as typeof paymentType)}>
-                                <option value="Prepayment">Предоплата</option>
+                                <option value="Prepayment" disabled={bookingStatus !== "Confirmed"}>Предоплата</option>
                                 <option value="AdditionalPayment">Доплата</option>
                             </select>
                         </Field>
