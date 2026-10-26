@@ -8,15 +8,18 @@ namespace RentFlow.Application.Payments.Handlers;
 public sealed class CreateRefundHandler : IRequestHandler<CreateRefundCommand, Guid>
 {
     private readonly IPaymentRepository _payments;
+    private readonly IPaymentAllocationRepository _allocations;
     private readonly IUnitOfWork _uow;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     public CreateRefundHandler(
         IPaymentRepository payments,
+        IPaymentAllocationRepository allocations,
         IUnitOfWork uow,
         IDateTimeProvider dateTimeProvider)
     {
         _payments = payments;
+        _allocations = allocations;
         _uow = uow;
         _dateTimeProvider = dateTimeProvider;
     }
@@ -92,7 +95,8 @@ public sealed class CreateRefundHandler : IRequestHandler<CreateRefundCommand, G
                     p.Status is PaymentStatus.Pending or PaymentStatus.Completed)
                 .Sum(p => p.Amount);
 
-            var availableToRefund = originalPayment.Amount - refunds;
+            var allocatedAmount = (await _allocations.GetByPaymentIdAsync(originalPayment.Id, ct)).Sum(x => x.Amount);
+            var availableToRefund = originalPayment.Amount - refunds - allocatedAmount;
 
             if (request.Amount > availableToRefund)
             {

@@ -11,17 +11,20 @@ public sealed class CancelBookingHandler : IRequestHandler<CancelBookingCommand>
 {
     private readonly IBookingRepository _bookings;
     private readonly IPaymentRepository _payments;
+    private readonly IPaymentAllocationRepository _allocations;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     public CancelBookingHandler(
         IBookingRepository bookings,
         IPaymentRepository payments,
+        IPaymentAllocationRepository allocations,
         IUnitOfWork unitOfWork,
         IDateTimeProvider dateTimeProvider)
     {
         _bookings = bookings;
         _payments = payments;
+        _allocations = allocations;
         _unitOfWork = unitOfWork;
         _dateTimeProvider = dateTimeProvider;
     }
@@ -113,6 +116,10 @@ public sealed class CancelBookingHandler : IRequestHandler<CancelBookingCommand>
                         group => group.Key,
                         group => group.Sum(p => p.Amount));
                 
+                var bookingAllocations = await _allocations.GetByBookingIdAsync(booking.Id, ct);
+                var allocatedByPayment = bookingAllocations.GroupBy(x => x.PaymentId)
+                    .ToDictionary(group => group.Key, group => group.Sum(x => x.Amount));
+
                 var availableByPayment = completedIncomingPayments
                     .Select(payment => new
                     {
@@ -120,7 +127,8 @@ public sealed class CancelBookingHandler : IRequestHandler<CancelBookingCommand>
                         Available = Math.Max(
                             0m,
                             payment.Amount -
-                            reservedRefunds.GetValueOrDefault(payment.Id))
+                            reservedRefunds.GetValueOrDefault(payment.Id) -
+                            allocatedByPayment.GetValueOrDefault(payment.Id))
                     })
                     .Where(x => x.Available > 0m)
                     .OrderBy(x => x.Payment.CreatedAt)
