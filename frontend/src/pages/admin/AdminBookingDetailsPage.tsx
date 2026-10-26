@@ -593,7 +593,7 @@ export const AdminBookingDetailsPage = () => {
                             </div>
                         </section>
                         {/* Единая финансовая история */}
-                        <BookingFinancesSection bookingId={booking.id} price={booking.price} services={booking.services} />
+                        <BookingFinancesSection bookingId={booking.id} price={booking.price} services={booking.services} bookingStatus={booking.status} />
                     </div>
                 </div>
 
