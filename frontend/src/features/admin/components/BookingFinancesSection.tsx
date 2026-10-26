@@ -7,6 +7,7 @@ import type { BookingPriceDto, BookingServiceDto } from "@/entities/booking/book
 import {
     bookingFinanceApi,
     type BookingChargeDto,
+    type BookingChargeSettingsDto,
     type BookingChargeStatus,
     type BookingChargeType,
     type BookingPaymentSummaryDto,
@@ -84,6 +85,10 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
     const [loading, setLoading] = useState(true);
     const [busyId, setBusyId] = useState<string | null>(null);
     const [chargeModalOpen, setChargeModalOpen] = useState(false);
+    const [settingsModalOpen, setSettingsModalOpen] = useState(false);
+    const [chargeSettings, setChargeSettings] = useState<BookingChargeSettingsDto | null>(null);
+    const [lateCancellationTariff, setLateCancellationTariff] = useState("");
+    const [refuelingPricePerLiter, setRefuelingPricePerLiter] = useState("");
     const [paymentModalOpen, setPaymentModalOpen] = useState(false);
     const [allocationPayment, setAllocationPayment] = useState<PaymentTransactionDto | null>(null);
     const [chargeForm, setChargeForm] = useState(emptyChargeForm);
@@ -96,14 +101,18 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
     const loadFinance = useCallback(async () => {
         setLoading(true);
         try {
-            const [chargesResult, paymentsResult, summaryResult] = await Promise.all([
+            const [chargesResult, paymentsResult, summaryResult, settingsResult] = await Promise.all([
                 bookingFinanceApi.getCharges(bookingId),
                 bookingFinanceApi.getTransactions(bookingId),
                 bookingFinanceApi.getSummary(bookingId),
+                bookingFinanceApi.getChargeSettings(),
             ]);
             setCharges(chargesResult);
             setPayments(paymentsResult);
             setSummary(summaryResult);
+            setChargeSettings(settingsResult);
+            setLateCancellationTariff(String(settingsResult.lateCancellationTariff));
+            setRefuelingPricePerLiter(String(settingsResult.refuelingPricePerLiter));
         } catch (error) {
             console.error("Failed to load booking finance:", error);
             toast.error("Не удалось загрузить финансовые данные бронирования.");
@@ -130,6 +139,26 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
         } finally {
             setBusyId(null);
         }
+    };
+
+    const submitSettings = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const lateTariff = Number(lateCancellationTariff);
+        const refuelingPrice = Number(refuelingPricePerLiter);
+        if (
+            !Number.isFinite(lateTariff) || lateTariff < 0 ||
+            !Number.isFinite(refuelingPrice) || refuelingPrice < 0 ||
+            Number(lateTariff.toFixed(2)) !== lateTariff ||
+            Number(refuelingPrice.toFixed(2)) !== refuelingPrice
+        ) {
+            toast.error("Тарифы должны быть неотрицательными суммами с двумя знаками после запятой.");
+            return;
+        }
+        const succeeded = await runAction("charge-settings", () =>
+            bookingFinanceApi.updateChargeSettings(lateTariff, refuelingPrice),
+            "Тарифы начислений сохранены.",
+        );
+        if (succeeded) setSettingsModalOpen(false);
     };
 
     const submitCharge = async (event: FormEvent<HTMLFormElement>) => {
@@ -321,6 +350,9 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
                     <button type="button" onClick={() => setChargeModalOpen(true)} className={`${buttonClass} border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700`}>
                         <Plus className="h-4 w-4" /> Добавить начисление
                     </button>
+                    <button type="button" onClick={() => setSettingsModalOpen(true)} className={`${buttonClass} border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700`}>
+                        Тарифы
+                    </button>
                     <button type="button" onClick={() => void loadFinance()} disabled={loading} aria-label="Обновить финансы" className={`${buttonClass} border border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300`}>
                         <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                     </button>
@@ -402,6 +434,24 @@ export const BookingFinancesSection = ({ bookingId, price, services }: Props) =>
             </div>
 
             {loading && <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">Обновление финансовых данных…</p>}
+
+            {settingsModalOpen && (
+                <Modal title="Тарифы начислений" onClose={() => setSettingsModalOpen(false)}>
+                    <form className="space-y-4" onSubmit={submitSettings}>
+                        <Field label="Тариф за позднюю отмену, ₽">
+                            <input className={inputClass} type="number" min="0" step="0.01" required value={lateCancellationTariff} onChange={event => setLateCancellationTariff(event.target.value)} />
+                        </Field>
+                        <Field label="Стоимость топлива за литр, ₽">
+                            <input className={inputClass} type="number" min="0" step="0.01" required value={refuelingPricePerLiter} onChange={event => setRefuelingPricePerLiter(event.target.value)} />
+                        </Field>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Тарифы используются при создании новых начислений. Для поздней отмены и заправки сумма фиксируется в начислении на момент его создания.</p>
+                        <div className="flex justify-end gap-2">
+                            <button type="button" className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200" onClick={() => setSettingsModalOpen(false)}>Отмена</button>
+                            <button type="submit" disabled={busyId === "charge-settings"} className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">{busyId === "charge-settings" && <Loader2 className="h-4 w-4 animate-spin" />} Сохранить</button>
+                        </div>
+                    </form>
+                </Modal>
+            )}
 
             {chargeModalOpen && (
                 <Modal title="Новое начисление" onClose={() => setChargeModalOpen(false)}>
