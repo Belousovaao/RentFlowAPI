@@ -54,7 +54,7 @@ export const apiClient = {
     return response.data;
   },
 
-  async patch<T>(url: string, body?: unknown, config?: AxiosRequestConfig): Promise<T> {
+  async put<T>(url: string, body?: unknown, config?: AxiosRequestConfig): Promise<T> {\n        const response = await axiosClient.put<T>(url, body, config);\n        return response.data;\n    },\n\n  async patch<T>(url: string, body?: unknown, config?: AxiosRequestConfig): Promise<T> {
         const response = await axiosClient.patch<T>(url, body, config);
         return response.data;
     },
