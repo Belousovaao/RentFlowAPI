@@ -7,7 +7,6 @@ import type { BookingPriceDto, BookingServiceDto, BookingStatus } from "@/entiti
 import {
     bookingFinanceApi,
     type BookingChargeDto,
-    type BookingChargeSettingsDto,
     type BookingChargeStatus,
     type BookingChargeType,
     type BookingPaymentSummaryDto,
