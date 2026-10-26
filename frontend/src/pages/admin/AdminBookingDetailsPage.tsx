@@ -192,19 +192,6 @@ export const AdminBookingDetailsPage = () => {
         };
     });
 
-    const rentalPrice =
-        booking.price.rentalPrice.rentalPriceWithDiscount;
-
-    const servicesPrice = booking.price.servicesPrice;
-    const routeSurcharge = booking.price.routeSurcharge;
-
-    const penaltiesPrice = booking.price.penaltiesPrice;
-
-    const deposit = booking.price.deposit;
-
-    const total = booking.price.total;
-    const totalToPay = booking.price.totalToPay;
-
     return (
         <div className="min-h-screen bg-gray-50 pt-24 pb-16 dark:bg-gray-900">
             <div className="container mx-auto max-w-5xl px-4">
