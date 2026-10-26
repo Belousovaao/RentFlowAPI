@@ -11,13 +11,16 @@ public sealed class GetBookingPaymentSummaryHandler : IRequestHandler<GetBooking
 {
     private readonly IBookingRepository _bookings;
     private readonly IPaymentRepository _payments;
+    private readonly IPaymentAllocationRepository _allocations;
 
     public GetBookingPaymentSummaryHandler(
         IBookingRepository bookings,
-        IPaymentRepository payments)
+        IPaymentRepository payments,
+        IPaymentAllocationRepository allocations)
     {
         _bookings = bookings;
         _payments = payments;
+        _allocations = allocations;
     }
 
     public async Task<BookingPaymentSummaryDto> Handle(
@@ -62,7 +65,17 @@ public sealed class GetBookingPaymentSummaryHandler : IRequestHandler<GetBooking
         if (refunded > received)
             throw new InvalidOperationException("Completed refunds exceed completed incoming payments.");
 
-        if (pendingRefunds > received - refunded)
+        var allocated = (await _allocations.GetByBookingIdAsync(request.BookingId, ct))
+            .Where(a => payments.Any(p => p.Id == a.PaymentId &&
+                p.Status == PaymentStatus.Completed &&
+                p.Type is PaymentType.Prepayment or PaymentType.AdditionalPayment))
+            .Sum(a => a.Amount);
+
+        var refundableBeforePending = received - refunded - allocated;
+        if (refundableBeforePending < 0)
+            throw new InvalidOperationException("Allocated payments and completed refunds exceed completed incoming payments.");
+
+        if (pendingRefunds > refundableBeforePending)
             throw new InvalidOperationException("Pending refunds exceed the refundable balance.");
 
         return new BookingPaymentSummaryDto(
@@ -72,6 +85,6 @@ public sealed class GetBookingPaymentSummaryHandler : IRequestHandler<GetBooking
             refunded,
             pendingRefunds,
             received - refunded,
-            received - refunded - pendingRefunds);
+            refundableBeforePending - pendingRefunds);
     }
 }
