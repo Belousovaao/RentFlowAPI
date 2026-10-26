@@ -1,0 +1,21 @@
+public record ChangeBookingPeriodPreviewDto(
+    DateTime StartDate,
+    DateTime EndDate,
+    int CurrentRentalDays, 
+    int NewRentalDays,
+    decimal CurrentDailyPrice, 
+    decimal NewDailyPrice,
+    int ChangedDays,
+    decimal CurrentRentalPrice, 
+    decimal NewRentalPrice,
+    decimal Penalty,
+    decimal CurrentTotal,
+    decimal NewTotal,
+    decimal Difference,
+    bool IsExtension, 
+    bool IsReduction,
+    bool IsAdditionalPayment,
+    bool IsRefund,
+    IReadOnlyCollection<RentalPriceSegmentDto> CurrentSegments,
+    IReadOnlyCollection<RentalPriceSegmentDto> ChangedSegments
+);

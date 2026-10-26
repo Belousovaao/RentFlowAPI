@@ -5,19 +5,31 @@ namespace RentFlow.Domain.Customers;
 
 public class Organization : Customer
 {
-    public string FullName { get; private set; }
-    public string ShortName { get; private set; }
-    public OrganizationLegalForm LegalForm { get; private set; }
+    public string? FullName { get; private set; }
+    public string? ShortName { get; private set; }
+    public OrganizationLegalForm? LegalForm { get; private set; }
     public string INN { get; private set; }
-    public string OGRN { get; private set; }
-    public string KPP { get; private set; }
-    public string OrganizationAddress { get; private set; }
-    public string FactAddress { get; private set; }
-    public Guid RepresentativeId { get; private set; }
-    public SigningBasis SigningBasis { get; private set; }
-    public BankAccount OrganizationBankAccount { get; private set; }
+    public string? OGRN { get; private set; }
+    public string? KPP { get; private set; }
+    public string? OrganizationAddress { get; private set; }
+    public string? FactAddress { get; private set; }
+    public Guid? RepresentativeId { get; private set; }
+    public SigningBasis? SigningBasis { get; private set; }
+    public BankAccount? OrganizationBankAccount { get; private set; }
 
     private Organization() {}
+    public Organization(
+        string? email,
+        string phone,
+        string inn,
+        Guid? representativeId)
+    {
+        Id = Guid.NewGuid();
+        Email = email;
+        Phone = phone;
+        INN = inn;
+        RepresentativeId = representativeId;
+    }
     public Organization(
         string? email,
         string phone,
@@ -29,8 +41,8 @@ public class Organization : Customer
         string kpp,
         string organizationAddress,
         string factAddress,
-        Guid representativeId,
-        SigningBasis signingBasis,
+        Guid? representativeId,
+        SigningBasis? signingBasis,
         BankAccount bankAccount
         )
     {
@@ -56,5 +68,27 @@ public class Organization : Customer
             throw new ArgumentException("Driver is required for organization");
 
         return provideDriver;
+    }
+
+    public void UpdateOrganizationData(
+        string shortName, 
+        string fullName, 
+        OrganizationLegalForm legalForm,
+        string inn,
+        string ogrn,
+        string kpp,
+        string organizationAddress,
+        string factAddress,
+        BankAccount bankAccount)
+    {
+        ShortName = shortName;
+        FullName = fullName;
+        LegalForm = legalForm;
+        INN = inn;
+        OGRN = ogrn;
+        KPP = kpp;
+        OrganizationAddress = organizationAddress;
+        FactAddress = factAddress;
+        OrganizationBankAccount = bankAccount;
     }
 }

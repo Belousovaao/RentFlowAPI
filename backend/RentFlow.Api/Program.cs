@@ -19,6 +19,12 @@ using RentFlow.Infrastructure.Persistence.Repositories;
 using System.Text;
 using RentFlow.Application.Assets.Handlers;
 using RentFlow.Application.Assets.Queries;
+using RentFlow.Domain.Bookings.Pricing;
+using RentFlow.Infrastructure.Redis;
+using RentFlow.Application.Auth.Registration;
+using RentFlow.Application.Bookings.Services;
+using RentFlow.Persistance.Repositories.Customers;
+using System.Security.Claims;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -37,6 +43,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog();
 
+builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddDbContext<RentFlowDbContext>((sp, opt) =>
 {
     var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
@@ -80,18 +87,31 @@ builder.Services.AddScoped<IBookingRepository, BookingRepository>();
 builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 builder.Services.Configure<GarageOptions>(builder.Configuration.GetSection(GarageOptions.SectionName));
-builder.Services.AddScoped<IAssetPhotoStorage, GaragePhotoStorage>();
+builder.Services.AddScoped<IFileStorage, GaragePhotoStorage>();
 builder.Services.AddScoped<CreateBookingHandler>();
 builder.Services.AddScoped<IAssetPhotoRepository, AssetPhotoRepository>();
+builder.Services.AddScoped<IAppUserRepository, AppUserRepository>();
+builder.Services.AddScoped<IAdditionalServiceRepository, AdditionalServiceRepository>();
+builder.Services.AddMemoryCache();
+builder.Services.Configure<RentFlow.Api.Services.Auth.AuthOptions>(builder.Configuration.GetSection(RentFlow.Api.Services.Auth.AuthOptions.SectionName));
+builder.Services.AddScoped<RentFlow.Api.Services.Auth.IJwtTokenService, RentFlow.Api.Services.Auth.JwtTokenService>();
+builder.Services.AddScoped<IDateTimeProvider, KrasnoyarskDateTimeProvider>();
+builder.Services.AddScoped<IBookingPricingService, BookingPricingService>();
+builder.Services.AddScoped<IBookingReadRepository, BookingReadRepository>();
+builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<IBookingDestinationResolver, BookingDestinationResolver>();
+builder.Services.AddScoped<IDestinationRepository, DestinationRepository>();
+builder.Services.AddScoped<IConsentDocumentRepository, ConsentDocumentRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<RentFlow.Persistance.ConsentDocuments.ConsentDocumentSeeder>();
 
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.UnknownTypeHandling = System.Text.Json.Serialization.JsonUnknownTypeHandling.JsonElement;
-        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-    });
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.UnknownTypeHandling = System.Text.Json.Serialization.JsonUnknownTypeHandling.JsonElement;
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
 
 // Настройка аутентификации JWT
 var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not configured");
@@ -113,7 +133,9 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtIssuer,
         ValidAudience = jwtAudience,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        RoleClaimType = ClaimTypes.Role,
+        NameClaimType = ClaimTypes.NameIdentifier
     };
     
     options.Events = new JwtBearerEvents
@@ -162,6 +184,7 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -173,13 +196,17 @@ if (!app.Environment.IsEnvironment("Testing"))
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<RentFlowDbContext>();
     db.Database.Migrate();
+    var seeder = scope.ServiceProvider
+        .GetRequiredService<RentFlow.Persistance.ConsentDocuments.ConsentDocumentSeeder>();
+
+    await seeder.SeedAsync();
 }
 
 app.UseMiddleware<CorrelationMiddleware>();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseRouting();
 app.UseCors("AllowFrontend");
-
+app.UseAuthentication();
 // заглушка для админских запросов для тестирования
 if (app.Environment.IsDevelopment())
 {
@@ -198,16 +225,12 @@ if (app.Environment.IsDevelopment())
         await next();
     });
 }
-app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Use(async (context, next) =>
 {
-    Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path}");
     await next();
-    Console.WriteLine($"Response: {context.Response.StatusCode}");
 });
 
 app.Run();

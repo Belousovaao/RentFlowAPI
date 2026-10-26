@@ -23,31 +23,29 @@ public class CreateAssetCommandHandler : IRequestHandler<CreateAssetCommand, Ass
             code: code,
             brandName: request.BrandName,
             model: request.Model,
-            shortDescription: "",
-            fullDescription: "",
-            type: AssetType.Auto,
-            category: AssetCategory.Crossover,
+            shortDescription: request.ShortDescription,
+            fullDescription: request.FullDescription,
+            type: request.Type,
+            category: request.Category,
             year: request.Year,
             fuelType: request.FuelType,
             transmission: request.Transmission,
             driveType: request.DriveType,
             seats: request.Seats,
-            doors: 5,
-            engine: "",
+            doors: request.Doors,
+            engine: request.Engine,
             horsepower: request.Horsepower,
-            acceleration: "",
-            topSpeed: 60,
-            color: "",
-            features: new List<string>(),
+            acceleration: request.Acceleration,
+            topSpeed: request.TopSpeed,
+            color: request.Color,
+            features: request.Features,
             dailyPrice: request.DailyPrice,
-            deposit: 5000,
-            locationId: Guid.Empty,
-            canDeliver: false,
-            deliveryPrice: null,
-            latitude: null,
-            longitude: null
+            deposit: request.Deposit,
+            locationId: request.LocationId ?? Guid.Empty,
+            latitude: request.Latitude,
+            longitude: request.Longitude
             );
-            asset.UpdateStatus(request.Status);
+            asset.UpdateStatus(Enum.Parse<AssetStatus>(request.Status));
             await _repo.AddAsync(asset, ct);
             await _uow.SaveChangesAsync(ct);
             return asset;

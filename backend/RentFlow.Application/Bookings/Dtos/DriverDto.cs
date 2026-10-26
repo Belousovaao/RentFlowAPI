@@ -10,7 +10,8 @@ public sealed record DriverDto(
     string MiddleName,
     string Phone,
     string LisenceNumber,
-    List<char> Categories,
+    List<string> Categories,
     DateOnly IssuedDate,
-    DateOnly ExpirationDate
+    DateOnly ExpirationDate,
+    int ExprerienceFromYear
 );

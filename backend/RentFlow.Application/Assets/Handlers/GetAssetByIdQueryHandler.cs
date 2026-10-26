@@ -1,10 +1,11 @@
 using MediatR;
+using RentFlow.Application.Assets.Dtos;
+using RentFlow.Application.Assets.Mappers;
 using RentFlow.Application.Interfaces;
-using RentFlow.Domain.Assets;
 
 namespace RentFlow.Application.Assets.Queries
 {
-    public class GetAssetByIdQueryHandler : IRequestHandler<GetAssetByIdQuery, Asset?>
+    public class GetAssetByIdQueryHandler : IRequestHandler<GetAssetByIdQuery, AssetDto?>
     {
         private readonly IAssetRepository _assetRepository;
         
@@ -13,9 +14,10 @@ namespace RentFlow.Application.Assets.Queries
             _assetRepository = assetRepository;
         }
         
-        public async Task<Asset?> Handle(GetAssetByIdQuery request, CancellationToken cancellationToken)
+        public async Task<AssetDto?> Handle(GetAssetByIdQuery request, CancellationToken cancellationToken)
         {
-            return await _assetRepository.GetByIdAsync(request.Id, cancellationToken);
+            var asset = await _assetRepository.GetByIdAsync(request.Id, cancellationToken);
+            return asset != null ? AssetMapper.ToDto(asset) : null;
         }
     }
 }

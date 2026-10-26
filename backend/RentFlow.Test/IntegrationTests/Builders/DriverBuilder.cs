@@ -9,9 +9,10 @@ public class DriverBuilder
     private string _middleName = "Ivanovich";
     private string _phone = "+7 (900) 000-22-00";
     private string _licenseNumber = "11 22 333333";
-    private List<char> _categories = new() {'A', 'B'};
+    private List<string> _categories = new() {"A", "B1"};
     private DateOnly _issued = new(2020, 1, 1);
     private DateOnly _expiration = new(2030, 1, 1);
+    private int _experienceFrom = 2002;
 
     public DriverBuilder WithName(string firstName, string lastName, string middleName)
     {
@@ -21,12 +22,13 @@ public class DriverBuilder
         return this;
     }
 
-    public DriverBuilder WithLicense(string licenseNumber, List<char> categories, DateOnly issued, DateOnly expiration)
+    public DriverBuilder WithLicense(string licenseNumber, List<string> categories, DateOnly issued, DateOnly expiration, int experience)
     {
         _licenseNumber = licenseNumber;
         _categories = categories;
         _issued = issued;
         _expiration = expiration;
+        _experienceFrom = experience;
         return this;
     }
 
@@ -38,6 +40,7 @@ public class DriverBuilder
         _licenseNumber,
         _categories,
         _issued,
-        _expiration
+        _expiration,
+        _experienceFrom
     );
 }

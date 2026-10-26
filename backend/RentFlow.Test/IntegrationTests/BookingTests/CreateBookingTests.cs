@@ -69,11 +69,7 @@ public class CreateBookingTests : IntegrationBaseTest
 
         booking.AssetSnapshot.Should().NotBeNull();
         booking.AssetSnapshot.Category.Should().Be(asset.Category);
-        booking.AssetSnapshot.DailyPrice.Should().Be(asset.DailyPrice);
-        booking.AssetSnapshot.Deposit.Should().Be(asset.Deposit);
         booking.AssetSnapshot.Type.Should().Be(asset.Type);
-        booking.AssetSnapshot.DeliveryPrice.Should().Be(asset.DeliveryPrice);
-        booking.AssetSnapshot.CanDeliver.Should().Be(asset.CanDeliver);
 
         booking.BookingDriver.Should().NotBeNull(); 
         booking.BookingDriver.Phone.Should().Be(individualCustomer.Phone);

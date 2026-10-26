@@ -1,6 +1,7 @@
 using RentFlow.Domain.Bookings;
 using FluentAssertions;
 using RentFlow.Domain.Common;
+using RentFlow.Domain.Bookings.ValueObjects;
 
 namespace RentFlow.Test;
 

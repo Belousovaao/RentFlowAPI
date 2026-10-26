@@ -7,7 +7,7 @@ using Amazon.Runtime;
 
 namespace RentFlow.Persistance.Services;
 
-public sealed class GaragePhotoStorage : IAssetPhotoStorage
+public sealed class GaragePhotoStorage : IFileStorage
 {
     private readonly GarageOptions _options;
     private readonly IAmazonS3 _s3;
@@ -15,13 +15,6 @@ public sealed class GaragePhotoStorage : IAssetPhotoStorage
     public GaragePhotoStorage(IOptions<GarageOptions> options)
     {
         _options = options.Value;
-        
-        Console.WriteLine($"=== MinIO Configuration ===");
-        Console.WriteLine($"Endpoint: {_options.Endpoint}");
-        Console.WriteLine($"Bucket: {_options.Bucket}");
-        Console.WriteLine($"AccessKey: {_options.AccessKey}");
-        Console.WriteLine($"SecretKey: {new string('*', _options.SecretKey?.Length ?? 0)}");
-        Console.WriteLine($"PublicBaseUrl: {_options.PublicBaseUrl}");
     
         var credentials = new BasicAWSCredentials(_options.AccessKey, _options.SecretKey);
         
@@ -83,14 +76,17 @@ public sealed class GaragePhotoStorage : IAssetPhotoStorage
         string contentType,
         CancellationToken ct = default)
     {
-        var extension = Path.GetExtension(fileName);
-        if (string.IsNullOrWhiteSpace(extension))
-        {
-            extension = ".jpg";
-        }
-
         var objectKey = BuildObjectKey(assetId, fileName);
 
+        return await UploadAsync(objectKey, fileStream, contentType, ct);
+    }
+
+    public async Task<string> UploadAsync(
+        string objectKey,
+        Stream fileStream,
+        string contentType,
+        CancellationToken ct = default)
+    {
         var putRequest = new PutObjectRequest
         {
             BucketName = _options.Bucket,
@@ -137,5 +133,24 @@ public sealed class GaragePhotoStorage : IAssetPhotoStorage
             // Пробрасываем исключение дальше, чтобы обработать на уровне выше
             throw new InvalidOperationException($"Failed to delete file {objectKey} from storage", ex);
         }
+    }
+
+    public Task<string> CreatePresignedDownloadUrlAsync(
+    string objectKey,
+    int expiresInSeconds = 900,
+    CancellationToken ct = default)
+    {
+        var request = new GetPreSignedUrlRequest
+        {
+            BucketName = _options.Bucket,
+            Key = objectKey,
+            Verb = HttpVerb.GET,
+            Expires = DateTime.UtcNow.AddSeconds(expiresInSeconds),
+            Protocol = Protocol.HTTP
+        };
+
+        var downloadUrl = _s3.GetPreSignedURL(request);
+
+        return Task.FromResult(downloadUrl);
     }
 }

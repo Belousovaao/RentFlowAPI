@@ -37,8 +37,6 @@ public class AssetBuilder
             dailyPrice: 6000,
             deposit: 10000,
             locationId: Guid.NewGuid(),
-            canDeliver: true,
-            deliveryPrice: 2000,
             latitude: null,
             longitude: null
         );

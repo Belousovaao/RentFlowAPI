@@ -18,9 +18,10 @@ public static class ValueObjectConfiguration
         builder.Property(p => p.Number);
         builder.Property(p => p.IssuedDate);
         builder.Property(p => p.ExpirationDate);
+        builder.Property(p => p.ExprerienceFromYear);
         builder.Property(p => p.Categories).HasConversion(
                     v => string.Join(',', v),
-                    v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(c => c[0]).ToList());
+                    v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList());
     }
 
     public static void ConfigureBankAccount<TEntity>(this OwnedNavigationBuilder<TEntity, BankAccount> builder) where TEntity : class

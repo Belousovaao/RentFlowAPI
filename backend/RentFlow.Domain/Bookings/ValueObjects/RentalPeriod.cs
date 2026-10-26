@@ -1,29 +1,29 @@
-using System;
 using RentFlow.Domain.Common;
 
-namespace RentFlow.Domain.Bookings;
+namespace RentFlow.Domain.Bookings.ValueObjects;
 
 public class RentalPeriod
 {
     public DateTime StartDate { get; }
+
     public DateTime EndDate { get; }
 
-    public int TotalDays => (EndDate - StartDate).Days;
+    private RentalPeriod()
+    {
+    }
 
-    private RentalPeriod() {}
     public RentalPeriod(DateTime start, DateTime end)
     {
         if (end <= start)
             throw new InvalidRentalPeriodException();
 
-        if (start.Kind != DateTimeKind.Utc || end.Kind != DateTimeKind.Utc)
-            throw new InvalidRentalPeriodException();
         StartDate = start;
         EndDate = end;
     }
 
     public bool Intersects(RentalPeriod other)
     {
-        return StartDate < other.EndDate && EndDate > other.StartDate;
+        return StartDate < other.EndDate &&
+               EndDate > other.StartDate;
     }
 }

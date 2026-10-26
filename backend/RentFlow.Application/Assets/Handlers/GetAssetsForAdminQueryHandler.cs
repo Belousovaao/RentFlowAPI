@@ -3,9 +3,10 @@ using RentFlow.Application.Assets.Dtos;
 using RentFlow.Application.Interfaces;
 using RentFlow.Domain.Assets;
 using RentFlow.Application.Assets.Queries;
+using RentFlow.Application.Assets.Mappers;
 
 namespace RentFlow.Application.Assets.Handlers;
-public class GetAssetsForAdminQueryHandler : IRequestHandler<GetAssetsForAdminQuery, PaginatedResponse<Asset>>
+public class GetAssetsForAdminQueryHandler : IRequestHandler<GetAssetsForAdminQuery, PaginatedResponse<AssetDto>>
 {
     private readonly IAssetRepository _assetRepository;
     
@@ -14,7 +15,7 @@ public class GetAssetsForAdminQueryHandler : IRequestHandler<GetAssetsForAdminQu
         _assetRepository = assetRepository;
     }
     
-    public async Task<PaginatedResponse<Asset>> Handle(GetAssetsForAdminQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedResponse<AssetDto>> Handle(GetAssetsForAdminQuery request, CancellationToken cancellationToken)
     {
         var filter = request.Filter;
         
@@ -46,8 +47,8 @@ public class GetAssetsForAdminQueryHandler : IRequestHandler<GetAssetsForAdminQu
         
         var totalPages = (int)Math.Ceiling((double)total / filter.PageSize);
         
-        return new PaginatedResponse<Asset>(
-            items,
+        return new PaginatedResponse<AssetDto>(
+            items.Select(AssetMapper.ToDto).ToList(),
             total,
             filter.Page,
             filter.PageSize,

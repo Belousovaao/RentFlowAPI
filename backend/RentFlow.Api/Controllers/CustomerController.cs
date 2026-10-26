@@ -1,9 +1,11 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using RentFlow.Application.Interfaces;
-using RentFlow.Domain.Bookings;
-using RentFlow.Application.Bookings.Commands;
-using RentFlow.Application.Bookings.Handlers;
+using RentFlow.Domain.Customers;
+using RentFlow.Application.Customers.Queries;
+using MediatR;
+using RentFlow.Application.Customers.Dtos;
+using Microsoft.AspNetCore.Authorization;
+using RentFlow.Application.Customers.Commands;
+using System.Security.Claims;
 
 namespace RentFlow.Api.Controllers
 {
@@ -11,27 +13,45 @@ namespace RentFlow.Api.Controllers
     [ApiController]
     public class CustomerController : ControllerBase
     {
-        private readonly IBookingRepository _repo;
-        private readonly CreateBookingHandler _handler;
+        private readonly IMediator _mediator;
 
-        public CustomerController(IBookingRepository repo, CreateBookingHandler handler)
+        public CustomerController(IMediator mediator)
         {
-            _repo = repo;
-            _handler = handler;
+            _mediator = mediator;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        [Authorize]
+        [HttpGet("me")]
+        public async Task<ActionResult<CustomerDetailsDto>> GetMe(CancellationToken ct)
         {
-            var bookings = await _repo.GetAllAsync();
-            return Ok(bookings);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            var customer = await _mediator.Send(new GetCurrentCustomerQuery(userId), ct);
+
+            return Ok(customer);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(CreateBookingCommand cmd, CancellationToken ct)
+        [Authorize]
+        [HttpPut("me")]
+        public async Task<ActionResult<CustomerDetailsDto>> Update(
+            [FromBody] UpdateCustomerRequest request,
+            CancellationToken ct)
         {
-            Booking booking = await _handler.Handle(cmd, ct);
-            return CreatedAtAction(nameof(Create), booking);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            var customer = await _mediator.Send(new UpdateCustomerCommand(userId, request), ct);
+            return Ok(customer);
         }
+
     }
 }

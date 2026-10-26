@@ -6,3 +6,4 @@ public enum CustomerType
     IndividualEntrepreneur = 2,
     Organization = 3
 }
+

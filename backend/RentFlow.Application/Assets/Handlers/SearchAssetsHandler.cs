@@ -1,5 +1,6 @@
 using MediatR;
 using RentFlow.Application.Assets.Dtos;
+using RentFlow.Application.Assets.Mappers;
 using RentFlow.Application.Assets.Queries;
 using RentFlow.Application.Interfaces;
 using RentFlow.Domain.Assets;
@@ -80,39 +81,14 @@ public sealed class SearchAssetsHandler : IRequestHandler<SearchAssetsQuery, Pag
                 );
             }
             
-            dtos.Add(new AssetDto(
-                asset.Id,
-                asset.Code,
-                asset.BrandName,
-                asset.Model,
-                asset.Year,
-                asset.ShortDescription,
-                asset.FullDescription,
-                asset.Type,
-                asset.Category,
-                asset.FuelType,
-                asset.Transmission,
-                asset.DriveType,
-                asset.Seats,
-                asset.Doors,
-                asset.Engine,
-                asset.Horsepower,
-                asset.Acceleration,
-                asset.TopSpeed,
-                asset.Color,
-                asset.Features,
-                asset.DailyPrice,
-                asset.Deposit,
-                asset.Status,
-                asset.LocationId,
-                location?.Name ?? "Unknown Location",
-                asset.Latitude,
-                asset.Longitude,
-                null,
-                allPhotos,
-                exteriorPhotos,
-                interiorPhotos
-            ));
+            dtos.Add(AssetMapper.ToDto(asset) with
+            {
+                LocationName = location?.Name ?? string.Empty,
+                DistanceFromUser = distance,
+                Photos = allPhotos,
+                ExteriorPhotos = exteriorPhotos,
+                InteriorPhotos = interiorPhotos
+            });
         }
         
         return new PaginatedResponse<AssetDto>(

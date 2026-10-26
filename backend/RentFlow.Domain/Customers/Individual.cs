@@ -35,4 +35,18 @@ public class Individual : Customer
         return provideDriver ?? Driver.FromIndividual(this);
     }
 
+    public void UpdatePersonalData(
+        PersonName name, 
+        DateOnly? dateOfBirth, 
+        Passport? passport, 
+        DriverLicense? driverLicense, 
+        BankAccount? bankAccount)
+    {
+        Name = name;
+        DateOfBirth = dateOfBirth;
+        IndividualPassport = passport;
+        IndividualDriverLicense = driverLicense;
+        IndividualBankAccount = bankAccount;
+    }
+
 }

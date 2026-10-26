@@ -15,7 +15,7 @@ public class CustomerBuilder
             name: new PersonName("Vasya", "Pupkin", "Nikitich"),
             dateOfBirth: new DateOnly(1992, 12, 2),
             passport: new Passport("1111", "222222", "Otdelom UFMS Rossii", new DateOnly(2000,1,1), "Moscow, Tsvetochanaya st., 555 apt."),
-            driverLicense: new DriverLicense("11 22 333333", new List<char>{'A', 'B'}, new DateOnly(2001, 2, 2), new DateOnly(2030, 12, 31)), 
+            driverLicense: new DriverLicense("11 22 333333", new List<string>{"A", "B1"}, new DateOnly(2001, 2, 2), new DateOnly(2030, 12, 31), 2002), 
             bankAccount: new BankAccount("11111111111111111", "222222222222222222222222", "09454950", "VTB-Bank"));
     public CustomerBuilder AsEntrepreneur()
     {

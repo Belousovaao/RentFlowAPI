@@ -1,5 +1,3 @@
-using System;
-using System.Data;
 using FluentValidation;
 using RentFlow.Application.Bookings.Commands;
 
@@ -10,8 +8,27 @@ public class CreateBookingCommandValidator : AbstractValidator<CreateBookingComm
     public CreateBookingCommandValidator()
     {
         RuleFor(x => x.AssetId).NotEmpty();
+
         RuleFor(x => x.CustomerId).NotEmpty();
-        RuleFor(x => x.StartDate).GreaterThanOrEqualTo(DateTime.UtcNow.Date).WithMessage("Start date cannot be in the past");
-        RuleFor(x => x.EndDate).GreaterThan(x => x.StartDate).WithMessage("End date cannot be earlier or equal to startdate");
+
+        RuleFor(x => x.PickupDate)
+            .Must(date =>
+            {
+                var today = DateOnly.FromDateTime(DateTime.Today);
+
+                Console.WriteLine($"Request pickup = {date}");
+                Console.WriteLine($"Today          = {today}");
+                Console.WriteLine($"Compare        = {date >= today}");
+
+                return date >= today;
+            })
+            .WithMessage("Pickup date cannot be in the past.");
+
+        RuleForEach(x => x.Services)
+            .ChildRules(service =>
+            {
+                service.RuleFor(x => x.AdditionalServiceId)
+                    .NotEmpty();
+            });
     }
 }

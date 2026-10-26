@@ -2,11 +2,9 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RentFlow.Application.Bookings.Commands;
 using RentFlow.Domain.Assets;
-using RentFlow.Domain.Bookings;
 using RentFlow.Domain.Customers;
 using RentFlow.Test.IntegrationTests.Builders;
 using RentFlow.Test.IntegrationTests.Infrastructure;
@@ -33,7 +31,8 @@ public class OverlappingBookingTests : IntegrationBaseTest
         CreateBookingCommand command1 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(5))
+            .WithPeriod(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)), null,
+                        DateOnly.FromDateTime(DateTime.UtcNow.AddDays(3)), null)
             .Build();
 
         var response1 = await Client.PostAsJsonAsync("/api/booking", command1);
@@ -43,7 +42,8 @@ public class OverlappingBookingTests : IntegrationBaseTest
         CreateBookingCommand command2 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(DateTime.UtcNow.AddDays(2), DateTime.UtcNow.AddDays(4))
+            .WithPeriod(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(2)), null,
+                        DateOnly.FromDateTime(DateTime.UtcNow.AddDays(4)), null)
             .Build();
 
         var response2 = await Client.PostAsJsonAsync("/api/booking", command2);
@@ -70,8 +70,8 @@ public class OverlappingBookingTests : IntegrationBaseTest
         arrangeDb.Assets.Add(asset);
         await arrangeDb.SaveChangesAsync();
 
-        var start1 = DateTime.UtcNow.AddDays(2);
-        var end1 = DateTime.UtcNow.AddDays(5);
+        var start1 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(2));
+        var end1 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5));
         
         var start2 = start1.AddDays(-1);
         var end2 = start1.AddDays(2); // Пересекается с началом первого
@@ -79,7 +79,7 @@ public class OverlappingBookingTests : IntegrationBaseTest
         CreateBookingCommand command1 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(start1, end1)
+            .WithPeriod(start1, null, end1, null)
             .Build();
 
         var response1 = await Client.PostAsJsonAsync("/api/booking", command1);
@@ -88,7 +88,7 @@ public class OverlappingBookingTests : IntegrationBaseTest
         CreateBookingCommand command2 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(start2, end2)
+            .WithPeriod(start2, null, end2, null)
             .Build();
 
         var response2 = await Client.PostAsJsonAsync("/api/booking", command2);
@@ -108,8 +108,8 @@ public class OverlappingBookingTests : IntegrationBaseTest
         arrangeDb.Assets.Add(asset);
         await arrangeDb.SaveChangesAsync();
 
-        var start1 = DateTime.UtcNow.AddDays(1);
-        var end1 = DateTime.UtcNow.AddDays(5);
+        var start1 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        var end1 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5));
         
         var start2 = start1.AddDays(4);
         var end2 = start1.AddDays(8); // Пересекается с концом первого
@@ -117,7 +117,7 @@ public class OverlappingBookingTests : IntegrationBaseTest
         CreateBookingCommand command1 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(start1, end1)
+            .WithPeriod(start1, null, end1, null)
             .Build();
 
         var response1 = await Client.PostAsJsonAsync("/api/booking", command1);
@@ -126,7 +126,7 @@ public class OverlappingBookingTests : IntegrationBaseTest
         CreateBookingCommand command2 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(start2, end2)
+            .WithPeriod(start2, null, end2, null)
             .Build();
 
         var response2 = await Client.PostAsJsonAsync("/api/booking", command2);
@@ -146,13 +146,13 @@ public class OverlappingBookingTests : IntegrationBaseTest
         arrangeDb.Assets.Add(asset);
         await arrangeDb.SaveChangesAsync();
 
-        var start = DateTime.UtcNow.AddDays(1);
-        var end = DateTime.UtcNow.AddDays(5);
+        var start = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        var end = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5));
 
         CreateBookingCommand command1 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(start, end)
+            .WithPeriod(start, null, end, null)
             .Build();
 
         var response1 = await Client.PostAsJsonAsync("/api/booking", command1);
@@ -161,7 +161,7 @@ public class OverlappingBookingTests : IntegrationBaseTest
         CreateBookingCommand command2 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(start, end) // Те же даты
+            .WithPeriod(start, null, end, null) // Те же даты
             .Build();
 
         var response2 = await Client.PostAsJsonAsync("/api/booking", command2);
@@ -181,16 +181,16 @@ public class OverlappingBookingTests : IntegrationBaseTest
         arrangeDb.Assets.Add(asset);
         await arrangeDb.SaveChangesAsync();
 
-        var start1 = DateTime.UtcNow.AddDays(1);
-        var end1 = DateTime.UtcNow.AddDays(5);
+        var start1 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        var end1 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5));
         
         var start2 = end1; // Начинается точно в день окончания первого
-        var end2 = DateTime.UtcNow.AddDays(9);
+        var end2 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(9));
 
         CreateBookingCommand command1 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(start1, end1)
+            .WithPeriod(start1, null, end1, null)
             .Build();
 
         var response1 = await Client.PostAsJsonAsync("/api/booking", command1);
@@ -199,7 +199,7 @@ public class OverlappingBookingTests : IntegrationBaseTest
         CreateBookingCommand command2 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(start2, end2)
+            .WithPeriod(start2, null, end2, null)
             .Build();
 
         var response2 = await Client.PostAsJsonAsync("/api/booking", command2);
@@ -221,16 +221,16 @@ public class OverlappingBookingTests : IntegrationBaseTest
         arrangeDb.Assets.Add(asset);
         await arrangeDb.SaveChangesAsync();
 
-        var start1 = DateTime.UtcNow.AddDays(5);
-        var end1 = DateTime.UtcNow.AddDays(10);
+        var start1 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5));
+        var end1 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10));
         
-        var start2 = DateTime.UtcNow.AddDays(1);
+        var start2 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
         var end2 = start1; // Заканчивается точно в день начала первого
 
         CreateBookingCommand command1 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(start1, end1)
+            .WithPeriod(start1, null, end1, null)
             .Build();
 
         var response1 = await Client.PostAsJsonAsync("/api/booking", command1);
@@ -239,7 +239,7 @@ public class OverlappingBookingTests : IntegrationBaseTest
         CreateBookingCommand command2 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(start2, end2)
+            .WithPeriod(start2, null, end2, null)
             .Build();
 
         var response2 = await Client.PostAsJsonAsync("/api/booking", command2);
@@ -260,16 +260,16 @@ public class OverlappingBookingTests : IntegrationBaseTest
         arrangeDb.Assets.Add(asset);
         await arrangeDb.SaveChangesAsync();
 
-        var start1 = DateTime.UtcNow.AddDays(1);
-        var end1 = DateTime.UtcNow.AddDays(5);
+        var start1 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        var end1 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5));
         
-        var start2 = DateTime.UtcNow.AddDays(6); // День после окончания первого
-        var end2 = DateTime.UtcNow.AddDays(10);
+        var start2 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(6)); // День после окончания первого
+        var end2 = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10));
 
         CreateBookingCommand command1 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(start1, end1)
+            .WithPeriod(start1, null, end1, null)
             .Build();
 
         var response1 = await Client.PostAsJsonAsync("/api/booking", command1);
@@ -278,7 +278,7 @@ public class OverlappingBookingTests : IntegrationBaseTest
         CreateBookingCommand command2 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(start2, end2)
+            .WithPeriod(start2, null, end2, null)
             .Build();
 
         var response2 = await Client.PostAsJsonAsync("/api/booking", command2);
@@ -305,14 +305,14 @@ public class OverlappingBookingTests : IntegrationBaseTest
         arrangeDb.Assets.AddRange(asset1, asset2);
         await arrangeDb.SaveChangesAsync();
 
-        var start = DateTime.UtcNow.AddDays(1);
-        var end = DateTime.UtcNow.AddDays(5);
+        var start = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        var end = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5));
 
         // Бронирование для первого ассета
         CreateBookingCommand command1 = new CreateBookingCommandBuilder()
             .WithAsset(asset1.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(start, end)
+            .WithPeriod(start, null, end, null)
             .Build();
 
         var response1 = await Client.PostAsJsonAsync("/api/booking", command1);
@@ -322,7 +322,7 @@ public class OverlappingBookingTests : IntegrationBaseTest
         CreateBookingCommand command2 = new CreateBookingCommandBuilder()
             .WithAsset(asset2.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(start, end)
+            .WithPeriod(start, null, end, null)
             .Build();
 
         var response2 = await Client.PostAsJsonAsync("/api/booking", command2);
@@ -351,7 +351,7 @@ public class OverlappingBookingTests : IntegrationBaseTest
         CreateBookingCommand command1 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddDays(3))
+            .WithPeriod(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1)), null, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(3)), null)
             .Build();
 
         var response1 = await Client.PostAsJsonAsync("/api/booking", command1);
@@ -364,7 +364,7 @@ public class OverlappingBookingTests : IntegrationBaseTest
         CreateBookingCommand command2 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer.Id)
-            .WithPeriod(DateTime.UtcNow.AddDays(4), DateTime.UtcNow.AddDays(6))
+            .WithPeriod(DateOnly.FromDateTime(DateTime.UtcNow.AddDays(4)), null, DateOnly.FromDateTime(DateTime.UtcNow.AddDays(6)), null)
             .Build();
 
         var response2 = await Client.PostAsJsonAsync("/api/booking", command2);
@@ -395,19 +395,19 @@ public class OverlappingBookingTests : IntegrationBaseTest
         arrangeDb.Assets.Add(asset);
         await arrangeDb.SaveChangesAsync();
 
-        var start = DateTime.UtcNow.AddDays(1);
-        var end = DateTime.UtcNow.AddDays(5);
+        var start = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(1));
+        var end = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5));
 
         CreateBookingCommand command1 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer1.Id)
-            .WithPeriod(start, end)
+            .WithPeriod(start, null, end, null)
             .Build();
 
         CreateBookingCommand command2 = new CreateBookingCommandBuilder()
             .WithAsset(asset.Id)
             .WithCustomer(customer2.Id)
-            .WithPeriod(start, end)
+            .WithPeriod(start, null, end, null)
             .Build();
 
         // отправляем два запроса параллельно

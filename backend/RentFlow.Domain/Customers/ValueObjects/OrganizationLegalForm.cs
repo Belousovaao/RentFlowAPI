@@ -16,7 +16,7 @@ public class OrganizationLegalForm
     }
 
     public static readonly OrganizationLegalForm OOO = new("ООО", "Общество с ограниченной ответственностью");
-    public static readonly OrganizationLegalForm AO = new("АО", "Акицонерное общество");
+    public static readonly OrganizationLegalForm AO = new("АО", "Акционерное общество");
     public static readonly OrganizationLegalForm KFH = new("КФХ", "Крестьянское (фермерское) хозяйство");
     public static readonly OrganizationLegalForm IP = new("ИП", "Индивидуальный предприниматель");
 

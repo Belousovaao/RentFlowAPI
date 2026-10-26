@@ -3,6 +3,9 @@ using RentFlow.Domain.Assets;
 using RentFlow.Domain.Locations;
 using RentFlow.Domain.Bookings;
 using RentFlow.Domain.Customers;
+using RentFlow.Domain.Auth;
+using RentFlow.Domain.Bookings.Services;
+using RentFlow.Domain.Payments;
 
 namespace RentFlow.Persistance;
 
@@ -12,10 +15,15 @@ public class RentFlowDbContext : DbContext
     public DbSet<Location> Locations => Set<Location>();
     public DbSet<AssetPhoto> AssetPhotos => Set<AssetPhoto>();
     public DbSet<Booking> Bookings => Set<Booking>();
-    public DbSet<PricingRule> PricingRules => Set<PricingRule>();
     public DbSet<Customer> Customers => Set<Customer>();
-
-
+    public DbSet<CustomerDocument> CustomerDocuments => Set<CustomerDocument>();
+    public DbSet<AppUser> AppUsers => Set<AppUser>();
+    public DbSet<AdditionalService> AdditionalServices => Set<AdditionalService>();
+    public DbSet<BookingService> BookingServices => Set<BookingService>();
+    public DbSet<Destination> Destinations => Set<Destination>();
+    public DbSet<ConsentDocument> ConsentDocuments => Set<ConsentDocument>();
+    public DbSet<PersonalDataConsent> PersonalDataConsents => Set<PersonalDataConsent>();
+    public DbSet<Payment> Payments => Set<Payment>();
     public RentFlowDbContext(DbContextOptions<RentFlowDbContext> options)
         : base(options) { }
 

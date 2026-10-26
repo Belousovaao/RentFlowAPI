@@ -12,13 +12,17 @@ public record PersonName
 
     public PersonName(string firstName, string lastName, string? middleName)
     {
-        FirstName = firstName.Trim() ?? throw new ArgumentException("First name required");
-        LastName = lastName.Trim() ?? throw new ArgumentException("Last name required");
-        MiddleName = string.IsNullOrWhiteSpace(middleName)
-            ? null
-            : middleName.Trim();
-    }
+        if (string.IsNullOrWhiteSpace(firstName))
+            throw new ArgumentException("First name required", nameof(firstName));
 
+        if (string.IsNullOrWhiteSpace(lastName))
+            throw new ArgumentException("Last name required", nameof(lastName));
+
+        FirstName = firstName.Trim();
+        LastName = lastName.Trim();
+        MiddleName = string.IsNullOrWhiteSpace(middleName) ? null : middleName.Trim();
+    }
+ 
     public string? FullName
     {
         get

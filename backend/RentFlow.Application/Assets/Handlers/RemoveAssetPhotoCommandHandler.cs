@@ -19,7 +19,7 @@ public class RemoveAssetPhotoCommandHandler : IRequestHandler<RemoveAssetPhotoCo
     {
         Console.WriteLine($"=== RemoveAssetPhotoCommand ===");
         Console.WriteLine($"AssetId: {request.AssetId}");
-        Console.WriteLine($"PhotoUrl: {request.PhotoUrl}");
+        Console.WriteLine($"PhotoUrl: {request.PhotoId}");
         
         try
         {
@@ -33,7 +33,7 @@ public class RemoveAssetPhotoCommandHandler : IRequestHandler<RemoveAssetPhotoCo
             Console.WriteLine($"Asset found. Before removal - photos count: {asset.Photos.Count}");
             
             // Удаляем фото из коллекции
-            var photoToRemove = asset.Photos.FirstOrDefault(p => p.Url == request.PhotoUrl);
+            var photoToRemove = asset.Photos.FirstOrDefault(p => p.Id == request.PhotoId);
             if (photoToRemove != null)
             {
                 // Используем рефлексию для доступа к приватному полю _photos

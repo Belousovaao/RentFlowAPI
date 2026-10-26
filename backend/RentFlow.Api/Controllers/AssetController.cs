@@ -11,7 +11,7 @@ namespace RentFlow.Api.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IAssetRepository _assetRepository;
-        private readonly IAssetPhotoStorage _assetPhotoStorage;
+        private readonly IFileStorage _assetPhotoStorage;
         private readonly IUnitOfWork _unitOfWork;
         private static readonly HashSet<string> AllowedImageTypes = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -23,7 +23,7 @@ namespace RentFlow.Api.Controllers
         public AssetsController (
             IMediator mediator,
             IAssetRepository assetRepository,
-            IAssetPhotoStorage assetPhotoStorage,
+            IFileStorage assetPhotoStorage,
             IUnitOfWork unitOfWork)
         {
             _mediator = mediator;
@@ -55,34 +55,6 @@ namespace RentFlow.Api.Controllers
             if (asset == null) return NotFound();
             return Ok(asset);
         }
-
-        // [HttpPost("{assetId:guid}/photos")]
-        // [Consumes("multipart/form-data")]
-        // public async Task<IActionResult> UploadPhoto(Guid assetId, [FromForm] IFormFile file, CancellationToken ct)
-        // {
-        //     if (file.Length == 0)
-        //         return BadRequest("Empty file.");
-
-        //     if (!AllowedImageTypes.Contains(file.ContentType))
-        //         return BadRequest("Unsupported content type.");
-
-        //     var asset = await _assetRepository.GetByIdAsync(assetId, ct);
-        //     if (asset is null)
-        //         return NotFound("Asset not found.");
-
-        //     await using var stream = file.OpenReadStream();
-        //     var photoUrl = await _assetPhotoStorage.UploadAsync(
-        //         assetId,
-        //         stream,
-        //         file.FileName,
-        //         file.ContentType,
-        //         ct);
-
-        //     asset.AddPhoto(photoUrl);
-        //     await _unitOfWork.SaveChangesAsync(ct);
-
-        //     return Ok(new { assetId, photoUrl });
-        // }
 
         [HttpPost("{assetId:guid}/photos/upload-url")]
         public async Task<IActionResult> CreatePhotoUploadUrl(

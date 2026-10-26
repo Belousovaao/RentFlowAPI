@@ -35,8 +35,6 @@ public class Asset
     public decimal? Deposit { get; private set; }
 
     public Guid LocationId { get; private set; }
-    public bool CanDeliver { get; private set; }
-    public decimal? DeliveryPrice { get; private set; }
     public double? Latitude { get; private set; }
     public double? Longitude { get; private set; }
 
@@ -72,8 +70,6 @@ public class Asset
         decimal dailyPrice,
         decimal? deposit,
         Guid locationId,
-        bool canDeliver,
-        decimal? deliveryPrice,
         double? latitude,
         double? longitude
     )
@@ -105,9 +101,6 @@ public class Asset
         if (topSpeed <= 0)
             throw new ArgumentException("Top speed must be greater than 0.");
 
-        if (canDeliver && deliveryPrice is null)
-            throw new ArgumentException("DeliveryPrice required id delivery is able");
-        
         Console.WriteLine($"Asset constructor - BEFORE: Code = {code}");
             
         Id = Guid.NewGuid();
@@ -134,8 +127,6 @@ public class Asset
         DailyPrice = dailyPrice;
         Deposit = deposit;
         LocationId = locationId; 
-        CanDeliver = canDeliver;
-        DeliveryPrice = deliveryPrice;
         Status = AssetStatus.Available;
         Latitude = latitude;
         Longitude = longitude;
@@ -164,8 +155,6 @@ public class Asset
         decimal dailyPrice,
         decimal? deposit,
         Guid locationId,
-        bool canDeliver,
-        decimal? deliveryPrice,
         double? latitude,
         double? longitude
     )
@@ -173,33 +162,62 @@ public class Asset
         return new Asset(code, brandName, model, shortDescription,
             fullDescription, type, category, year, fuelType, transmission, driveType, seats, doors,
             engine, horsepower, acceleration, topSpeed, color, features, dailyPrice, deposit,
-            locationId, canDeliver, deliveryPrice, latitude, longitude);
+            locationId, latitude, longitude);
     }
 
-    public void UpdateBasicInfo(
-    string brandName,
-    string model,
-    int year,
-    decimal dailyPrice,
-    FuelType fuelType,
-    TransmissionType transmission,
-    DriveType driveType,
-    int seats,
-    int horsepower,
-    AssetStatus status)
+    public void Update(
+        string brandName,
+        string model,
+        string shortDescription,
+        string fullDescription,
+        AssetCategory category,
+        int year,
+        FuelType fuelType,
+        TransmissionType transmission,
+        DriveType driveType,
+        int seats,
+        int doors,
+        string engine,
+        int horsepower,
+        string acceleration,
+        int topSpeed,
+        string color,
+        List<string> features,
+        decimal dailyPrice,
+        decimal? deposit,
+        AssetStatus status,
+        double? latitude,
+        double? longitude)
     {
         BrandName = brandName;
         Model = model;
+        ShortDescription = shortDescription;
+        FullDescription = fullDescription;
+        Category = category;
         Year = year;
-        DailyPrice = dailyPrice;
+
         FuelType = fuelType;
         Transmission = transmission;
         DriveType = driveType;
-        Seats = seats;
-        Horsepower = horsepower;
-        Status = status;
-    }
 
+        Seats = seats;
+        Doors = doors;
+
+        Engine = engine;
+        Horsepower = horsepower;
+        Acceleration = acceleration;
+        TopSpeed = topSpeed;
+        Color = color;
+        Features = features;
+
+        DailyPrice = dailyPrice;
+        Deposit = deposit;
+
+        Status = status;
+
+        Latitude = latitude;
+        Longitude = longitude;
+    }
     public void AddPhoto(string url, PhotoType type, int order = 0)
     {
         if (string.IsNullOrWhiteSpace(url))

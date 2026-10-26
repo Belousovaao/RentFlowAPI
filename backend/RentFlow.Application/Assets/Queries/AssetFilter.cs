@@ -14,9 +14,9 @@ public class AssetFilter
     public decimal? PriceTo { get; set; }
     public int? YearFrom { get; set; }
     public int? YearTo { get; set; }
-    public FuelType? FuelType { get; set; }
-    public TransmissionType? Transmission { get; set; }
-    public DriveType? DriveType { get; set; }
+    public IReadOnlyList<FuelType>? FuelTypes { get; set; }
+    public IReadOnlyList<TransmissionType>? Transmissions { get; set; }
+    public IReadOnlyList<DriveType>? DriveTypes { get; set; }
     public int? MinSeats { get; set; }
     public int? MaxSeats { get; set; }
     public int? MinDoors { get; set; }

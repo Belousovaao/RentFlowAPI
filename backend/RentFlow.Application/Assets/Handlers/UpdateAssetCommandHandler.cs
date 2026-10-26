@@ -22,17 +22,29 @@ namespace RentFlow.Application.Assets.Handlers
             if (asset == null)
                 throw new Exception($"Asset with id {request.Id} not found");
 
-            asset.UpdateBasicInfo(
+            asset.Update(
                 request.BrandName,
                 request.Model,
+                request.ShortDescription,
+                request.FullDescription,
+                request.Category,
                 request.Year,
-                request.DailyPrice,
-                Enum.Parse<FuelType>(request.FuelType),
-                Enum.Parse<TransmissionType>(request.Transmission),
-                Enum.Parse<Domain.Assets.DriveType>(request.DriveType),
+                request.FuelType,
+                request.Transmission,
+                request.DriveType,
                 request.Seats,
+                request.Doors,
+                request.Engine,
                 request.Horsepower,
-                Enum.Parse<AssetStatus>(request.Status)
+                request.Acceleration,
+                request.TopSpeed,
+                request.Color,
+                request.Features,
+                request.DailyPrice,
+                request.Deposit,
+                Enum.Parse<AssetStatus>(request.Status),
+                request.Latitude,
+                request.Longitude
             );
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);

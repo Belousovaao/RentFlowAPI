@@ -3,7 +3,7 @@ using RentFlow.Application.Assets.Dtos;
 using RentFlow.Domain.Assets;
 
 namespace RentFlow.Application.Assets.Queries;
-public class GetAssetsForAdminQuery : IRequest<PaginatedResponse<Asset>>
+public class GetAssetsForAdminQuery : IRequest<PaginatedResponse<AssetDto>>
 {
     public AdminAssetFilter Filter { get; set; }
     

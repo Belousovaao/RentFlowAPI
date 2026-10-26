@@ -25,10 +25,12 @@ public class AssetRepository : IAssetRepository
         // Поиск по тексту
         if (!string.IsNullOrWhiteSpace(filter.Search))
         {
-            query = query.Where(a => 
-                a.BrandName.Contains(filter.Search) ||
-                a.Model.Contains(filter.Search) ||
-                a.Code.Contains(filter.Search));
+            var search = filter.Search.Trim();
+
+            query = query.Where(a =>
+                EF.Functions.ILike(a.BrandName, $"%{search}%") ||
+                EF.Functions.ILike(a.Model, $"%{search}%") ||
+                EF.Functions.ILike(a.Code, $"%{search}%"));
         }
 
         // Фильтр по бренду
@@ -60,21 +62,21 @@ public class AssetRepository : IAssetRepository
         }
 
         // Фильтр по типу топлива
-        if (filter.FuelType.HasValue)
+        if (filter.FuelTypes is { Count: > 0 })
         {
-            query = query.Where(a => a.FuelType == filter.FuelType.Value);
+            query = query.Where(a => filter.FuelTypes.Contains(a.FuelType));
         }
 
         // Фильтр по трансмиссии
-        if (filter.Transmission.HasValue)
+        if (filter.Transmissions is { Count: > 0 })
         {
-            query = query.Where(a => a.Transmission == filter.Transmission.Value);
+            query = query.Where(a => filter.Transmissions.Contains(a.Transmission));
         }
 
         // Фильтр по типу привода
-        if (filter.DriveType.HasValue)
+        if (filter.DriveTypes is { Count: > 0 })
         {
-            query = query.Where(a => a.DriveType == filter.DriveType.Value);
+            query = query.Where(a => filter.DriveTypes.Contains(a.DriveType));
         }
 
         // Фильтр по количеству мест

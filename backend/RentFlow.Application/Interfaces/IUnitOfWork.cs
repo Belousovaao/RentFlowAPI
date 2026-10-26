@@ -9,4 +9,7 @@ public interface IUnitOfWork
     Task CommitAsync(CancellationToken ct = default);
     Task RollbackAsync(CancellationToken ct = default);
     Task SaveChangesAsync(CancellationToken ct = default);
+    Task LockBookingPaymentsAsync(
+        Guid bookingId,
+        CancellationToken ct = default);
 }

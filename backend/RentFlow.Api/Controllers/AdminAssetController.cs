@@ -15,11 +15,11 @@ namespace RentFlow.Api.Controllers.Admin
     public class AdminAssetsController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly IAssetPhotoStorage _photoStorage;
+        private readonly IFileStorage _photoStorage;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAssetRepository _assetRepository;
 
-        public AdminAssetsController(IMediator mediator, IAssetPhotoStorage photoStorage, IUnitOfWork unitOfWork, IAssetRepository assetRepository)
+        public AdminAssetsController(IMediator mediator, IFileStorage photoStorage, IUnitOfWork unitOfWork, IAssetRepository assetRepository)
         {
             _mediator = mediator;
             _photoStorage = photoStorage;
@@ -31,8 +31,6 @@ namespace RentFlow.Api.Controllers.Admin
         [HttpGet]
         public async Task<IActionResult> GetList([FromQuery] AdminAssetFilter filter, CancellationToken ct)
         {
-            Debug.WriteLine($"=== AdminAssetsController.GetList ===");
-            Debug.WriteLine($"Filter: Page={filter.Page}, PageSize={filter.PageSize}");
             try
             {
                 var result = await _mediator.Send(new GetAssetsForAdminQuery(filter), ct);
@@ -97,48 +95,33 @@ namespace RentFlow.Api.Controllers.Admin
         [HttpPost("{assetId:guid}/photos/exterior/batch")]
         public async Task<IActionResult> UploadExteriorPhotos(Guid assetId, IFormFileCollection files, CancellationToken ct)
         {
-            Console.WriteLine($"=== UploadExteriorPhotos START ===");
-            Console.WriteLine($"AssetId: {assetId}");
-            Console.WriteLine($"Files count: {files?.Count ?? 0}");
-    
             if (files == null || files.Count == 0)
                 return BadRequest("No files provided");
     
             List<object> result = new List<object>();
-            Console.WriteLine("Getting asset...");
-            var asset = await _mediator.Send(new GetAssetByIdQuery(assetId), ct);
+            var asset = await _mediator.Send(new GetAssetEntityQuery(assetId), ct);
             if (asset == null)
                 return NotFound("Asset not found");
 
-            Console.WriteLine($"Asset found. Current exterior photos: {asset.GetExteriorPhotos().Count}");
             int order = asset.GetExteriorPhotos().Count;
-            Console.WriteLine($"Starting order: {order}");
 
             foreach (var file in files)
             {
-                Console.WriteLine($"Processing file: {file.FileName}, Size: {file.Length}");
                 if (file.Length == 0) continue;
         
                 await using var stream = file.OpenReadStream();
                 var fileName = $"{Guid.NewGuid():N}{Path.GetExtension(file.FileName)}";
-        
-                Console.WriteLine($"Uploading to MinIO: {fileName}");
                 var photoUrl = await _photoStorage.UploadAsync(assetId, stream, fileName, file.ContentType, ct);
-                Console.WriteLine($"Uploaded to MinIO. URL: {photoUrl}");
-                Console.WriteLine($"Sending UploadAssetPhotoCommand...");
                 var photo = await _mediator.Send(new UploadAssetPhotoCommand(assetId, photoUrl, PhotoType.Exterior, order++), ct);
-                Console.WriteLine($"Photo added to DB. Id: {photo?.Id}");
-
                 result.Add(new { id = photo.Id, url = photoUrl});
             }
-            Console.WriteLine($"=== UploadExteriorPhotos END. Successfully added {result.Count} photos ===");
             return Ok(new { urls = result, count = result.Count });
         }
 
         [HttpPost("{assetId:guid}/photos/exterior/reorder")]
         public async Task<IActionResult> ReorderExteriorPhotos(Guid assetId, [FromBody] ReorderPhotosRequest request, CancellationToken ct)
         {
-            var asset = await _mediator.Send(new GetAssetByIdQuery(assetId), ct);
+            var asset = await _mediator.Send(new GetAssetEntityQuery(assetId), ct);
             if (asset == null) return NotFound();
             
             // Обновляем порядок фото
@@ -159,7 +142,7 @@ namespace RentFlow.Api.Controllers.Admin
         [HttpPost("{assetId:guid}/photos/interior/reorder")]
         public async Task<IActionResult> ReorderEInteriorPhotos(Guid assetId, [FromBody] ReorderPhotosRequest request, CancellationToken ct)
         {
-            var asset = await _mediator.Send(new GetAssetByIdQuery(assetId), ct);
+            var asset = await _mediator.Send(new GetAssetEntityQuery(assetId), ct);
             if (asset == null) return NotFound();
             
             // Обновляем порядок фото
@@ -187,7 +170,7 @@ namespace RentFlow.Api.Controllers.Admin
     
             var result = new List<object>();
             var order = 0;
-            var asset = await _mediator.Send(new GetAssetByIdQuery(assetId), ct);
+            var asset = await _mediator.Send(new GetAssetEntityQuery(assetId), ct);
             if (asset != null)
             {
                 order = asset.GetInteriorPhotos().Count;
@@ -216,21 +199,38 @@ namespace RentFlow.Api.Controllers.Admin
         [HttpDelete("{assetId:guid}/photos/exterior/{photoId:guid}")]
         public async Task<IActionResult> DeleteExteriorPhoto(Guid assetId, Guid photoId, CancellationToken ct)
         {
-            var asset = await _mediator.Send(new GetAssetByIdQuery(assetId), ct);
+            Console.WriteLine($"=== DeleteExteriorPhoto ===");
+            Console.WriteLine($"AssetId: {assetId}");
+            Console.WriteLine($"PhotoId: {photoId}");
+            var asset = await _mediator.Send(new GetAssetEntityQuery(assetId), ct);
             if (asset == null)
+            {
+                Console.WriteLine("❌ Asset not found!");
                 return NotFound("Asset not found");
+            }
             
+            Console.WriteLine($"✅ Asset found. Total photos: {asset.Photos.Count}");
             var photo = asset.GetExteriorPhotos().FirstOrDefault(p => p.Id == photoId);
             if (photo == null)
+            {
+                Console.WriteLine($"❌ Photo with ID {photoId} not found in exterior photos!");
+                Console.WriteLine($"Available exterior photo IDs: {string.Join(", ", asset.GetExteriorPhotos().Select(p => p.Id))}");
                 return NotFound("Photo not found");
+            }
+
+            Console.WriteLine($"✅ Photo found. URL: {photo.Url}");
             
             // Удаляем из MinIO
             var objectKey = ExtractObjectKeyFromUrl(photo.Url);
+            Console.WriteLine($"Object key for MinIO: {objectKey}");
             if (!string.IsNullOrEmpty(objectKey))
                 await _photoStorage.DeleteAsync(objectKey, ct);
+                Console.WriteLine("✅ File deleted from MinIO");
             
             // Удаляем из БД
-            await _mediator.Send(new RemoveAssetPhotoCommand(assetId, photo.Url), ct);
+            Console.WriteLine("Sending RemoveAssetPhotoCommand...");
+            await _mediator.Send(new RemoveAssetPhotoCommand(assetId, photo.Id), ct);
+            Console.WriteLine("✅ Photo removed from database");
             
             return NoContent();
         }
@@ -239,7 +239,7 @@ namespace RentFlow.Api.Controllers.Admin
         [HttpDelete("{assetId:guid}/photos/interior/{photoId:guid}")]
         public async Task<IActionResult> DeleteInteriorPhoto(Guid assetId, Guid photoId, CancellationToken ct)
         {
-            var asset = await _mediator.Send(new GetAssetByIdQuery(assetId), ct);
+            var asset = await _mediator.Send(new GetAssetEntityQuery(assetId), ct);
             if (asset == null)
                 return NotFound("Asset not found");
             
@@ -253,7 +253,7 @@ namespace RentFlow.Api.Controllers.Admin
                 await _photoStorage.DeleteAsync(objectKey, ct);
             
             // Удаляем из БД
-            await _mediator.Send(new RemoveAssetPhotoCommand(assetId, photo.Url), ct);
+            await _mediator.Send(new RemoveAssetPhotoCommand(assetId, photo.Id), ct);
             
             return NoContent();
         }
@@ -261,9 +261,12 @@ namespace RentFlow.Api.Controllers.Admin
 
         private string? ExtractObjectKeyFromUrl(string photoUrl)
         {
-            // В зависимости от реализации BuildPublicUrl, вытаскиваем путь после bucket/ или просто относительный путь
             var uri = new Uri(photoUrl);
-            return uri.AbsolutePath.TrimStart('/');
+            var path = uri.AbsolutePath.TrimStart('/');
+            const string bucketPrefix = "rentflow-photos/";
+            if (path.StartsWith(bucketPrefix, StringComparison.OrdinalIgnoreCase))
+                return path[bucketPrefix.Length..];
+            return path;
         }
 
         public record UpdateAssetStatusRequest(string Status);
