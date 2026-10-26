@@ -1,0 +1,3 @@
+using RentFlow.Domain.Bookings;
+namespace RentFlow.Application.BookingCharges.Dtos;
+public sealed record BookingChargeDto(Guid Id, Guid BookingId, BookingChargeType Type, BookingChargeStatus Status, string Title, string? Description, string? ReferenceNumber, decimal Quantity, string Unit, decimal UnitPrice, decimal Amount, string Currency, decimal PaidAmount, decimal Balance, DateTimeOffset CreatedAt, DateTimeOffset? ReviewedAt);
