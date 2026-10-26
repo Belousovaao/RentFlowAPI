@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using RentFlow.Domain.Assets;
 using RentFlow.Domain.Locations;
 using RentFlow.Domain.Bookings;
@@ -6,9 +6,7 @@ using RentFlow.Domain.Customers;
 using RentFlow.Domain.Auth;
 using RentFlow.Domain.Bookings.Services;
 using RentFlow.Domain.Payments;
-
 namespace RentFlow.Persistance;
-
 public class RentFlowDbContext : DbContext
 {
     public DbSet<Asset> Assets => Set<Asset>();
@@ -24,12 +22,9 @@ public class RentFlowDbContext : DbContext
     public DbSet<ConsentDocument> ConsentDocuments => Set<ConsentDocument>();
     public DbSet<PersonalDataConsent> PersonalDataConsents => Set<PersonalDataConsent>();
     public DbSet<Payment> Payments => Set<Payment>();
-    public RentFlowDbContext(DbContextOptions<RentFlowDbContext> options)
-        : base(options) { }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(RentFlowDbContext).Assembly);
-    }
+    public DbSet<BookingCharge> BookingCharges => Set<BookingCharge>();
+    public DbSet<BookingChargeSettings> BookingChargeSettings => Set<BookingChargeSettings>();
+    public DbSet<PaymentAllocation> PaymentAllocations => Set<PaymentAllocation>();
+    public RentFlowDbContext(DbContextOptions<RentFlowDbContext> options) : base(options) { }
+    protected override void OnModelCreating(ModelBuilder modelBuilder) => modelBuilder.ApplyConfigurationsFromAssembly(typeof(RentFlowDbContext).Assembly);
 }
-

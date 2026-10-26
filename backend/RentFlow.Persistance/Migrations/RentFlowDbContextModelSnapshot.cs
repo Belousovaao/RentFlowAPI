@@ -23,6 +23,55 @@ namespace RentFlow.Persistance.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("RentFlow.Domain.Bookings.BookingCharge", b =>
+                {
+                    b.Property<Guid>("Id").HasColumnType("uuid");
+                    b.Property<decimal>("Amount").HasPrecision(18, 2).HasColumnType("numeric(18,2)");
+                    b.Property<Guid>("BookingId").HasColumnType("uuid");
+                    b.Property<string>("Currency").IsRequired().HasMaxLength(3).HasColumnType("character varying(3)");
+                    b.Property<DateTimeOffset>("CreatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<Guid?>("CreatedByUserId").HasColumnType("uuid");
+                    b.Property<string>("Description").HasMaxLength(2000).HasColumnType("character varying(2000)");
+                    b.Property<decimal>("Quantity").HasPrecision(18, 3).HasColumnType("numeric(18,3)");
+                    b.Property<string>("ReferenceNumber").HasMaxLength(100).HasColumnType("character varying(100)");
+                    b.Property<DateTimeOffset?>("ReviewedAt").HasColumnType("timestamp with time zone");
+                    b.Property<Guid?>("ReviewedByUserId").HasColumnType("uuid");
+                    b.Property<string>("Status").IsRequired().HasMaxLength(32).HasColumnType("character varying(32)");
+                    b.Property<string>("Title").IsRequired().HasMaxLength(160).HasColumnType("character varying(160)");
+                    b.Property<string>("Type").IsRequired().HasMaxLength(40).HasColumnType("character varying(40)");
+                    b.Property<decimal>("UnitPrice").HasPrecision(18, 2).HasColumnType("numeric(18,2)");
+                    b.Property<string>("Unit").IsRequired().HasMaxLength(20).HasColumnType("character varying(20)");
+                    b.HasKey("Id");
+                    b.HasIndex("BookingId", "Status");
+                    b.ToTable("BookingCharges");
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Bookings.BookingChargeSettings", b =>
+                {
+                    b.Property<int>("Id").HasColumnType("integer");
+                    b.Property<decimal>("LateCancellationTariff").HasPrecision(18, 2).HasColumnType("numeric(18,2)");
+                    b.Property<decimal>("RefuelingPricePerLiter").HasPrecision(18, 2).HasColumnType("numeric(18,2)");
+                    b.Property<DateTimeOffset>("UpdatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<Guid?>("UpdatedByUserId").HasColumnType("uuid");
+                    b.HasKey("Id");
+                    b.ToTable("BookingChargeSettings", t => t.HasCheckConstraint("CK_BookingChargeSettings_Singleton", "\"Id\" = 1"));
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Payments.PaymentAllocation", b =>
+                {
+                    b.Property<Guid>("Id").HasColumnType("uuid");
+                    b.Property<decimal>("Amount").HasPrecision(18, 2).HasColumnType("numeric(18,2)");
+                    b.Property<Guid>("BookingChargeId").HasColumnType("uuid");
+                    b.Property<DateTimeOffset>("CreatedAt").HasColumnType("timestamp with time zone");
+                    b.Property<Guid?>("CreatedByUserId").HasColumnType("uuid");
+                    b.Property<Guid>("PaymentId").HasColumnType("uuid");
+                    b.HasKey("Id");
+                    b.HasIndex("BookingChargeId");
+                    b.HasIndex("PaymentId");
+                    b.HasIndex("PaymentId", "BookingChargeId").IsUnique();
+                    b.ToTable("PaymentAllocations");
+                });
+
             modelBuilder.Entity("CustomerDocument", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1547,6 +1596,30 @@ namespace RentFlow.Persistance.Migrations
                     b.Navigation("OrganizationBankAccount");
 
                     b.Navigation("SigningBasis");
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Bookings.BookingCharge", b =>
+                {
+                    b.HasOne("RentFlow.Domain.Bookings.Booking", null)
+                        .WithMany()
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Payments.PaymentAllocation", b =>
+                {
+                    b.HasOne("RentFlow.Domain.Bookings.BookingCharge", null)
+                        .WithMany()
+                        .HasForeignKey("BookingChargeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("RentFlow.Domain.Payments.Payment", null)
+                        .WithMany()
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("RentFlow.Domain.Assets.Asset", b =>

@@ -103,6 +103,8 @@ builder.Services.AddScoped<IBookingDestinationResolver, BookingDestinationResolv
 builder.Services.AddScoped<IDestinationRepository, DestinationRepository>();
 builder.Services.AddScoped<IConsentDocumentRepository, ConsentDocumentRepository>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IBookingChargeRepository, BookingChargeRepository>();
+builder.Services.AddScoped<IPaymentAllocationRepository, PaymentAllocationRepository>();
 builder.Services.AddScoped<RentFlow.Persistance.ConsentDocuments.ConsentDocumentSeeder>();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
