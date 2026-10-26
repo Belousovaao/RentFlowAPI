@@ -559,7 +559,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
     return <label className="block space-y-1.5"><span className="text-sm font-medium text-gray-700 dark:text-gray-200">{label}</span>{children}</label>;
 }
 
-function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
+function Modal({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}>
             <div role="dialog" aria-modal="true" aria-label={title} className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-xl dark:bg-gray-800 sm:p-6">
