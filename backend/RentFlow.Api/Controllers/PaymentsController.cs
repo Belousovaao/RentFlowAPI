@@ -58,7 +58,7 @@ public sealed class PaymentsController : ControllerBase
         CancellationToken ct)
     {
         var id = await _mediator.Send(command, ct);
-        return Created($"/api/payments/{id}", new { id });
+        return Ok(new { id });
     }
 
     [HttpPost("{paymentId:guid}/complete")]
