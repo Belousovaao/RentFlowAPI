@@ -173,6 +173,11 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             return;
         }
 
+        if (chargeForm.type === "TrafficFine" && !chargeForm.description.trim() && !chargeForm.referenceNumber.trim()) {
+            toast.error("Для штрафа укажите описание или номер постановления.");
+            return;
+        }
+
         const request: CreateBookingChargeRequest = {
             bookingId,
             type: chargeForm.type,
@@ -238,11 +243,13 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             toast.error("Укажите сумму хотя бы для одного начисления.");
             return;
         }
-        await runAction(`allocate-${allocationPayment.id}`, () =>
+        const succeeded = await runAction(`allocate-${allocationPayment.id}`, () =>
             bookingFinanceApi.allocatePayment(allocationPayment.id, allocations),
         "Платёж распределён по начислениям.");
-        setAllocationPayment(null);
-        setAllocationAmounts({});
+        if (succeeded) {
+            setAllocationPayment(null);
+            setAllocationAmounts({});
+        }
     };
 
     const rows = useMemo<FinanceRow[]>(() => {
