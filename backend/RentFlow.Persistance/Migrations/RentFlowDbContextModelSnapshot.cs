@@ -391,7 +391,7 @@ namespace RentFlow.Persistance.Migrations
 
                     b.ToTable("RentalTariffs", t =>
                         {
-                            t.HasCheckConstraint("CK_RentalTariffs_Price_NonNegative", "\\"Price\\" >= 0");
+                            t.HasCheckConstraint("CK_RentalTariffs_Price_NonNegative", "\"Price\" >= 0");
                         });
                 });
 
