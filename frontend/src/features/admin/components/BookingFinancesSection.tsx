@@ -40,6 +40,7 @@ const chargeTypeLabels: Record<BookingChargeType, string> = {
     TrafficFine: "Штраф ГИБДД",
     Cleaning: "Уборка",
     Refueling: "Заправка",
+    ExcessMileage: "Перепробег",
     PropertyLossOrDamage: "Утрата имущества / повреждение",
     Other: "Прочее начисление",
 };
@@ -86,8 +87,11 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
     const [busyId, setBusyId] = useState<string | null>(null);
     const [chargeModalOpen, setChargeModalOpen] = useState(false);
     const [settingsModalOpen, setSettingsModalOpen] = useState(false);
-    const [lateCancellationTariff, setLateCancellationTariff] = useState("");
-    const [refuelingPricePerLiter, setRefuelingPricePerLiter] = useState("");
+    const [rentalTariffs, setRentalTariffs] = useState<Record<string, string>>({
+        fuel_per_liter: "",
+        excess_mileage_per_km: "",
+        body_wash: "",
+    });
     const [paymentModalOpen, setPaymentModalOpen] = useState(false);
     const [allocationPayment, setAllocationPayment] = useState<PaymentTransactionDto | null>(null);
     const [chargeForm, setChargeForm] = useState(emptyChargeForm);
@@ -104,13 +108,12 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                 bookingFinanceApi.getCharges(bookingId),
                 bookingFinanceApi.getTransactions(bookingId),
                 bookingFinanceApi.getSummary(bookingId),
-                bookingFinanceApi.getChargeSettings(),
+                bookingFinanceApi.getRentalTariffs(),
             ]);
             setCharges(chargesResult);
             setPayments(paymentsResult);
             setSummary(summaryResult);
-            setLateCancellationTariff(String(settingsResult.lateCancellationTariff));
-            setRefuelingPricePerLiter(String(settingsResult.refuelingPricePerLiter));
+            setRentalTariffs(Object.fromEntries(settingsResult.map(tariff => [tariff.code, String(tariff.price)])));
         } catch (error) {
             console.error("Failed to load booking finance:", error);
             toast.error("Не удалось загрузить финансовые данные бронирования.");
@@ -141,21 +144,22 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
 
     const submitSettings = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const lateTariff = Number(lateCancellationTariff);
-        const refuelingPrice = Number(refuelingPricePerLiter);
-        if (
-            !Number.isFinite(lateTariff) || lateTariff < 0 ||
-            !Number.isFinite(refuelingPrice) || refuelingPrice < 0 ||
-            Number(lateTariff.toFixed(2)) !== lateTariff ||
-            Number(refuelingPrice.toFixed(2)) !== refuelingPrice
-        ) {
+        const values = [
+            ["fuel_per_liter", Number(rentalTariffs.fuel_per_liter), "л"],
+            ["excess_mileage_per_km", Number(rentalTariffs.excess_mileage_per_km), "км"],
+            ["body_wash", Number(rentalTariffs.body_wash), "услуга"],
+        ] as const;
+        if (values.some(([, value]) =>
+            !Number.isFinite(value) || value < 0 || Number(value.toFixed(2)) !== value
+        )) {
             toast.error("Тарифы должны быть неотрицательными суммами с двумя знаками после запятой.");
             return;
         }
-        const succeeded = await runAction("charge-settings", () =>
-            bookingFinanceApi.updateChargeSettings(lateTariff, refuelingPrice),
-            "Тарифы начислений сохранены.",
-        );
+        const succeeded = await runAction("rental-tariffs", async () => {
+            for (const [code, value, unit] of values) {
+                await bookingFinanceApi.updateRentalTariff(code, value, unit);
+            }
+        }, "Тарифы аренды сохранены.");
         if (succeeded) setSettingsModalOpen(false);
     };
 
@@ -445,13 +449,16 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             {settingsModalOpen && (
                 <Modal title="Тарифы начислений" onClose={() => setSettingsModalOpen(false)}>
                     <form className="space-y-4" onSubmit={submitSettings}>
-                        <Field label="Тариф за позднюю отмену, ₽">
-                            <input className={inputClass} type="number" min="0" step="0.01" required value={lateCancellationTariff} onChange={event => setLateCancellationTariff(event.target.value)} />
+                        <Field label="Топливо, 1 литр — ₽">
+                            <input className={inputClass} type="number" min="0" step="0.01" required value={rentalTariffs.fuel_per_liter ?? ""} onChange={event => setRentalTariffs(prev => ({ ...prev, fuel_per_liter: event.target.value }))} />
                         </Field>
-                        <Field label="Стоимость топлива за литр, ₽">
-                            <input className={inputClass} type="number" min="0" step="0.01" required value={refuelingPricePerLiter} onChange={event => setRefuelingPricePerLiter(event.target.value)} />
+                        <Field label="Перепробег, 1 км — ₽">
+                            <input className={inputClass} type="number" min="0" step="0.01" required value={rentalTariffs.excess_mileage_per_km ?? ""} onChange={event => setRentalTariffs(prev => ({ ...prev, excess_mileage_per_km: event.target.value }))} />
                         </Field>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Тарифы используются при создании новых начислений. Для поздней отмены и заправки сумма фиксируется в начислении на момент его создания.</p>
+                        <Field label="Мойка кузова — ₽">
+                            <input className={inputClass} type="number" min="0" step="0.01" required value={rentalTariffs.body_wash ?? ""} onChange={event => setRentalTariffs(prev => ({ ...prev, body_wash: event.target.value }))} />
+                        </Field>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Тарифы применяются к новым начислениям. Уже созданные начисления сохраняют исходные цены и суммы.</p>
                         <div className="flex justify-end gap-2">
                             <button type="button" className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200" onClick={() => setSettingsModalOpen(false)}>Отмена</button>
                             <button type="submit" disabled={busyId === "charge-settings"} className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">{busyId === "charge-settings" && <Loader2 className="h-4 w-4 animate-spin" />} Сохранить</button>
@@ -468,16 +475,17 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                 {Object.entries(chargeTypeLabels).map(([value, label]) => <option key={value} value={value} disabled={value === "LateCancellation" && bookingStatus !== "Cancelled"}>{label}</option>)}
                             </select>
                         </Field>
-                        {chargeForm.type === "Refueling" ? (
-                            <Field label="Количество литров">
+                        {chargeForm.type === "Refueling" || chargeForm.type === "ExcessMileage" ? (
+                            <Field label={chargeForm.type === "Refueling" ? "Количество литров" : "Количество километров"}>
                                 <input className={inputClass} type="number" min="0.001" step="0.001" required value={chargeForm.quantity} onChange={event => setChargeForm(prev => ({ ...prev, quantity: event.target.value }))} />
                             </Field>
                         ) : chargeForm.type !== "LateCancellation" ? (
                             <Field label="Сумма, ₽">
-                                <input className={inputClass} type="number" min="0.01" step="0.01" required value={chargeForm.amount} onChange={event => setChargeForm(prev => ({ ...prev, amount: event.target.value }))} />
+                                <input className={inputClass} type="number" min="0.01" step="0.01" required={chargeForm.type !== "Cleaning"} value={chargeForm.amount} onChange={event => setChargeForm(prev => ({ ...prev, amount: event.target.value }))} />
+                                {chargeForm.type === "Cleaning" && <span className="text-xs text-gray-500">Если оставить поле пустым, применится тариф мойки кузова.</span>}
                             </Field>
                         ) : (
-                            <p className="rounded-lg bg-blue-50 p-3 text-sm text-blue-800 dark:bg-blue-950/30 dark:text-blue-200">Сумма будет взята из настроенного тарифа поздней отмены.</p>
+                            <p className="rounded-lg bg-blue-50 p-3 text-sm text-blue-800 dark:bg-blue-950/30 dark:text-blue-200">Сумма рассчитывается по суточной цене автомобиля, сохранённой в бронировании.</p>
                         )}
                         {chargeForm.type === "Other" && <Field label="Название"><input className={inputClass} required value={chargeForm.title} onChange={event => setChargeForm(prev => ({ ...prev, title: event.target.value }))} /></Field>}
                         {(chargeForm.type === "TrafficFine" || chargeForm.type === "Cleaning" || chargeForm.type === "PropertyLossOrDamage" || chargeForm.type === "Other") && (
