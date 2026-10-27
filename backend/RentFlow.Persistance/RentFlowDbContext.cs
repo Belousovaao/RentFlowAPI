@@ -24,6 +24,7 @@ public class RentFlowDbContext : DbContext
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<BookingCharge> BookingCharges => Set<BookingCharge>();
     public DbSet<BookingChargeSettings> BookingChargeSettings => Set<BookingChargeSettings>();
+    public DbSet<RentFlow.Domain.Settings.RentalTariff> RentalTariffs => Set<RentFlow.Domain.Settings.RentalTariff>();
     public DbSet<PaymentAllocation> PaymentAllocations => Set<PaymentAllocation>();
     public RentFlowDbContext(DbContextOptions<RentFlowDbContext> options) : base(options) { }
     protected override void OnModelCreating(ModelBuilder modelBuilder) => modelBuilder.ApplyConfigurationsFromAssembly(typeof(RentFlowDbContext).Assembly);
