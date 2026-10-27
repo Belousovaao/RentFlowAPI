@@ -38,7 +38,7 @@ type FinanceRow = {
 const chargeTypeLabels: Record<BookingChargeType, string> = {
     LateCancellation: "Поздняя отмена",
     TrafficFine: "Штраф ГИБДД",
-    Cleaning: "Уборка",
+    Cleaning: "Мойка кузова / уборка",
     Refueling: "Заправка",
     ExcessMileage: "Перепробег",
     PropertyLossOrDamage: "Утрата имущества / повреждение",
@@ -173,7 +173,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             return;
         }
         if (quantity !== undefined && (!Number.isFinite(quantity) || quantity <= 0 || Number(quantity.toFixed(3)) !== quantity)) {
-            toast.error("Введите положительное количество литров с точностью до 0,001.");
+            toast.error("Введите положительное количество с точностью до 0,001.");
             return;
         }
 
