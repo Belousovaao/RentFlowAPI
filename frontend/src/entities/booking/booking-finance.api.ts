@@ -5,6 +5,7 @@ export type BookingChargeType =
     | "TrafficFine"
     | "Cleaning"
     | "Refueling"
+    | "ExcessMileage"
     | "PropertyLossOrDamage"
     | "Other";
 
@@ -29,10 +30,11 @@ export interface BookingChargeDto {
     reviewedAt: string | null;
 }
 
-export interface BookingChargeSettingsDto {
-    lateCancellationTariff: number;
-    refuelingPricePerLiter: number;
-    updatedAt: string;
+export interface RentalTariffDto {
+    code: string;
+    price: number;
+    unit: string;
+    updatedAtUtc: string;
 }
 
 export type PaymentType = "Prepayment" | "AdditionalPayment" | "Refund";
@@ -97,14 +99,11 @@ export const bookingFinanceApi = {
     getCharges: (bookingId: string) =>
         apiClient.get<BookingChargeDto[]>(`/api/booking-charges/booking/${bookingId}`),
 
-    getChargeSettings: () =>
-        apiClient.get<BookingChargeSettingsDto>("/api/booking-charges/admin/settings"),
+    getRentalTariffs: () =>
+        apiClient.get<RentalTariffDto[]>("/api/rental-tariffs"),
 
-    updateChargeSettings: (lateCancellationTariff: number, refuelingPricePerLiter: number) =>
-        apiClient.put<BookingChargeSettingsDto>("/api/booking-charges/admin/settings", {
-            lateCancellationTariff,
-            refuelingPricePerLiter,
-        }),
+    updateRentalTariff: (code: string, price: number, unit: string) =>
+        apiClient.put<RentalTariffDto>(`/api/rental-tariffs/${encodeURIComponent(code)}`, { price, unit }),
 
     createCharge: (bookingId: string, request: CreateBookingChargeRequest) =>
         apiClient.post<{ id: string }>(`/api/booking-charges/admin/booking/${bookingId}`, request),
