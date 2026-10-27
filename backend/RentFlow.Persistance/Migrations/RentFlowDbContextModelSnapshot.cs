@@ -365,6 +365,7 @@ namespace RentFlow.Persistance.Migrations
             modelBuilder.Entity("RentFlow.Domain.Settings.RentalTariff", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("Code")
