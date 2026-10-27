@@ -39,6 +39,7 @@ public partial class AddRentalTariffs : Migration
         migrationBuilder.InsertData(
             table: "RentalTariffs",
             columns: new[] { "Id", "Code", "Price", "Unit", "UpdatedAtUtc" },
+            columnTypes: new[] { "uuid", "character varying(100)", "numeric(18,2)", "character varying(20)", "timestamp with time zone" },
             values: new object[,]
             {
                 { new Guid("c1f6bce5-4d55-4b31-9b2e-1c20a7e9c101"), "fuel_per_liter", 100m, "л", initialUpdatedAt },
