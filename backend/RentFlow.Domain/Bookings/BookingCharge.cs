@@ -58,5 +58,5 @@ public sealed class BookingCharge
         if (Status != BookingChargeStatus.PendingApproval) throw new InvalidOperationException("Only charges awaiting approval can be reviewed.");
     }
 }
-public enum BookingChargeType { LateCancellation, TrafficFine, Cleaning, Refueling, PropertyLossOrDamage, Other }
+public enum BookingChargeType { LateCancellation, TrafficFine, Cleaning, Refueling, ExcessMileage, PropertyLossOrDamage, Other }
 public enum BookingChargeStatus { PendingApproval, Confirmed, Rejected }
