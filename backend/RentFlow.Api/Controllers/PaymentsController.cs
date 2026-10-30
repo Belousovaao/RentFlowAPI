@@ -59,16 +59,6 @@ public sealed class PaymentsController : ControllerBase
         return Ok(new { id });
     }
 
-    [HttpPost("{paymentId:guid}/complete")]
-    public async Task<IActionResult> CompleteIncoming(
-        Guid paymentId,
-        [FromBody] CompleteIncomingPaymentRequest request,
-        CancellationToken ct)
-    {
-        await _mediator.Send(new CompleteIncomingPaymentCommand(paymentId, request.ExternalOperationId), ct);
-        return NoContent();
-    }
-
     [HttpPost("refunds")]
     public async Task<IActionResult> CreateRefund(
         [FromBody] CreateRefundCommand command,
