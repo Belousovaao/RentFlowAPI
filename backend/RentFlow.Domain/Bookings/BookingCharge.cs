@@ -41,15 +41,9 @@ public sealed class BookingCharge
             Currency = "RUB", CreatedAt = createdAt, CreatedByUserId = createdByUserId };
     }
 
-    public void Confirm(DateTimeOffset reviewedAt, Guid? reviewedByUserId = null)
-    {
-        EnsureNotRejected();
-        if (reviewedAt < CreatedAt) throw new ArgumentOutOfRangeException(nameof(reviewedAt));
-        throw new InvalidOperationException("A charge is accrued immediately when created.");
-    }
     public void Reject(DateTimeOffset reviewedAt, Guid? reviewedByUserId = null)
     {
-        EnsurePending();
+        EnsureNotRejected();
         if (reviewedAt < CreatedAt) throw new ArgumentOutOfRangeException(nameof(reviewedAt));
         Status = BookingChargeStatus.Rejected; ReviewedAt = reviewedAt; ReviewedByUserId = reviewedByUserId;
     }
