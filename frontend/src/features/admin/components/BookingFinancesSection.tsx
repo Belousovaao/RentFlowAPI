@@ -320,8 +320,8 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
     }, [price, services, charges, payments]);
 
     const canRegisterPayment = bookingStatus === "Confirmed" || bookingStatus === "Active" || bookingStatus === "Completed";
-    const confirmedCharges = charges.filter(charge => charge.status === "Accrued" && charge.balance > 0);
-    const pendingCharges = charges.filter(charge => charge.status === "Accrued");
+    const accruedCharges = charges.filter(charge => charge.status === "Accrued" && charge.balance > 0);
+    
 
     return (
         <section className="rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-800 sm:p-6 lg:col-span-2">
@@ -372,15 +372,11 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                 <SummaryCard label="Стоимость аренды" value={formatPrice(price.total)} hint="Без депозита" />
                 <SummaryCard label="К оплате с депозитом" value={formatPrice(price.totalToPay)} hint="Аренда и обеспечительный платёж" />
                 <SummaryCard label="Поступило" value={formatPrice(summary?.totalReceived ?? 0)} hint="Все зарегистрированные поступления" />
-                <SummaryCard label="Возвращено" value={formatPrice(summary?.totalRefunded ?? 0)} hint={summary ? `Ожидает возврата: ${formatPrice(summary.pendingRefunds)}` : "Загрузка…"} />
+                <SummaryCard label="Возвращено" value={formatPrice(summary?.totalRefunded ?? 0)} hint={summary ? `Доступно к возврату: ${formatPrice(summary.availableToRefund)}` : "Загрузка…"} />
                 <SummaryCard label="Чистая оплата" value={formatPrice(summary?.netPaid ?? 0)} hint={summary ? `Доступно к возврату: ${formatPrice(summary.availableToRefund)}` : "Загрузка…"} />
             </div>
 
-            {pendingCharges.length > 0 && (
-                <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/20 dark:text-amber-200">
-                    На согласовании: {pendingCharges.length} {pendingCharges.length === 1 ? "начисление" : "начисления"}. До подтверждения они не увеличивают задолженность клиента.
-                </div>
-            )}
+
 
             <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
                 <table className="min-w-[850px] w-full text-left text-sm">
@@ -422,12 +418,12 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                     {row.kind === "payment" && false && row.payment.type !== "Refund" && (
                                         <button type="button" disabled={busyId === row.id} onClick={() => void runAction(row.id, () => bookingFinanceApi.completeIncoming(row.id), "Платёж подтверждён.")} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50 disabled:opacity-50 dark:text-blue-300 dark:hover:bg-blue-950/30">Подтвердить</button>
                                     )}
-                                    {row.kind === "payment" && row.payment?.status === "Pending" && row.payment.type === "Refund" && (
+                                    {row.kind === "payment" && row.false && row.payment.type === "Refund" && (
                                         <button type="button" disabled={busyId === row.id} onClick={() => void runAction(row.id, () => bookingFinanceApi.completeRefund(row.id), "Возврат подтверждён.")} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50 disabled:opacity-50 dark:text-blue-300 dark:hover:bg-blue-950/30">Подтвердить</button>
                                     )}
                                     {row.kind === "payment" && row.payment.type !== "Refund" && (
                                         <div className="flex flex-wrap justify-end gap-1">
-                                            {confirmedCharges.length > 0 && (
+                                            {accruedCharges.length > 0 && (
                                                 <button type="button" onClick={() => { setAllocationPayment(row.payment!); setAllocationAmounts({}); }} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-950/30">Распределить</button>
                                             )}
                                             <button type="button" onClick={() => void createRefund(row.payment!)} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-950/30">Возврат</button>
@@ -532,7 +528,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                 <Modal title="Распределение платежа" onClose={() => setAllocationPayment(null)}>
                     <form className="space-y-4" onSubmit={submitAllocations}>
                         <p className="text-sm text-gray-600 dark:text-gray-300">Платёж: {formatPrice(allocationPayment.amount)}. Укажите, какую сумму направить на каждое подтверждённое начисление. Общая сумма не должна превышать нераспределённый остаток платежа.</p>
-                        {confirmedCharges.map(charge => (
+                        {accruedCharges.map(charge => (
                             <Field key={charge.id} label={`${charge.title} · остаток ${formatPrice(charge.balance)}`}>
                                 <input className={inputClass} type="number" min="0" max={charge.balance} step="0.01" value={allocationAmounts[charge.id] ?? ""} onChange={event => setAllocationAmounts(prev => ({ ...prev, [charge.id]: event.target.value }))} />
                             </Field>
@@ -581,11 +577,7 @@ function Modal({ title, children, onClose }: { title: string; children: ReactNod
 }
 
 function statusClass(status: string) {
-    if (["Подтверждено", "Выполнено"].includes(status)) 
-        return "bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-300";
-    if (["Отклонено", "Ошибка", "Отменено"].includes(status)) 
-        return "bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300";
-    if (["На согласовании", "Ожидает подтверждения"].includes(status)) 
-        return "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300";
+    if (status === "Начислено") return "bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300";
+    if (status === "Отклонено") return "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400";
     return "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200";
 }
