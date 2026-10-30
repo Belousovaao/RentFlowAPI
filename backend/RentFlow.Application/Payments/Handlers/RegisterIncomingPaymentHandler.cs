@@ -6,8 +6,7 @@ using RentFlow.Domain.Payments;
 
 namespace RentFlow.Application.Payments.Handlers;
 
-public sealed class RegisterIncomingPaymentHandler
-    : IRequestHandler<RegisterIncomingPaymentCommand, Guid>
+public sealed class RegisterIncomingPaymentHandler : IRequestHandler<RegisterIncomingPaymentCommand, Guid>
 {
     private readonly IBookingRepository _bookings;
     private readonly IPaymentRepository _payments;
@@ -34,29 +33,22 @@ public sealed class RegisterIncomingPaymentHandler
             throw new ArgumentException("BookingId cannot be empty.");
 
         if (request.Amount <= 0)
-            throw new ArgumentOutOfRangeException(
-                nameof(request.Amount),
-                "Payment amount must be greater than zero.");
+            throw new ArgumentOutOfRangeException(nameof(request.Amount), "Payment amount must be greater than zero.");
 
         if (request.Amount != decimal.Round(request.Amount, 2))
-            throw new ArgumentOutOfRangeException(
-                nameof(request.Amount),
-                "Payment amount cannot have more than two decimal places.");
+            throw new ArgumentOutOfRangeException(nameof(request.Amount), "Payment amount cannot have more than two decimal places.");
 
         if (request.Type is not (
             PaymentType.Prepayment or PaymentType.AdditionalPayment))
         {
-            throw new ArgumentOutOfRangeException(
-                nameof(request.Type),
-                "Only incoming payment types are allowed.");
+            throw new ArgumentOutOfRangeException(nameof(request.Type), "Only incoming payment types are allowed.");
         }
 
         await _uow.BeginTransactionAsync(ct);
 
         try
         {
-            await _uow.LockBookingPaymentsAsync(
-                request.BookingId, ct);
+            await _uow.LockBookingPaymentsAsync(request.BookingId, ct);
 
             var booking = await _bookings.GetByIdAsync(
                 request.BookingId, ct)
@@ -85,17 +77,15 @@ public sealed class RegisterIncomingPaymentHandler
         }
     }
 
-    private static void EnsurePaymentAllowed(
-        BookingStatus status,
-        PaymentType type)
+    private static void EnsurePaymentAllowed(BookingStatus status, PaymentType type)
     {
         var allowed = type switch
         {
-            PaymentType.Prepayment =>
-                status == BookingStatus.Confirmed,
+            PaymentType.Prepayment => status == BookingStatus.Confirmed,
 
-            PaymentType.AdditionalPayment =>
-                status is BookingStatus.Confirmed or BookingStatus.Active,
+            PaymentType.AdditionalPayment => status is BookingStatus.Confirmed
+                or BookingStatus.Active
+                or BookingStatus.Completed,
 
             _ => false
         };

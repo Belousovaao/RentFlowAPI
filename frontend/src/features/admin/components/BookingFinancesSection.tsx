@@ -4,16 +4,7 @@ import { Check, CircleDollarSign, Loader2, Plus, RefreshCw, X } from "lucide-rea
 import { toast } from "react-hot-toast";
 import { formatDateTime, formatPrice } from "@/shared/utils/formatters";
 import type { BookingPriceDto, BookingServiceDto, BookingStatus } from "@/entities/booking/booking.types";
-import {
-    bookingFinanceApi,
-    type BookingChargeDto,
-    type BookingChargeStatus,
-    type BookingChargeType,
-    type BookingPaymentSummaryDto,
-    type CreateBookingChargeRequest,
-    type PaymentMethod,
-    type PaymentTransactionDto,
-} from "@/entities/booking/booking-finance.api";
+import { bookingFinanceApi, type BookingChargeDto, type BookingChargeStatus, type BookingChargeType, type BookingPaymentSummaryDto, type CreateBookingChargeRequest, type PaymentMethod, type PaymentTransactionDto, } from "@/entities/booking/booking-finance.api";
 
 interface Props {
     bookingId: string;
@@ -53,7 +44,7 @@ const chargeStatusLabels: Record<BookingChargeStatus, string> = {
 
 const paymentTypeLabels = {
     Prepayment: "Предоплата",
-    AdditionalPayment: "Доплата",
+    AdditionalPayment: "Оплата",
     Refund: "Возврат",
 } as const;
 
@@ -64,11 +55,8 @@ const paymentStatusLabels = {
     Cancelled: "Отменено",
 } as const;
 
-const inputClass =
-    "w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:focus:ring-blue-900/40";
-
-const buttonClass =
-    "inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50";
+const inputClass = "w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:focus:ring-blue-900/40";
+const buttonClass = "inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50";
 
 const emptyChargeForm = {
     type: "TrafficFine" as BookingChargeType,
@@ -221,9 +209,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
     };
 
     const createRefund = async (payment: PaymentTransactionDto) => {
-        const raw = window.prompt(
-            `Доступный к возврату остаток по платежу: ${formatPrice(payment.amount)}. Введите сумму возврата:`,
-        );
+        const raw = window.prompt(`Доступный к возврату остаток по платежу: ${formatPrice(payment.amount)}. Введите сумму возврата:`,);
         if (raw === null) return;
         const amount = Number(raw.replace(",", "."));
         if (!Number.isFinite(amount) || amount <= 0 || Number(amount.toFixed(2)) !== amount) {
@@ -248,8 +234,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             return;
         }
         const succeeded = await runAction(`allocate-${allocationPayment.id}`, () =>
-            bookingFinanceApi.allocatePayment(allocationPayment.id, allocations),
-        "Платёж распределён по начислениям.");
+            bookingFinanceApi.allocatePayment(allocationPayment.id, allocations), "Платёж распределён по начислениям.");
         if (succeeded) {
             setAllocationPayment(null);
             setAllocationAmounts({});
@@ -340,7 +325,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
         });
     }, [price, services, charges, payments]);
 
-    const canRegisterPayment = bookingStatus === "Confirmed" || bookingStatus === "Active";
+    const canRegisterPayment = bookingStatus === "Confirmed" || bookingStatus === "Active" || bookingStatus === "Completed";
     const confirmedCharges = charges.filter(charge => charge.status === "Confirmed" && charge.balance > 0);
     const pendingCharges = charges.filter(charge => charge.status === "PendingApproval");
 
@@ -354,16 +339,36 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                     </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                    <button type="button" onClick={() => setPaymentModalOpen(true)} disabled={!canRegisterPayment} title={!canRegisterPayment ? "Платежи доступны только для подтверждённого или активного бронирования" : undefined} className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>
-                        <CircleDollarSign className="h-4 w-4" /> Добавить платёж
+                    <button 
+                        type="button" 
+                        onClick={() => setPaymentModalOpen(true)} 
+                        disabled={!canRegisterPayment} 
+                        title={!canRegisterPayment 
+                            ? "Платежи доступны только для подтверждённого, активного или завершенного бронирования" 
+                            : undefined} 
+                        className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>
+                        <CircleDollarSign className="h-4 w-4" /> 
+                            Добавить платёж
                     </button>
-                    <button type="button" onClick={() => setChargeModalOpen(true)} className={`${buttonClass} border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700`}>
-                        <Plus className="h-4 w-4" /> Добавить начисление
+                    <button 
+                        type="button" 
+                        onClick={() => setChargeModalOpen(true)} 
+                        className={`${buttonClass} border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700`}>
+                        <Plus className="h-4 w-4" /> 
+                            Добавить начисление
                     </button>
-                    <button type="button" onClick={() => setSettingsModalOpen(true)} className={`${buttonClass} border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700`}>
-                        Тарифы
+                    <button 
+                        type="button" 
+                        onClick={() => setSettingsModalOpen(true)} 
+                        className={`${buttonClass} border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700`}>
+                            Тарифы
                     </button>
-                    <button type="button" onClick={() => void loadFinance()} disabled={loading} aria-label="Обновить финансы" className={`${buttonClass} border border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300`}>
+                    <button 
+                        type="button" 
+                        onClick={() => void loadFinance()} 
+                        disabled={loading} 
+                        aria-label="Обновить финансы" 
+                        className={`${buttonClass} border border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300`}>
                         <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                     </button>
                 </div>
@@ -582,8 +587,11 @@ function Modal({ title, children, onClose }: { title: string; children: ReactNod
 }
 
 function statusClass(status: string) {
-    if (["Подтверждено", "Выполнено"].includes(status)) return "bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-300";
-    if (["Отклонено", "Ошибка", "Отменено"].includes(status)) return "bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300";
-    if (["На согласовании", "Ожидает подтверждения"].includes(status)) return "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300";
+    if (["Подтверждено", "Выполнено"].includes(status)) 
+        return "bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-300";
+    if (["Отклонено", "Ошибка", "Отменено"].includes(status)) 
+        return "bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300";
+    if (["На согласовании", "Ожидает подтверждения"].includes(status)) 
+        return "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300";
     return "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200";
 }
