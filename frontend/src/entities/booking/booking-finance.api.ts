@@ -9,7 +9,7 @@ export type BookingChargeType =
     | "PropertyLossOrDamage"
     | "Other";
 
-export type BookingChargeStatus = "PendingApproval" | "Confirmed" | "Rejected";
+export type BookingChargeStatus = "Accrued" | "Rejected";
 
 export interface BookingChargeDto {
     id: string;
