@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
-import { Check, CircleDollarSign, Loader2, Plus, RefreshCw, X } from "lucide-react";
+import { CircleDollarSign, Loader2, Plus, RefreshCw, X } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { formatDateTime, formatPrice } from "@/shared/utils/formatters";
 import type { BookingPriceDto, BookingServiceDto, BookingStatus } from "@/entities/booking/booking.types";
@@ -37,8 +37,7 @@ const chargeTypeLabels: Record<BookingChargeType, string> = {
 };
 
 const chargeStatusLabels: Record<BookingChargeStatus, string> = {
-    PendingApproval: "На согласовании",
-    Confirmed: "Подтверждено",
+    Accrued: "Начислено",
     Rejected: "Отклонено",
 };
 
@@ -48,12 +47,7 @@ const paymentTypeLabels = {
     Refund: "Возврат",
 } as const;
 
-const paymentStatusLabels = {
-    Pending: "Ожидает подтверждения",
-    Completed: "Выполнено",
-    Failed: "Ошибка",
-    Cancelled: "Отменено",
-} as const;
+
 
 const inputClass = "w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:focus:ring-blue-900/40";
 const buttonClass = "inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50";
@@ -180,7 +174,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             ...(chargeForm.referenceNumber.trim() ? { referenceNumber: chargeForm.referenceNumber.trim() } : {}),
         };
 
-        const succeeded = await runAction("create-charge", () => bookingFinanceApi.createCharge(bookingId, request), "Начисление создано и отправлено на согласование.");
+        const succeeded = await runAction("create-charge", () => bookingFinanceApi.createCharge(bookingId, request), "Начисление создано.");
         if (succeeded) {
             setChargeModalOpen(false);
             setChargeForm(emptyChargeForm);
@@ -312,7 +306,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                     payment.note,
                     payment.externalOperationId ? `Операция: ${payment.externalOperationId}` : null,
                 ].filter(Boolean).join(" · "),
-                status: paymentStatusLabels[payment.status],
+                status: "",
                 amount: payment.type === "Refund" ? -payment.amount : payment.amount,
                 kind: "payment",
                 payment,
@@ -326,8 +320,8 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
     }, [price, services, charges, payments]);
 
     const canRegisterPayment = bookingStatus === "Confirmed" || bookingStatus === "Active" || bookingStatus === "Completed";
-    const confirmedCharges = charges.filter(charge => charge.status === "Confirmed" && charge.balance > 0);
-    const pendingCharges = charges.filter(charge => charge.status === "PendingApproval");
+    const confirmedCharges = charges.filter(charge => charge.status === "Accrued" && charge.balance > 0);
+    const pendingCharges = charges.filter(charge => charge.status === "Accrued");
 
     return (
         <section className="rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-800 sm:p-6 lg:col-span-2">
@@ -377,7 +371,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
                 <SummaryCard label="Стоимость аренды" value={formatPrice(price.total)} hint="Без депозита" />
                 <SummaryCard label="К оплате с депозитом" value={formatPrice(price.totalToPay)} hint="Аренда и обеспечительный платёж" />
-                <SummaryCard label="Поступило" value={formatPrice(summary?.totalReceived ?? 0)} hint="Подтверждённые платежи" />
+                <SummaryCard label="Поступило" value={formatPrice(summary?.totalReceived ?? 0)} hint="Все зарегистрированные поступления" />
                 <SummaryCard label="Возвращено" value={formatPrice(summary?.totalRefunded ?? 0)} hint={summary ? `Ожидает возврата: ${formatPrice(summary.pendingRefunds)}` : "Загрузка…"} />
                 <SummaryCard label="Чистая оплата" value={formatPrice(summary?.netPaid ?? 0)} hint={summary ? `Доступно к возврату: ${formatPrice(summary.availableToRefund)}` : "Загрузка…"} />
             </div>
@@ -419,19 +413,19 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                     {row.balance === undefined ? "—" : formatPrice(row.balance)}
                                 </td>
                                 <td className="px-4 py-3 text-right">
-                                    {row.kind === "charge" && row.charge?.status === "PendingApproval" && (
+                                    {row.kind === "charge" && row.charge?.status === "Accrued" && (
                                         <div className="flex justify-end gap-1">
-                                            <button type="button" title="Подтвердить начисление" disabled={busyId === row.id} onClick={() => void runAction(row.id, () => bookingFinanceApi.confirmCharge(bookingId, row.id), "Начисление подтверждено.")} className="rounded-lg p-2 text-green-700 hover:bg-green-50 disabled:opacity-50 dark:text-green-400 dark:hover:bg-green-950/30"><Check className="h-4 w-4" /></button>
+                                            <button type="button" title="Отклонить начисление" disabled={busyId === row.id} onClick={() => void runAction(row.id, () => bookingFinanceApi.rejectCharge(bookingId, row.id), "Начисление отклонено.")} className="rounded-lg p-2 text-green-700 hover:bg-green-50 disabled:opacity-50 dark:text-green-400 dark:hover:bg-green-950/30"><X className="h-4 w-4" /></button>
                                             <button type="button" title="Отклонить начисление" disabled={busyId === row.id} onClick={() => void runAction(row.id, () => bookingFinanceApi.rejectCharge(bookingId, row.id), "Начисление отклонено.")} className="rounded-lg p-2 text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"><X className="h-4 w-4" /></button>
                                         </div>
                                     )}
-                                    {row.kind === "payment" && row.payment?.status === "Pending" && row.payment.type !== "Refund" && (
+                                    {row.kind === "payment" && false && row.payment.type !== "Refund" && (
                                         <button type="button" disabled={busyId === row.id} onClick={() => void runAction(row.id, () => bookingFinanceApi.completeIncoming(row.id), "Платёж подтверждён.")} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50 disabled:opacity-50 dark:text-blue-300 dark:hover:bg-blue-950/30">Подтвердить</button>
                                     )}
                                     {row.kind === "payment" && row.payment?.status === "Pending" && row.payment.type === "Refund" && (
                                         <button type="button" disabled={busyId === row.id} onClick={() => void runAction(row.id, () => bookingFinanceApi.completeRefund(row.id), "Возврат подтверждён.")} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50 disabled:opacity-50 dark:text-blue-300 dark:hover:bg-blue-950/30">Подтвердить</button>
                                     )}
-                                    {row.kind === "payment" && row.payment?.status === "Completed" && row.payment.type !== "Refund" && (
+                                    {row.kind === "payment" && row.payment.type !== "Refund" && (
                                         <div className="flex flex-wrap justify-end gap-1">
                                             {confirmedCharges.length > 0 && (
                                                 <button type="button" onClick={() => { setAllocationPayment(row.payment!); setAllocationAmounts({}); }} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-950/30">Распределить</button>
@@ -499,7 +493,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                             </Field>
                         )}
                         {chargeForm.type === "TrafficFine" && <Field label="Номер постановления (если есть)"><input className={inputClass} value={chargeForm.referenceNumber} onChange={event => setChargeForm(prev => ({ ...prev, referenceNumber: event.target.value }))} /></Field>}
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Новое начисление получает статус «На согласовании» и учитывается в долге только после подтверждения.</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Начисление сразу учитывается в задолженности. При необходимости его можно отклонить.</p>
                         <div className="flex justify-end gap-2">
                             <button type="button" className={`${buttonClass} border border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-200`} onClick={() => setChargeModalOpen(false)}>Отмена</button>
                             <button type="submit" disabled={busyId === "create-charge"} className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>{busyId === "create-charge" && <Loader2 className="h-4 w-4 animate-spin" />} Создать</button>
@@ -525,7 +519,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                             </select>
                         </Field>
                         <Field label="Комментарий (необязательно)"><textarea className={inputClass} rows={2} value={paymentNote} onChange={event => setPaymentNote(event.target.value)} /></Field>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">После регистрации платёж будет ожидать подтверждения. В сводке поступлений он появится после подтверждения.</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Платёж сразу учитывается в поступлениях и доступном для распределения остатке.</p>
                         <div className="flex justify-end gap-2">
                             <button type="button" className={`${buttonClass} border border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-200`} onClick={() => setPaymentModalOpen(false)}>Отмена</button>
                             <button type="submit" disabled={busyId === "register-payment"} className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>{busyId === "register-payment" && <Loader2 className="h-4 w-4 animate-spin" />} Зарегистрировать</button>
