@@ -113,7 +113,7 @@ public sealed class CreateRefundHandler : IRequestHandler<CreateRefundCommand, G
                 _dateTimeProvider.UtcNow,
                 note: request.Note);
 
-            await _payments.AddAsync(refund, ct);
+            refund.Complete(_dateTimeProvider.UtcNow);\n            await _payments.AddAsync(refund, ct);
             await _uow.SaveChangesAsync(ct);
             await _uow.CommitAsync(ct);
 
