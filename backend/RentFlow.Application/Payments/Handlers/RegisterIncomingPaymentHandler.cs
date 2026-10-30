@@ -64,7 +64,7 @@ public sealed class RegisterIncomingPaymentHandler : IRequestHandler<RegisterInc
                 _dateTimeProvider.UtcNow,
                 note: request.Note);
 
-            await _payments.AddAsync(payment, ct);
+            payment.Complete(_dateTimeProvider.UtcNow);\n            await _payments.AddAsync(payment, ct);
             await _uow.SaveChangesAsync(ct);
             await _uow.CommitAsync(ct);
 
