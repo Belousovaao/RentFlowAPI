@@ -37,10 +37,8 @@ public sealed class PaymentsController : ControllerBase
             p.Currency,
             p.Type,
             p.Method,
-            p.Status,
             p.ExternalOperationId,
             p.CreatedAt,
-            p.CompletedAt,
             p.Note
         )));
     }
@@ -102,8 +100,6 @@ public sealed record PaymentTransactionDto(
     string Currency,
     PaymentType Type,
     PaymentMethod Method,
-    PaymentStatus Status,
     string? ExternalOperationId,
     DateTimeOffset CreatedAt,
-    DateTimeOffset? CompletedAt,
     string? Note);
