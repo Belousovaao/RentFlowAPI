@@ -12,6 +12,7 @@ import { ServiceModal } from "@/features/booking/components/ServiceModal";
 import { formatDate, formatDateTime, formatPrice, } from "@/shared/utils/formatters";
 import { travelZones } from "@/entities/destination/destination.constants";
 import { RouteReviewStatus } from "@/entities/destination/destination.type";
+import { BookingFinancesSection } from "@/features/admin/components/BookingFinancesSection";
 
 export const AdminBookingDetailsPage = () => {
     const { id } = useParams<{ id: string }>();
@@ -191,19 +192,6 @@ export const AdminBookingDetailsPage = () => {
         };
     });
 
-    const rentalPrice =
-        booking.price.rentalPrice.rentalPriceWithDiscount;
-
-    const servicesPrice = booking.price.servicesPrice;
-    const routeSurcharge = booking.price.routeSurcharge;
-
-    const penaltiesPrice = booking.price.penaltiesPrice;
-
-    const deposit = booking.price.deposit;
-
-    const total = booking.price.total;
-    const totalToPay = booking.price.totalToPay;
-
     return (
         <div className="min-h-screen bg-gray-50 pt-24 pb-16 dark:bg-gray-900">
             <div className="container mx-auto max-w-5xl px-4">
@@ -348,185 +336,118 @@ export const AdminBookingDetailsPage = () => {
                             </section>
                         </button>
                     </div>
-
-                    {/* Период аренды */}
-                    <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
-                        <div className="mb-6">
-                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                Период аренды
-                            </h2>
-                        </div>
-
-                        <div className="relative">
-                            {/* Линия таймлайна */}
-                            <div className="absolute left-[7px] top-2 bottom-2 w-px bg-gray-200 dark:bg-gray-700" />
-
-                            {/* Начало */}
-                            <div className="relative flex gap-4">
-                                <div className="relative z-10 mt-1 h-4 w-4 shrink-0 rounded-full border-4 border-white bg-blue-600 dark:border-gray-800" />
-
-                                <div className="pb-5">
-                                    <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                                        Начало аренды
-                                    </p>
-
-                                    <p className="mt-1 font-medium text-gray-900 dark:text-white">
-                                        {formatDateTime(rentalStart)}
-                                    </p>
-                                </div>
+                    {/* Период аренды + Маршрут */}
+                    <div className="grid gap-6 lg:grid-cols-2">
+                        {/* Период аренды */}
+                        <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
+                            <div className="mb-6">
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                    Период аренды
+                                </h2>
                             </div>
 
-                            {/* Сегменты */}
-                            <div className="space-y-4">
-                                {segmentTimeline.map((segment, index) => (
-                                    <div
-                                        key={`${segment.start.toISOString()}-${index}`}
-                                        className="relative flex gap-4"
-                                    >
-                                        <div className="relative z-10 mt-5 h-4 w-4 shrink-0 rounded-full border-4 border-white bg-gray-300 dark:border-gray-800 dark:bg-gray-600" />
+                            <div className="relative">
+                                {/* Линия таймлайна */}
+                                <div className="absolute left-[7px] top-2 bottom-2 w-px bg-gray-200 dark:bg-gray-700" />
 
-                                        <div className="min-w-0 flex-1 rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-700/50">
-                                            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                                                <div>
-                                                    <div className="flex flex-wrap items-center gap-2">
-                                                        <span className="font-semibold text-gray-900 dark:text-white">
-                                                            {segment.days}{" "}
-                                                            {segment.days ===
-                                                            1
-                                                                ? "день"
-                                                                : segment.days <
-                                                                    5
-                                                                  ? "дня"
-                                                                  : "дней"}
-                                                        </span>
+                                {/* Начало */}
+                                <div className="relative flex gap-4">
+                                    <div className="relative z-10 mt-1 h-4 w-4 shrink-0 rounded-full border-4 border-white bg-blue-600 dark:border-gray-800" />
 
-                                                        {segment.durationDiscountPercent >
-                                                            0 && (
-                                                            <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                                                −
-                                                                {
-                                                                    segment.durationDiscountPercent
-                                                                }
-                                                                %
+                                    <div className="pb-5">
+                                        <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                                            Начало аренды
+                                        </p>
+
+                                        <p className="mt-1 font-medium text-gray-900 dark:text-white">
+                                            {formatDateTime(rentalStart)}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Сегменты */}
+                                <div className="space-y-4">
+                                    {segmentTimeline.map((segment, index) => (
+                                        <div
+                                            key={`${segment.start.toISOString()}-${index}`}
+                                            className="relative flex gap-4"
+                                        >
+                                            <div className="relative z-10 mt-5 h-4 w-4 shrink-0 rounded-full border-4 border-white bg-gray-300 dark:border-gray-800 dark:bg-gray-600" />
+
+                                            <div className="min-w-0 flex-1 rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-700/50">
+                                                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                                    <div>
+                                                        <div className="flex flex-wrap items-center gap-2">
+                                                            <span className="font-semibold text-gray-900 dark:text-white">
+                                                                {segment.days}{" "}
+                                                                {segment.days ===
+                                                                1
+                                                                    ? "день"
+                                                                    : segment.days <
+                                                                        5
+                                                                    ? "дня"
+                                                                    : "дней"}
                                                             </span>
-                                                        )}
+
+                                                            {segment.durationDiscountPercent >
+                                                                0 && (
+                                                                <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                                                    −
+                                                                    {
+                                                                        segment.durationDiscountPercent
+                                                                    }
+                                                                    %
+                                                                </span>
+                                                            )}
+                                                        </div>
+
+                                                        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                                            {formatDate(
+                                                                segment.start
+                                                            )}{" "}
+                                                            —{" "}
+                                                            {formatDate(
+                                                                segment.end
+                                                            )}
+                                                        </p>
                                                     </div>
 
-                                                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                                        {formatDate(
-                                                            segment.start
-                                                        )}{" "}
-                                                        —{" "}
-                                                        {formatDate(
-                                                            segment.end
-                                                        )}
-                                                    </p>
-                                                </div>
+                                                    <div className="text-left sm:text-right">
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                            {formatPrice(
+                                                                segment.discountedDailyPrice
+                                                            )}{" "}
+                                                            / день
+                                                        </p>
 
-                                                <div className="text-left sm:text-right">
-                                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                        {formatPrice(
-                                                            segment.discountedDailyPrice
-                                                        )}{" "}
-                                                        / день
-                                                    </p>
-
-                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-white">
-                                                        {formatPrice(
-                                                            segment.total
-                                                        )}
-                                                    </p>
+                                                        <p className="mt-1 font-semibold text-gray-900 dark:text-white">
+                                                            {formatPrice(
+                                                                segment.total
+                                                            )}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Конец */}
-                            <div className="relative mt-4 flex gap-4">
-                                <div className="relative z-10 mt-1 h-4 w-4 shrink-0 rounded-full border-4 border-white bg-blue-600 dark:border-gray-800" />
-
-                                <div>
-                                    <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                                        Конец аренды
-                                    </p>
-
-                                    <p className="mt-1 font-medium text-gray-900 dark:text-white">
-                                        {formatDateTime(rentalEnd)}
-                                    </p>
+                                    ))}
                                 </div>
-                            </div>
-                        </div>
-                    </section>
 
-                    {/* Дополнительные услуги */}
-                    <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
-                        <div className="mb-5 flex items-center justify-between gap-4">
-                            <div>
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    Дополнительные услуги
-                                </h2>
+                                {/* Конец */}
+                                <div className="relative mt-4 flex gap-4">
+                                    <div className="relative z-10 mt-1 h-4 w-4 shrink-0 rounded-full border-4 border-white bg-blue-600 dark:border-gray-800" />
 
-                                {booking.services.length > 0 && (
-                                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                        {booking.services.length}{" "}
-                                        {booking.services.length === 1
-                                            ? "услуга"
-                                            : booking.services.length < 5
-                                              ? "услуги"
-                                              : "услуг"}
-                                    </p>
-                                )}
-                            </div>
+                                    <div>
+                                        <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                                            Конец аренды
+                                        </p>
 
-                            <button
-                                type="button"
-                                disabled={!canEditBooking}
-                                onClick={() => setServiceModalOpen(true)}
-                                className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-750"
-                            >
-                                <Plus className="h-4 w-4" />
-                                Добавить
-                            </button>
-                        </div>
-
-                        {booking.services.length === 0 ? (
-                            <div className="rounded-xl border border-dashed border-gray-200 px-4 py-8 text-center dark:border-gray-700">
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    Дополнительные услуги не выбраны.
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                                {booking.services.map((service, index) => (
-                                    <div
-                                        key={`${service.name}-${service.selectedTime ?? ""}-${index}`}
-                                        className="flex flex-col gap-2 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
-                                    >
-                                        <div>
-                                            <p className="font-medium text-gray-900 dark:text-white">
-                                                {service.name}
-                                            </p>
-
-                                            {service.selectedTime && (
-                                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                                    {service.selectedTime}
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        <p className="font-medium text-gray-900 dark:text-white">
-                                            {formatPrice(service.price)}
+                                        <p className="mt-1 font-medium text-gray-900 dark:text-white">
+                                            {formatDateTime(rentalEnd)}
                                         </p>
                                     </div>
-                                ))}
+                                </div>
                             </div>
-                        )}
-                    </section>
-
-                    {/* Маршрут + Стоимость */}
-                    <div className="grid gap-6 lg:grid-cols-2">
+                        </section>
                         {/* Маршрут */}
                         <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
                             <div className="mb-5 flex items-center gap-3">
@@ -591,91 +512,74 @@ export const AdminBookingDetailsPage = () => {
                                 </div>
                             </div>
                         </section>
-                        {/* Стоимость */}
-                        <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
-                            <div className="mb-6">
+                    </div>
+                    
+                    {/* Дополнительные услуги */}
+                    <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
+                        <div className="mb-5 flex items-center justify-between gap-4">
+                            <div>
                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    Стоимость
+                                    Дополнительные услуги
                                 </h2>
+
+                                {booking.services.length > 0 && (
+                                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                        {booking.services.length}{" "}
+                                        {booking.services.length === 1
+                                            ? "услуга"
+                                            : booking.services.length < 5
+                                                ? "услуги"
+                                                : "услуг"}
+                                    </p>
+                                )}
                             </div>
-                            <div className="space-y-3">
-                                {/* Аренда */}
-                                <div className="flex items-center justify-between gap-4">
-                                    <span className="text-gray-600 dark:text-gray-300">
-                                        Аренда
-                                    </span>
-                                    <span className="shrink-0 font-medium text-gray-900 dark:text-white">
-                                        {formatPrice(rentalPrice)}
-                                    </span>
-                                </div>
-                                {/* Услуги */}
-                                {servicesPrice > 0 && (
-                                    <div className="flex items-center justify-between gap-4">
-                                        <span className="text-gray-600 dark:text-gray-300">
-                                            Дополнительные услуги
-                                        </span>
-                                        <span className="shrink-0 font-medium text-gray-900 dark:text-white">
-                                            {formatPrice(servicesPrice)}
-                                        </span>
-                                    </div>
-                                )}
-                                {/* Маршрут */}
-                                {routeSurcharge > 0 && (
-                                    <div className="flex items-center justify-between gap-4">
-                                        <span className="text-gray-600 dark:text-gray-300">
-                                            Доплата за маршрут
-                                        </span>
-                                        <span className="shrink-0 font-medium text-gray-900 dark:text-white">
-                                            {formatPrice(routeSurcharge)}
-                                        </span>
-                                    </div>
-                                )}
-                                {/* Штрафы */}
-                                {penaltiesPrice > 0 && (
-                                    <div className="flex items-center justify-between gap-4">
-                                        <div className="min-w-0">
-                                            <p className="text-gray-600 dark:text-gray-300">
-                                                Штрафы
+
+                            <button
+                                type="button"
+                                disabled={!canEditBooking}
+                                onClick={() => setServiceModalOpen(true)}
+                                className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-750"
+                            >
+                                <Plus className="h-4 w-4" />
+                                Добавить
+                            </button>
+                        </div>
+
+                        {booking.services.length === 0 ? (
+                            <div className="rounded-xl border border-dashed border-gray-200 px-4 py-8 text-center dark:border-gray-700">
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    Дополнительные услуги не выбраны.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                                {booking.services.map((service, index) => (
+                                    <div
+                                        key={`${service.name}-${service.selectedTime ?? ""}-${index}`}
+                                        className="flex flex-col gap-2 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between"
+                                    >
+                                        <div>
+                                            <p className="font-medium text-gray-900 dark:text-white">
+                                                {service.name}
                                             </p>
-                                            {booking.price.penalties.length > 0 && (
-                                                <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
-                                                    {booking.price.penalties.length}{" "}
-                                                    {booking.price.penalties.length === 1
-                                                        ? "начисление"
-                                                        : "начисления"}
+
+                                            {service.selectedTime && (
+                                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                                    {service.selectedTime}
                                                 </p>
                                             )}
                                         </div>
-                                        <span className="shrink-0 font-medium text-red-600 dark:text-red-400">
-                                            {formatPrice(penaltiesPrice)}
-                                        </span>
+
+                                        <p className="font-medium text-gray-900 dark:text-white">
+                                            {formatPrice(service.price)}
+                                        </p>
                                     </div>
-                                )}
+                                ))}
                             </div>
-                            {/* Итог аренды без депозита */}
-                            <div className="my-5 border-t border-gray-200 pt-5 dark:border-gray-700">
-                                <div className="flex items-center justify-between gap-4">
-                                    <span className="font-semibold text-gray-900 dark:text-white">
-                                        Итого за аренду
-                                    </span>
-                                    <span className="shrink-0 text-lg font-semibold text-gray-900 dark:text-white">
-                                        {formatPrice(total)}
-                                    </span>
-                                </div>
-                            </div>
-                            {/* Депозит */}
-                            <div className="flex items-center justify-between gap-4">
-                                <div>
-                                    <p className="text-gray-600 dark:text-gray-300">
-                                        Депозит
-                                    </p>
-                                </div>
-                                <span className="shrink-0 font-medium text-gray-900 dark:text-white">
-                                    {formatPrice(deposit)}
-                                </span>
-                            </div>
-                        </section>
-                    </div>
+                        )}
+                    </section>
+                    {/* Единая финансовая история */}
+                    <BookingFinancesSection bookingId={booking.id} price={booking.price} services={booking.services} bookingStatus={booking.status} />
                 </div>
 
                 {/* Модальные окна */}

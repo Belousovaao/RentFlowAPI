@@ -34,10 +34,4 @@ public sealed class BookingChargesController : ControllerBase
     [HttpPost("admin/booking/{bookingId:guid}/{chargeId:guid}/reject")]
     public async Task<IActionResult> Reject(Guid bookingId, Guid chargeId, CancellationToken ct)
     { await _mediator.Send(new ReviewBookingChargeCommand(bookingId,chargeId,false), ct); return NoContent(); }
-    [Authorize(Roles = "admin")]
-    [HttpGet("admin/settings")]
-    public async Task<IActionResult> GetSettings(CancellationToken ct) => Ok(await _mediator.Send(new GetBookingChargeSettingsQuery(), ct));
-    [Authorize(Roles = "admin")]
-    [HttpPut("admin/settings")]
-    public async Task<IActionResult> UpdateSettings([FromBody] UpdateBookingChargeSettingsCommand command, CancellationToken ct) => Ok(await _mediator.Send(command, ct));
 }
