@@ -39,7 +39,6 @@ export interface RentalTariffDto {
 
 export type PaymentType = "Prepayment" | "AdditionalPayment" | "Refund";
 export type PaymentMethod = "BankTransfer" | "Online";
-export type PaymentStatus = "Pending" | "Completed" | "Failed" | "Cancelled";
 
 export interface PaymentTransactionDto {
     id: string;
@@ -49,10 +48,8 @@ export interface PaymentTransactionDto {
     currency: string;
     type: PaymentType;
     method: PaymentMethod;
-    status: PaymentStatus;
     externalOperationId: string | null;
     createdAt: string;
-    completedAt: string | null;
     note: string | null;
 }
 
@@ -123,14 +120,10 @@ export const bookingFinanceApi = {
     registerIncoming: (request: RegisterIncomingPaymentRequest) =>
         apiClient.post<{ id: string }>("/api/payments/incoming", request),
 
-    completeIncoming: (paymentId: string, externalOperationId?: string | null) =>
-        apiClient.post<void>(`/api/payments/${paymentId}/complete`, { externalOperationId: externalOperationId ?? null }),
 
     createRefund: (request: CreateRefundRequest) =>
         apiClient.post<{ id: string }>("/api/payments/refunds", request),
 
-    completeRefund: (paymentId: string, externalOperationId?: string | null) =>
-        apiClient.post<void>(`/api/payments/refunds/${paymentId}/complete`, { externalOperationId: externalOperationId ?? null }),
 
     allocatePayment: (paymentId: string, allocations: PaymentAllocationItem[]) =>
         apiClient.put<void>(`/api/payments/${paymentId}/allocations`, { allocations }),
