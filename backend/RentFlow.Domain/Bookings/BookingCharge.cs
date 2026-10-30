@@ -34,7 +34,7 @@ public sealed class BookingCharge
         if (unitPrice < 0 || unitPrice != decimal.Round(unitPrice, 2)) throw new ArgumentOutOfRangeException(nameof(unitPrice));
         if (amount <= 0 || amount != decimal.Round(amount, 2)) throw new ArgumentOutOfRangeException(nameof(amount));
         return new BookingCharge { Id = Guid.NewGuid(), BookingId = bookingId, Type = type,
-            Status = BookingChargeStatus.PendingApproval, Title = title.Trim(),
+            Status = BookingChargeStatus.Accrued, Title = title.Trim(),
             Description = string.IsNullOrWhiteSpace(description) ? null : description.Trim(),
             ReferenceNumber = string.IsNullOrWhiteSpace(referenceNumber) ? null : referenceNumber.Trim(),
             Quantity = quantity, Unit = unit.Trim(), UnitPrice = unitPrice, Amount = amount,
@@ -43,9 +43,9 @@ public sealed class BookingCharge
 
     public void Confirm(DateTimeOffset reviewedAt, Guid? reviewedByUserId = null)
     {
-        EnsurePending();
+        EnsureNotRejected();
         if (reviewedAt < CreatedAt) throw new ArgumentOutOfRangeException(nameof(reviewedAt));
-        Status = BookingChargeStatus.Confirmed; ReviewedAt = reviewedAt; ReviewedByUserId = reviewedByUserId;
+        throw new InvalidOperationException("A charge is accrued immediately when created.");
     }
     public void Reject(DateTimeOffset reviewedAt, Guid? reviewedByUserId = null)
     {
@@ -53,10 +53,10 @@ public sealed class BookingCharge
         if (reviewedAt < CreatedAt) throw new ArgumentOutOfRangeException(nameof(reviewedAt));
         Status = BookingChargeStatus.Rejected; ReviewedAt = reviewedAt; ReviewedByUserId = reviewedByUserId;
     }
-    private void EnsurePending()
+    private void EnsureNotRejected()
     {
-        if (Status != BookingChargeStatus.PendingApproval) throw new InvalidOperationException("Only charges awaiting approval can be reviewed.");
+        if (Status == BookingChargeStatus.Rejected) throw new InvalidOperationException("A rejected charge cannot be changed.");
     }
 }
 public enum BookingChargeType { LateCancellation, TrafficFine, Cleaning, Refueling, ExcessMileage, PropertyLossOrDamage, Other }
-public enum BookingChargeStatus { PendingApproval, Confirmed, Rejected }
+public enum BookingChargeStatus { Accrued, Rejected }
