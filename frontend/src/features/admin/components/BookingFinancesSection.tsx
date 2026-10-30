@@ -400,7 +400,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                 <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{row.operation}</td>
                                 <td className="max-w-xs px-4 py-3 text-gray-500 dark:text-gray-400">{row.details || "—"}</td>
                                 <td className="px-4 py-3">
-                                    <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusClass(row.status)}`}>{row.status}</span>
+                                    {row.kind !== "payment" && row.status && <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusClass(row.status)}`}>{row.status}</span>}
                                 </td>
                                 <td className={`whitespace-nowrap px-4 py-3 text-right font-medium ${row.amount < 0 ? "text-green-600 dark:text-green-400" : "text-gray-900 dark:text-white"}`}>
                                     {row.amount < 0 ? "−" : ""}{formatPrice(Math.abs(row.amount))}
@@ -411,15 +411,8 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                 <td className="px-4 py-3 text-right">
                                     {row.kind === "charge" && row.charge?.status === "Accrued" && (
                                         <div className="flex justify-end gap-1">
-                                            <button type="button" title="Отклонить начисление" disabled={busyId === row.id} onClick={() => void runAction(row.id, () => bookingFinanceApi.rejectCharge(bookingId, row.id), "Начисление отклонено.")} className="rounded-lg p-2 text-green-700 hover:bg-green-50 disabled:opacity-50 dark:text-green-400 dark:hover:bg-green-950/30"><X className="h-4 w-4" /></button>
                                             <button type="button" title="Отклонить начисление" disabled={busyId === row.id} onClick={() => void runAction(row.id, () => bookingFinanceApi.rejectCharge(bookingId, row.id), "Начисление отклонено.")} className="rounded-lg p-2 text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"><X className="h-4 w-4" /></button>
                                         </div>
-                                    )}
-                                    {row.kind === "payment" && false && row.payment.type !== "Refund" && (
-                                        <button type="button" disabled={busyId === row.id} onClick={() => void runAction(row.id, () => bookingFinanceApi.completeIncoming(row.id), "Платёж подтверждён.")} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50 disabled:opacity-50 dark:text-blue-300 dark:hover:bg-blue-950/30">Подтвердить</button>
-                                    )}
-                                    {row.kind === "payment" && row.false && row.payment.type === "Refund" && (
-                                        <button type="button" disabled={busyId === row.id} onClick={() => void runAction(row.id, () => bookingFinanceApi.completeRefund(row.id), "Возврат подтверждён.")} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50 disabled:opacity-50 dark:text-blue-300 dark:hover:bg-blue-950/30">Подтвердить</button>
                                     )}
                                     {row.kind === "payment" && row.payment.type !== "Refund" && (
                                         <div className="flex flex-wrap justify-end gap-1">
