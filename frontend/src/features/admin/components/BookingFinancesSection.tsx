@@ -21,12 +21,16 @@ type FinanceRow = {
     status?: BookingChargeStatus;
     amount: number;
     balance?: number;
-    kind: "price" | "charge" | "payment";
+    kind: "charge" | "payment";
     charge?: BookingChargeDto;
     payment?: PaymentTransactionDto;
 };
 
 const chargeTypeLabels: Record<BookingChargeType, string> = {
+    Rental: "Аренда",
+    AdditionalServices: "Дополнительные услуги",
+    RouteSurcharge: "Доплата за маршрут",
+    Deposit: "Депозит",
     LateCancellation: "Поздняя отмена",
     TrafficFine: "Штраф ГИБДД",
     Cleaning: "Мойка кузова / уборка",
