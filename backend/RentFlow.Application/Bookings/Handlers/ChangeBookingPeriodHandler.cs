@@ -13,17 +13,20 @@ public sealed class ChangeBookingPeriodHandler: IRequestHandler<ChangeBookingPer
     private readonly IUnitOfWork _unitOfWork;
     private readonly IBookingPricingService _bookingPricingService;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IBookingChargeRepository _bookingCharges;
 
     public ChangeBookingPeriodHandler(
         IBookingRepository bookings,
         IUnitOfWork unitOfWork,
         IBookingPricingService bookingPricingService,
-        IDateTimeProvider dateTimeProvider)
+        IDateTimeProvider dateTimeProvider,
+        IBookingChargeRepository bookingCharges)
     {
         _bookings = bookings;
         _unitOfWork = unitOfWork;
         _bookingPricingService = bookingPricingService;
         _dateTimeProvider = dateTimeProvider;
+        _bookingCharges = bookingCharges;
     }
 
     public async Task Handle(ChangeBookingPeriodCommand request, CancellationToken ct)
@@ -59,6 +62,32 @@ public sealed class ChangeBookingPeriodHandler: IRequestHandler<ChangeBookingPer
             newPeriod,
             newRentalPrice,
             penalty);
+
+        // Update the existing rental charge instead of recreating it, so payment
+        // allocations remain attached to the same charge after a period change.
+        var rentalCharges = (await _bookingCharges.GetByBookingIdAsync(booking.Id, ct))
+            .Where(x => x.Type == BookingChargeType.Rental)
+            .ToList();
+
+        if (rentalCharges.Count > 1)
+            throw new InvalidOperationException("Booking has more than one rental charge; finance data must be reconciled before changing the period.");
+
+        var rentalAmount = booking.Price.RentalPrice.RentalPriceWithDiscount;
+        if (rentalAmount <= 0)
+            throw new InvalidOperationException("Rental price must be positive.");
+
+        if (rentalCharges.Count == 1)
+        {
+            rentalCharges[0].UpdateInitialAmount(rentalAmount);
+        }
+        else
+        {
+            // Compatibility fallback for bookings created before initial charges existed.
+            // The one-off backfill should use the original booking creation timestamp.
+            await _bookingCharges.AddAsync(BookingCharge.Create(
+                booking.Id, BookingChargeType.Rental, "Аренда", null, null,
+                1m, "услуга", rentalAmount, rentalAmount, _dateTimeProvider.UtcNow), ct);
+        }
 
         await _unitOfWork.SaveChangesAsync(ct);
     }
