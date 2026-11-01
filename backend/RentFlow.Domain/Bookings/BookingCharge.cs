@@ -52,5 +52,5 @@ public sealed class BookingCharge
         if (Status == BookingChargeStatus.Rejected) throw new InvalidOperationException("A rejected charge cannot be changed.");
     }
 }
-public enum BookingChargeType { LateCancellation, TrafficFine, Cleaning, Refueling, ExcessMileage, PropertyLossOrDamage, Other }
+public enum BookingChargeType { Rental, AdditionalServices, RouteSurcharge, Deposit, LateCancellation, TrafficFine, Cleaning, Refueling, ExcessMileage, PropertyLossOrDamage, Other }
 public enum BookingChargeStatus { Accrued, Rejected }
