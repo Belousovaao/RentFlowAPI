@@ -41,6 +41,19 @@ public sealed class BookingCharge
             Currency = "RUB", CreatedAt = createdAt, CreatedByUserId = createdByUserId };
     }
 
+    public void UpdateInitialAmount(decimal amount)
+    {
+        EnsureNotRejected();
+        if (Type is not (BookingChargeType.Rental or BookingChargeType.AdditionalServices or BookingChargeType.RouteSurcharge or BookingChargeType.Deposit))
+            throw new InvalidOperationException("Only an initial booking charge can be synchronized with the booking price.");
+        if (amount <= 0 || amount != decimal.Round(amount, 2))
+            throw new ArgumentOutOfRangeException(nameof(amount));
+
+        Quantity = 1m;
+        UnitPrice = amount;
+        Amount = amount;
+    }
+
     public void Reject(DateTimeOffset reviewedAt, Guid? reviewedByUserId = null)
     {
         EnsureNotRejected();
