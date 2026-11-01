@@ -242,7 +242,6 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                 date: null,
                 operation: "Аренда",
                 details: `Базовая стоимость ${price.rentalPrice.baseRentalPrice > price.rentalPrice.rentalPriceWithDiscount ? "(с учётом скидки)" : ""}`.trim(),
-                status: "Расчёт",
                 amount: price.rentalPrice.rentalPriceWithDiscount,
                 kind: "price",
             },
@@ -253,7 +252,6 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                 date: null,
                 operation: "Дополнительные услуги",
                 details: services.map(service => service.name).join(", ") || "Услуги по бронированию",
-                status: "Расчёт",
                 amount: price.servicesPrice,
                 kind: "price",
             });
@@ -264,13 +262,12 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                 date: null,
                 operation: "Доплата за маршрут",
                 details: "Дополнительная стоимость маршрута",
-                status: "Расчёт",
                 amount: price.routeSurcharge,
                 kind: "price",
             });
         }
         if (price.deposit > 0) {
-            result.push({ id: "deposit", date: null, operation: "Депозит", details: "Обеспечительный платёж; не входит в стоимость аренды", status: "Условие аренды", amount: price.deposit, kind: "price" });
+            result.push({ id: "deposit", date: null, operation: "Депозит", details: "Обеспечительный платёж; не входит в стоимость аренды", amount: price.deposit, kind: "price" });
         }
         for (const penalty of price.penalties ?? []) {
             result.push({
@@ -278,7 +275,6 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                 date: null,
                 operation: "Корректировка стоимости",
                 details: penalty.type,
-                status: "В расчёте",
                 amount: penalty.amount,
                 kind: "price",
             });
