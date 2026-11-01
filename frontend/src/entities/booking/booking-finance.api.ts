@@ -1,6 +1,10 @@
 import { apiClient } from "@/shared/api/client";
 
 export type BookingChargeType =
+    | "Rental"
+    | "AdditionalServices"
+    | "RouteSurcharge"
+    | "Deposit"
     | "LateCancellation"
     | "TrafficFine"
     | "Cleaning"
