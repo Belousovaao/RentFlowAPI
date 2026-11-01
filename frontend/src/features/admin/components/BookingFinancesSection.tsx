@@ -409,7 +409,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                             <button type="button" title="Отклонить начисление" disabled={busyId === row.id} onClick={() => void runAction(row.id, () => bookingFinanceApi.rejectCharge(bookingId, row.id), "Начисление отклонено.")} className="rounded-lg p-2 text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"><X className="h-4 w-4" /></button>
                                         </div>
                                     )}
-                                    {row.kind === "payment" && row.payment.type !== "Refund" && (
+                                    {row.kind === "payment" && row.payment && row.payment.type !== "Refund" && (
                                         <div className="flex flex-wrap justify-end gap-1">
                                             {accruedCharges.length > 0 && (
                                                 <button type="button" onClick={() => { setAllocationPayment(row.payment!); setAllocationAmounts({}); }} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-950/30">Распределить</button>
