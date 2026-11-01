@@ -361,7 +361,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                             </tr>
                         ))}
                         {!loading && rows.length === 0 && (
-                            <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500 dark:text-gray-400">Финансовых операций пока нет.</td></tr>
+                            <tr><td colSpan={8} className="px-4 py-10 text-center text-sm text-gray-500 dark:text-gray-400">Финансовых операций пока нет.</td></tr>
                         )}
                     </tbody>
                 </table>
@@ -422,7 +422,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                     <form className="space-y-4" onSubmit={submitCharge}>
                         <Field label="Тип начисления">
                             <select className={inputClass} value={chargeForm.type} onChange={event => setChargeForm(prev => ({ ...prev, type: event.target.value as BookingChargeType }))}>
-                                {Object.entries(chargeTypeLabels).map(([value, label]) => <option key={value} value={value} disabled={value === "LateCancellation" && bookingStatus !== "Cancelled"}>{label}</option>)}
+                                {Object.entries(chargeTypeLabels).filter(([value]) => !["Rental", "AdditionalServices", "RouteSurcharge", "Deposit"].includes(value)).map(([value, label]) => <option key={value} value={value} disabled={value === "LateCancellation" && bookingStatus !== "Cancelled"}>{label}</option>)}
                             </select>
                         </Field>
                         {chargeForm.type === "Refueling" || chargeForm.type === "ExcessMileage" ? (
