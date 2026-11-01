@@ -18,7 +18,7 @@ type FinanceRow = {
     date: string | null;
     operation: string;
     details: string;
-    status: string;
+    status?: BookingChargeStatus;
     amount: number;
     balance?: number;
     kind: "price" | "charge" | "payment";
@@ -285,7 +285,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                 date: charge.createdAt,
                 operation: chargeTypeLabels[charge.type] ?? charge.title,
                 details: [charge.title, charge.description, charge.referenceNumber, charge.quantity > 1 ? `${charge.quantity} ${charge.unit} × ${formatPrice(charge.unitPrice)}` : null].filter(Boolean).join(" · "),
-                status: chargeStatusLabels[charge.status],
+                status: charge.status,
                 amount: charge.amount,
                 balance: charge.balance,
                 kind: "charge",
@@ -302,7 +302,6 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                     payment.note,
                     payment.externalOperationId ? `Операция: ${payment.externalOperationId}` : null,
                 ].filter(Boolean).join(" · "),
-                status: "",
                 amount: payment.type === "Refund" ? -payment.amount : payment.amount,
                 kind: "payment",
                 payment,
@@ -381,7 +380,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                             <th className="px-4 py-3 font-medium">Дата</th>
                             <th className="px-4 py-3 font-medium">Операция</th>
                             <th className="px-4 py-3 font-medium">Детали</th>
-                            <th className="px-4 py-3 font-medium">Статус</th>
+                            <th className="px-4 py-3 font-medium">Начисление</th>
                             <th className="px-4 py-3 text-right font-medium">Сумма</th>
                             <th className="px-4 py-3 text-right font-medium">Остаток</th>
                             <th className="px-4 py-3 text-right font-medium">Действия</th>
@@ -396,7 +395,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                 <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{row.operation}</td>
                                 <td className="max-w-xs px-4 py-3 text-gray-500 dark:text-gray-400">{row.details || "—"}</td>
                                 <td className="px-4 py-3">
-                                    {row.kind !== "payment" && row.status && <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusClass(row.status)}`}>{row.status}</span>}
+                                    {row.kind === "charge" && row.status && <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusClass(chargeStatusLabels[row.status])}`}>{chargeStatusLabels[row.status]}</span>}
                                 </td>
                                 <td className={`whitespace-nowrap px-4 py-3 text-right font-medium ${row.amount < 0 ? "text-green-600 dark:text-green-400" : "text-gray-900 dark:text-white"}`}>
                                     {row.amount < 0 ? "−" : ""}{formatPrice(Math.abs(row.amount))}
