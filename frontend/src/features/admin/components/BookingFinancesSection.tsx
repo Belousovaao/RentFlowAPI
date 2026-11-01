@@ -20,6 +20,7 @@ type FinanceRow = {
     details: string;
     status?: BookingChargeStatus;
     amount: number;
+    paidAmount?: number;
     balance?: number;
     kind: "charge" | "payment";
     charge?: BookingChargeDto;
@@ -239,84 +240,28 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
         }
     };
 
-    const rows = useMemo<FinanceRow[]>(() => {
-        const result: FinanceRow[] = [
-            {
-                id: "rental",
-                date: null,
-                operation: "Аренда",
-                details: `Базовая стоимость ${price.rentalPrice.baseRentalPrice > price.rentalPrice.rentalPriceWithDiscount ? "(с учётом скидки)" : ""}`.trim(),
-                amount: price.rentalPrice.rentalPriceWithDiscount,
-                kind: "price",
-            },
-        ];
-        if (price.servicesPrice > 0) {
-            result.push({
-                id: "services",
-                date: null,
-                operation: "Дополнительные услуги",
-                details: services.map(service => service.name).join(", ") || "Услуги по бронированию",
-                amount: price.servicesPrice,
-                kind: "price",
-            });
-        }
-        if (price.routeSurcharge > 0) {
-            result.push({
-                id: "route",
-                date: null,
-                operation: "Доплата за маршрут",
-                details: "Дополнительная стоимость маршрута",
-                amount: price.routeSurcharge,
-                kind: "price",
-            });
-        }
-        if (price.deposit > 0) {
-            result.push({ id: "deposit", date: null, operation: "Депозит", details: "Обеспечительный платёж; не входит в стоимость аренды", amount: price.deposit, kind: "price" });
-        }
-        for (const penalty of price.penalties ?? []) {
-            result.push({
-                id: `legacy-penalty-${penalty.id}`,
-                date: null,
-                operation: "Корректировка стоимости",
-                details: penalty.type,
-                amount: penalty.amount,
-                kind: "price",
-            });
-        }
-        for (const charge of charges) {
-            result.push({
-                id: charge.id,
-                date: charge.createdAt,
-                operation: chargeTypeLabels[charge.type] ?? charge.title,
-                details: [charge.title, charge.description, charge.referenceNumber, charge.quantity > 1 ? `${charge.quantity} ${charge.unit} × ${formatPrice(charge.unitPrice)}` : null].filter(Boolean).join(" · "),
-                status: charge.status,
-                amount: charge.amount,
-                balance: charge.balance,
-                kind: "charge",
-                charge,
-            });
-        }
-        for (const payment of payments) {
-            result.push({
-                id: payment.id,
-                date: payment.createdAt,
-                operation: paymentTypeLabels[payment.type],
-                details: [
-                    payment.method === "BankTransfer" ? "Банковский перевод" : "Онлайн",
-                    payment.note,
-                    payment.externalOperationId ? `Операция: ${payment.externalOperationId}` : null,
-                ].filter(Boolean).join(" · "),
-                amount: payment.type === "Refund" ? -payment.amount : payment.amount,
-                kind: "payment",
-                payment,
-            });
-        }
-        return result.sort((a, b) => {
-            if (a.date === null && b.date !== null) return -1;
-            if (a.date !== null && b.date === null) return 1;
-            return (a.date ? new Date(a.date).getTime() : 0) - (b.date ? new Date(b.date).getTime() : 0);
-        });
-    }, [price, services, charges, payments]);
+    const rows = useMemo<FinanceRow[]>(() =>
+        charges.map(charge => ({
+            id: charge.id,
+            date: charge.createdAt,
+            operation: chargeTypeLabels[charge.type] ?? charge.title,
+            details: [
+                charge.title,
+                charge.description,
+                charge.referenceNumber,
+                charge.quantity > 1 ? `${charge.quantity} ${charge.unit} × ${formatPrice(charge.unitPrice)}` : null,
+            ].filter(Boolean).join(" · "),
+            status: charge.status,
+            amount: charge.amount,
+            paidAmount: charge.paidAmount,
+            balance: charge.status === "Accrued" ? charge.balance : 0,
+            kind: "charge" as const,
+            charge,
+        })).sort((a, b) =>
+            (a.date ? new Date(a.date).getTime() : 0) -
+            (b.date ? new Date(b.date).getTime() : 0)
+        ), [charges]);
+
 
     const canRegisterPayment = bookingStatus === "Confirmed" || bookingStatus === "Active" || bookingStatus === "Completed";
     const accruedCharges = charges.filter(charge => charge.status === "Accrued" && charge.balance > 0);
@@ -328,7 +273,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                 <div>
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Финансы бронирования</h2>
                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        Стоимость, начисления и движение денежных средств в одной истории.
+                        Начисления по бронированию и состояние их оплаты. Поступления распределяются по начислениям отдельно.
                     </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -378,14 +323,15 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
 
 
             <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
-                <table className="min-w-[850px] w-full text-left text-sm">
+                <table className="min-w-[1000px] w-full text-left text-sm">
                     <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500 dark:bg-gray-900/60 dark:text-gray-400">
                         <tr>
                             <th className="px-4 py-3 font-medium">Дата</th>
                             <th className="px-4 py-3 font-medium">Операция</th>
                             <th className="px-4 py-3 font-medium">Детали</th>
-                            <th className="px-4 py-3 font-medium">Начисление</th>
-                            <th className="px-4 py-3 text-right font-medium">Сумма</th>
+                            <th className="px-4 py-3 font-medium">Статус</th>
+                            <th className="px-4 py-3 text-right font-medium">Начислено</th>
+                            <th className="px-4 py-3 text-right font-medium">Оплачено</th>
                             <th className="px-4 py-3 text-right font-medium">Остаток</th>
                             <th className="px-4 py-3 text-right font-medium">Действия</th>
                         </tr>
@@ -399,28 +345,18 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                 <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{row.operation}</td>
                                 <td className="max-w-xs px-4 py-3 text-gray-500 dark:text-gray-400">{row.details || "—"}</td>
                                 <td className="px-4 py-3">
-                                    {row.kind === "charge" && row.status && <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusClass(chargeStatusLabels[row.status])}`}>{chargeStatusLabels[row.status]}</span>}
+                                    {row.status && <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusClass(chargeStatusLabels[row.status])}`}>{chargeStatusLabels[row.status]}</span>}
                                 </td>
-                                <td className={`whitespace-nowrap px-4 py-3 text-right font-medium ${row.amount < 0 ? "text-green-600 dark:text-green-400" : "text-gray-900 dark:text-white"}`}>
-                                    {row.amount < 0 ? "−" : ""}{formatPrice(Math.abs(row.amount))}
-                                </td>
-                                <td className="whitespace-nowrap px-4 py-3 text-right text-gray-600 dark:text-gray-300">
-                                    {row.balance === undefined ? "—" : formatPrice(row.balance)}
-                                </td>
+                                <td className="whitespace-nowrap px-4 py-3 text-right font-medium text-gray-900 dark:text-white">{formatPrice(row.amount)}</td>
+                                <td className="whitespace-nowrap px-4 py-3 text-right text-gray-600 dark:text-gray-300">{formatPrice(row.paidAmount ?? 0)}</td>
+                                <td className="whitespace-nowrap px-4 py-3 text-right text-gray-600 dark:text-gray-300">{formatPrice(row.balance ?? 0)}</td>
                                 <td className="px-4 py-3 text-right">
                                     {row.kind === "charge" && row.charge?.status === "Accrued" && (
                                         <div className="flex justify-end gap-1">
                                             <button type="button" title="Отклонить начисление" disabled={busyId === row.id} onClick={() => void runAction(row.id, () => bookingFinanceApi.rejectCharge(bookingId, row.id), "Начисление отклонено.")} className="rounded-lg p-2 text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"><X className="h-4 w-4" /></button>
                                         </div>
                                     )}
-                                    {row.kind === "payment" && row.payment && row.payment.type !== "Refund" && (
-                                        <div className="flex flex-wrap justify-end gap-1">
-                                            {accruedCharges.length > 0 && (
-                                                <button type="button" onClick={() => { setAllocationPayment(row.payment!); setAllocationAmounts({}); }} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-50 dark:text-blue-300 dark:hover:bg-blue-950/30">Распределить</button>
-                                            )}
-                                            <button type="button" onClick={() => void createRefund(row.payment!)} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-950/30">Возврат</button>
-                                        </div>
-                                    )}
+
                                 </td>
                             </tr>
                         ))}
@@ -429,6 +365,33 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                         )}
                     </tbody>
                 </table>
+            </div>
+
+            <div className="mt-5 rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                    <h3 className="font-medium text-gray-900 dark:text-white">Поступившие платежи</h3>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">Не отображаются строками в таблице начислений</span>
+                </div>
+                {payments.filter(payment => payment.type !== "Refund").length === 0 ? (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Платежей пока нет.</p>
+                ) : (
+                    <div className="space-y-2">
+                        {payments.filter(payment => payment.type !== "Refund").map(payment => (
+                            <div key={payment.id} className="flex flex-col gap-2 rounded-lg bg-gray-50 p-3 dark:bg-gray-900/40 sm:flex-row sm:items-center sm:justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-gray-900 dark:text-white">{paymentTypeLabels[payment.type]} · {formatPrice(payment.amount)}</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">{formatDateTime(new Date(payment.createdAt))}{payment.note ? ` · ${payment.note}` : ""}</p>
+                                </div>
+                                <div className="flex gap-2">
+                                    {accruedCharges.length > 0 && (
+                                        <button type="button" onClick={() => { setAllocationPayment(payment); setAllocationAmounts({}); }} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-950/30">Распределить</button>
+                                    )}
+                                    <button type="button" onClick={() => void createRefund(payment)} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100 dark:text-red-300 dark:hover:bg-red-950/30">Возврат</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {loading && <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">Обновление финансовых данных…</p>}
