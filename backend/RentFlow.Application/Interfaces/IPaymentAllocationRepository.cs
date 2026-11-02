@@ -5,4 +5,5 @@ public interface IPaymentAllocationRepository
     Task AddRangeAsync(IEnumerable<PaymentAllocation> allocations, CancellationToken ct = default);
     Task<IReadOnlyList<PaymentAllocation>> GetByPaymentIdAsync(Guid paymentId, CancellationToken ct = default);
     Task<IReadOnlyList<PaymentAllocation>> GetByBookingIdAsync(Guid bookingId, CancellationToken ct = default);
+    Task DeleteByBookingChargeIdAsync(Guid bookingChargeId, CancellationToken ct = default);
 }
