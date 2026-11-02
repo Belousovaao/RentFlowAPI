@@ -1,6 +1,7 @@
 import { Asset } from "@/entities/asset/asset.types";
 import { bookingApi } from "@/entities/booking/booking.api";
 import { adminAssetsApi } from "@/features/admin/api/adminAsset.api";
+import { adminCustomersApi } from "@/features/admin/api/adminCustomers.api";
 import { BarChart3, Calendar, Car, TrendingUp, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -57,9 +58,14 @@ export const AdminAccountPage = () => {
         },
     ];
 
-    const [stats, setStats] = useState({availableAssets: 0,});
+    const [stats, setStats] = useState({
+        availableAssets: 0,
+        activeBookings: 0,
+        totalCustomers: 0,
+        uniqueCustomers: 0,
+        monthlyRevenue: 0,
+    });
     const [loading, setLoading] = useState(true);
-    const [bookingCount, setBookingCount] = useState(0);
     const [pendingBookings, setPendingBookings] = useState(0);
 
     useEffect(() => {
@@ -69,48 +75,50 @@ export const AdminAccountPage = () => {
     const fetchStats = async () => {
         setLoading(true);
         try {
-            // Получаем данные для статистики
-            const [assetsRes, bookingsRes] = await Promise.all([
+            const [assetsRes, bookings, customersRes] = await Promise.all([
                 adminAssetsApi.getList({ page: 1, pageSize: 100, showDisabled: true }),
                 bookingApi.getAdminBookings(),
+                adminCustomersApi.getList({ page: 1, pageSize: 1, showRejected: true }),
             ]);
 
             const allAssets = assetsRes.data.data || [];
-            const pendingBookings = bookingsRes.filter(booking => booking.status === 'Pending').length;
-            const activeBookings = bookingsRes.filter((b: any) => b.status === 'Active').length || 0;
-            const availableAssets = allAssets.filter((a: Asset) => a.status === "Available").length;
-            setPendingBookings(pendingBookings)
-            //const totalCustomers = customersRes.data?.length || 0;
-            //const uniqCustomers = customersRes.data.Distinct().length;
-            
-            // Рассчитываем выручку за месяц (пример)
-            // const monthlyRevenue = calculateMonthlyRevenue(bookingsRes.data);
+            const activeBookings = bookings.filter(booking => booking.status === 'Active').length;
+            const pendingCount = bookings.filter(booking => booking.status === 'Pending').length;
+            const availableAssets = allAssets.filter((asset: Asset) => asset.status === "Available").length;
+            const uniqueCustomers = new Set(bookings.map(booking => booking.customer.id)).size;
+
+            const now = new Date();
+            const monthlyRevenue = bookings
+                .filter(booking => {
+                    const startDate = new Date(booking.rentalPeriod.startDate);
+                    return booking.status !== 'Cancelled' &&
+                        startDate.getMonth() === now.getMonth() &&
+                        startDate.getFullYear() === now.getFullYear();
+                })
+                .reduce((sum, booking) => sum + (booking.price?.total ?? 0), 0);
+
+            setPendingBookings(pendingCount);
             setStats({
-                 availableAssets,
-             });
-        } 
-        catch (err) {
+                availableAssets,
+                activeBookings,
+                totalCustomers: customersRes.data.totalCount,
+                uniqueCustomers,
+                monthlyRevenue,
+            });
+        } catch (err) {
             console.error('Error fetching stats:', err);
-        } 
-        finally {
+        } finally {
             setLoading(false);
         }
     };
 
-    const calculateMonthlyRevenue = (bookings: any[]) => {
-        if (!bookings) return 0;
-        const now = new Date();
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
-        
-        return bookings
-            .filter(b => {
-                const bookingDate = new Date(b.startDate);
-                return bookingDate.getMonth() === currentMonth && 
-                       bookingDate.getFullYear() === currentYear;
-            })
-            .reduce((sum, b) => sum + (b.price.totalPrice || 0), 0);
-    };
+    const formatCurrency = (amount: number) =>
+        new Intl.NumberFormat('ru-RU', {
+            style: 'currency',
+            currency: 'RUB',
+            maximumFractionDigits: 0,
+        }).format(amount);
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-24 pb-16">
             <div className="container mx-auto px-4">
@@ -152,18 +160,18 @@ export const AdminAccountPage = () => {
                     <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
                         Статистика
                     </h3>
-                    {loading? (
+                    {loading ? (
                         <div className="flex justify-center py-8">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
                         </div>
                     ) : (
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                            <StatCard label="Активных бронирований" value='0' icon={Calendar} />
+                            <StatCard label="Активных бронирований" value={stats.activeBookings.toString()} icon={Calendar} />
                             <StatCard label="Доступно автомобилей" value={stats.availableAssets.toString()} icon={Car} />
-                            <StatCard label="Всего клиентов" value='0' icon={Users} />
-                            <StatCard label="Количество уникальных клиентов" value='0' icon={Users} />
-                            <StatCard label="Выручка за месяц" value="₽ 342 500" icon={TrendingUp} />
-                            <StatCard label="Расходы на содержание и обслуживание" value="₽ 342 500" icon={TrendingUp} />
+                            <StatCard label="Всего клиентов" value={stats.totalCustomers.toString()} icon={Users} />
+                            <StatCard label="Количество уникальных клиентов" value={stats.uniqueCustomers.toString()} icon={Users} />
+                            <StatCard label="Выручка за месяц" value={formatCurrency(stats.monthlyRevenue)} icon={TrendingUp} />
+                            <StatCard label="Расходы на содержание и обслуживание" value="—" icon={TrendingUp} />
                         </div>
                     )}
                 </div>
@@ -171,5 +179,3 @@ export const AdminAccountPage = () => {
         </div>
     );
 };
-
-
