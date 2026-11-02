@@ -353,7 +353,21 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                 <td className="px-4 py-3 text-right">
                                     {row.kind === "charge" && row.charge?.status === "Accrued" && row.charge.type !== "Rental" && (
                                         <div className="flex justify-end gap-1">
-                                            <button type="button" title="Отклонить начисление" disabled={busyId === row.id} onClick={() => void runAction(row.id, () => bookingFinanceApi.rejectCharge(bookingId, row.id), "Начисление отклонено.")} className="rounded-lg p-2 text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"><X className="h-4 w-4" /></button>
+                                            <button
+                                                type="button"
+                                                title="Отклонить начисление"
+                                                disabled={busyId === row.id}
+                                                onClick={() => {
+                                                    const paidAmount = row.charge?.paidAmount ?? 0;
+                                                    const message = paidAmount > 0
+                                                        ? `Отклонить начисление «${row.charge?.title}» на ${formatPrice(row.charge?.amount ?? 0)}? Распределённая оплата ${formatPrice(paidAmount)} будет возвращена в нераспределённый остаток платежа.`
+                                                        : `Отклонить начисление «${row.charge?.title}» на ${formatPrice(row.charge?.amount ?? 0)}?`;
+                                                    if (window.confirm(message)) {
+                                                        void runAction(row.id, () => bookingFinanceApi.rejectCharge(bookingId, row.id), "Начисление отклонено. Распределённая оплата освобождена.");
+                                                    }
+                                                }}
+                                                className="rounded-lg p-2 text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"
+                                            ><X className="h-4 w-4" /></button>
                                         </div>
                                     )}
 
