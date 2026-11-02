@@ -277,9 +277,6 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Финансы бронирования</h2>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        Начисления по бронированию и состояние их оплаты. Поступления распределяются по начислениям отдельно.
-                    </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                     <button 
@@ -319,10 +316,10 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
 
             <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
                 <SummaryCard label="Стоимость аренды" value={formatPrice(price.total)} hint="Без депозита" />
-                <SummaryCard label="К оплате с депозитом" value={formatPrice(price.totalToPay)} hint="Аренда и обеспечительный платёж" />
-                <SummaryCard label="Поступило" value={formatPrice(summary?.totalReceived ?? 0)} hint="Все зарегистрированные поступления" />
-                <SummaryCard label="Возвращено" value={formatPrice(summary?.totalRefunded ?? 0)} hint={summary ? `Доступно к возврату: ${formatPrice(summary.availableToRefund)}` : "Загрузка…"} />
-                <SummaryCard label="Чистая оплата" value={formatPrice(summary?.netPaid ?? 0)} hint={summary ? `Доступно к возврату: ${formatPrice(summary.availableToRefund)}` : "Загрузка…"} />
+                <SummaryCard label="К оплате с депозитом" value={formatPrice(price.totalToPay)} hint="" />
+                <SummaryCard label="Поступило" value={formatPrice(summary?.totalReceived ?? 0)} hint="" />
+                <SummaryCard label="Возвращено" value={formatPrice(summary?.totalRefunded ?? 0)} hint="" />
+                <SummaryCard label="Чистая оплата" value={formatPrice(summary?.netPaid ?? 0)} hint="" />
             </div>
 
 
@@ -389,7 +386,6 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             <div className="mt-5 rounded-xl border border-gray-200 p-4 dark:border-gray-700">
                 <div className="mb-3 flex items-center justify-between gap-3">
                     <h3 className="font-medium text-gray-900 dark:text-white">Поступившие платежи</h3>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Не отображаются строками в таблице начислений</span>
                 </div>
                 {payments.filter(payment => payment.type !== "Refund" && payment.availableToAllocate > 0).length === 0 ? (
                     <p className="text-sm text-gray-500 dark:text-gray-400">Нераспределённых остатков нет.</p>
