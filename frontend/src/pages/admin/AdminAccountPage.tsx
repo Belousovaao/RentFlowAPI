@@ -76,7 +76,7 @@ export const AdminAccountPage = () => {
         setLoading(true);
         try {
             const [assetsRes, bookings, customersRes] = await Promise.all([
-                adminAssetsApi.getList({ page: 1, pageSize: 100, showDisabled: true }),
+                adminAssetsApi.getList({ page: 1, pageSize: 1000, showDisabled: true }),
                 bookingApi.getAdminBookings(),
                 adminCustomersApi.getList({ page: 1, pageSize: 1, showRejected: true }),
             ]);
@@ -170,7 +170,7 @@ export const AdminAccountPage = () => {
                             <StatCard label="Доступно автомобилей" value={stats.availableAssets.toString()} icon={Car} />
                             <StatCard label="Всего клиентов" value={stats.totalCustomers.toString()} icon={Users} />
                             <StatCard label="Количество уникальных клиентов" value={stats.uniqueCustomers.toString()} icon={Users} />
-                            <StatCard label="Выручка за месяц" value={formatCurrency(stats.monthlyRevenue)} icon={TrendingUp} />
+                            <StatCard label="Сумма бронирований за месяц" value={formatCurrency(stats.monthlyRevenue)} icon={TrendingUp} />
                             <StatCard label="Расходы на содержание и обслуживание" value="—" icon={TrendingUp} />
                         </div>
                     )}
