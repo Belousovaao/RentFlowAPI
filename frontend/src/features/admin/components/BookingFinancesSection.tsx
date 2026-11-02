@@ -41,11 +41,6 @@ const chargeTypeLabels: Record<BookingChargeType, string> = {
     Other: "Прочее начисление",
 };
 
-const chargeStatusLabels: Record<BookingChargeStatus, string> = {
-    Accrued: "Начислено",
-    Rejected: "Отклонено",
-};
-
 const paymentTypeLabels = {
     Prepayment: "Предоплата",
     AdditionalPayment: "Оплата",
@@ -345,7 +340,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                 </td>
                                 <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">
                                     <span className="inline-flex items-center gap-1.5">
-                                        {row.status === "Rejected" && <X className="h-4 w-4 shrink-0 text-red-500" aria-label="Начисление отклонено" title="Начисление отклонено" />}
+                                        {row.status === "Rejected" && <X className="h-4 w-4 shrink-0 text-red-500" aria-label="Начисление отклонено" />}
                                         {row.operation}
                                     </span>
                                 </td>
