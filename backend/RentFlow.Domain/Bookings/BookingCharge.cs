@@ -56,6 +56,8 @@ public sealed class BookingCharge
 
     public void Reject(DateTimeOffset reviewedAt, Guid? reviewedByUserId = null)
     {
+        if (Type == BookingChargeType.Rental)
+            throw new InvalidOperationException("The rental charge cannot be rejected.");
         EnsureNotRejected();
         if (reviewedAt < CreatedAt) throw new ArgumentOutOfRangeException(nameof(reviewedAt));
         Status = BookingChargeStatus.Rejected; ReviewedAt = reviewedAt; ReviewedByUserId = reviewedByUserId;
