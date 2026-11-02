@@ -65,7 +65,7 @@ public sealed class ChangeBookingPeriodHandler: IRequestHandler<ChangeBookingPer
 
         // Update the existing rental charge instead of recreating it, so payment
         // allocations remain attached to the same charge after a period change.
-        var rentalCharges = (await _bookingCharges.GetByBookingIdAsync(booking.Id, ct))
+        var rentalCharges = (await _bookingCharges.GetTrackedByBookingIdAsync(booking.Id, ct))
             .Where(x => x.Type == BookingChargeType.Rental)
             .ToList();
 
