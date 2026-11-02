@@ -12,15 +12,18 @@ public sealed class GetBookingPaymentSummaryHandler : IRequestHandler<GetBooking
     private readonly IBookingRepository _bookings;
     private readonly IPaymentRepository _payments;
     private readonly IPaymentAllocationRepository _allocations;
+    private readonly IBookingChargeRepository _charges;
 
     public GetBookingPaymentSummaryHandler(
         IBookingRepository bookings,
         IPaymentRepository payments,
-        IPaymentAllocationRepository allocations)
+        IPaymentAllocationRepository allocations,
+        IBookingChargeRepository charges)
     {
         _bookings = bookings;
         _payments = payments;
         _allocations = allocations;
+        _charges = charges;
     }
 
     public async Task<BookingPaymentSummaryDto> Handle(
@@ -78,6 +81,15 @@ public sealed class GetBookingPaymentSummaryHandler : IRequestHandler<GetBooking
         if (pendingRefunds > refundableBeforePending)
             throw new InvalidOperationException("Pending refunds exceed the refundable balance.");
 
+        var bookingAllocations = await _allocations.GetByBookingIdAsync(request.BookingId, ct);
+        var allocatedByCharge = bookingAllocations
+            .GroupBy(a => a.BookingChargeId)
+            .ToDictionary(g => g.Key, g => g.Sum(a => a.Amount));
+        var charges = await _charges.GetByBookingIdAsync(request.BookingId, ct);
+        var outstandingDebt = charges
+            .Where(c => c.Status == RentFlow.Domain.Bookings.BookingChargeStatus.Accrued)
+            .Sum(c => Math.Max(0m, c.Amount - allocatedByCharge.GetValueOrDefault(c.Id)));
+
         return new BookingPaymentSummaryDto(
             booking.Id,
             currency,
@@ -85,6 +97,6 @@ public sealed class GetBookingPaymentSummaryHandler : IRequestHandler<GetBooking
             refunded,
             pendingRefunds,
             received - refunded,
-            refundableBeforePending - pendingRefunds);
+            Math.Max(0m, refundableBeforePending - pendingRefunds - outstandingDebt));
     }
 }
