@@ -189,7 +189,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
     const submitPayment = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const amount = Number(paymentAmount);
-        if (!Number.isFinite(amount) || amount <= 0 || Number(amount.toFixed(2)) !== amount) {
+        if (!Number.isFinite(amount) || amount <= 0 || Number(amount.toFixed(2)) !== amount || amount > maxRefund) {
             toast.error("Введите положительную сумму не более чем с двумя знаками после запятой.");
             return;
         }
@@ -208,11 +208,16 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
     };
 
     const createRefund = async (payment: PaymentTransactionDto) => {
-        const raw = window.prompt(`Доступный нераспределённый остаток по платежу: ${formatPrice(payment.availableToAllocate)}. Введите сумму возврата:`,);
+        const maxRefund = Math.min(payment.availableToAllocate, summary?.availableToRefund ?? 0);
+        if (maxRefund <= 0) {
+            toast.error("Возврат невозможен: сначала необходимо погасить задолженность по начислениям.");
+            return;
+        }
+        const raw = window.prompt(`Максимально доступно к возврату с учётом задолженности: ${formatPrice(maxRefund)}. Введите сумму возврата:`);
         if (raw === null) return;
         const amount = Number(raw.replace(",", "."));
         if (!Number.isFinite(amount) || amount <= 0 || Number(amount.toFixed(2)) !== amount) {
-            toast.error("Введите положительную сумму не более чем с двумя знаками после запятой.");
+            toast.error(`Введите сумму от 0,01 до ${formatPrice(maxRefund)} с точностью до двух знаков после запятой.`);
             return;
         }
         await runAction(`refund-${payment.id}`, () => bookingFinanceApi.createRefund({
