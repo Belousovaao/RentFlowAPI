@@ -9,17 +9,20 @@ public sealed class CreateRefundHandler : IRequestHandler<CreateRefundCommand, G
 {
     private readonly IPaymentRepository _payments;
     private readonly IPaymentAllocationRepository _allocations;
+    private readonly IBookingChargeRepository _charges;
     private readonly IUnitOfWork _uow;
     private readonly IDateTimeProvider _dateTimeProvider;
 
     public CreateRefundHandler(
         IPaymentRepository payments,
         IPaymentAllocationRepository allocations,
+        IBookingChargeRepository charges,
         IUnitOfWork uow,
         IDateTimeProvider dateTimeProvider)
     {
         _payments = payments;
         _allocations = allocations;
+        _charges = charges;
         _uow = uow;
         _dateTimeProvider = dateTimeProvider;
     }
@@ -95,8 +98,30 @@ public sealed class CreateRefundHandler : IRequestHandler<CreateRefundCommand, G
                     p.Status is PaymentStatus.Pending or PaymentStatus.Completed)
                 .Sum(p => p.Amount);
 
-            var allocatedAmount = (await _allocations.GetByPaymentIdAsync(originalPayment.Id, ct)).Sum(x => x.Amount);
-            var availableToRefund = originalPayment.Amount - refunds - allocatedAmount;
+            var bookingAllocations = await _allocations.GetByBookingIdAsync(bookingId, ct);
+            var allocatedAmount = bookingAllocations
+                .Where(x => x.PaymentId == originalPayment.Id)
+                .Sum(x => x.Amount);
+            var paymentUnallocated = originalPayment.Amount - refunds - allocatedAmount;
+
+            var incomingPayments = payments
+                .Where(p => p.Status == PaymentStatus.Completed &&
+                    p.Type is PaymentType.Prepayment or PaymentType.AdditionalPayment)
+                .ToList();
+            var totalUnallocated = incomingPayments.Sum(p => p.Amount) -
+                payments.Where(p => p.Type == PaymentType.Refund &&
+                    p.Status is PaymentStatus.Pending or PaymentStatus.Completed).Sum(p => p.Amount) -
+                bookingAllocations.Where(a => incomingPayments.Any(p => p.Id == a.PaymentId)).Sum(a => a.Amount);
+
+            var charges = await _charges.GetByBookingIdAsync(bookingId, ct);
+            var allocatedByCharge = bookingAllocations
+                .GroupBy(a => a.BookingChargeId)
+                .ToDictionary(g => g.Key, g => g.Sum(a => a.Amount));
+            var outstandingDebt = charges
+                .Where(c => c.Status == RentFlow.Domain.Bookings.BookingChargeStatus.Accrued)
+                .Sum(c => Math.Max(0m, c.Amount - allocatedByCharge.GetValueOrDefault(c.Id)));
+
+            var availableToRefund = Math.Min(paymentUnallocated, Math.Max(0m, totalUnallocated - outstandingDebt));
 
             if (request.Amount > availableToRefund)
             {
