@@ -8,13 +8,15 @@ public sealed class ReviewBookingChargeHandler : IRequestHandler<ReviewBookingCh
 {
     private readonly IBookingRepository _bookings;
     private readonly IBookingChargeRepository _charges;
+    private readonly IPaymentAllocationRepository _allocations;
     private readonly IUnitOfWork _uow;
     private readonly IDateTimeProvider _clock;
 
-    public ReviewBookingChargeHandler(IBookingRepository bookings, IBookingChargeRepository charges, IUnitOfWork uow, IDateTimeProvider clock)
+    public ReviewBookingChargeHandler(IBookingRepository bookings, IBookingChargeRepository charges, IPaymentAllocationRepository allocations, IUnitOfWork uow, IDateTimeProvider clock)
     {
         _bookings = bookings;
         _charges = charges;
+        _allocations = allocations;
         _uow = uow;
         _clock = clock;
     }
@@ -37,6 +39,9 @@ public sealed class ReviewBookingChargeHandler : IRequestHandler<ReviewBookingCh
             if (charge.BookingId != booking.Id)
                 throw new InvalidOperationException("Charge does not belong to the specified booking.");
 
+            // Отклонение начисления отменяет распределения на него.
+            // Платежи сохраняются, поэтому суммы снова становятся доступными для распределения.
+            await _allocations.DeleteByBookingChargeIdAsync(charge.Id, ct);
             charge.Reject(_clock.UtcNow);
             await _uow.SaveChangesAsync(ct);
             await _uow.CommitAsync(ct);
