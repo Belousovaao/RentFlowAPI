@@ -208,7 +208,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
     };
 
     const createRefund = async (payment: PaymentTransactionDto) => {
-        const raw = window.prompt(`Доступный к возврату остаток по платежу: ${formatPrice(payment.amount)}. Введите сумму возврата:`,);
+        const raw = window.prompt(`Доступный нераспределённый остаток по платежу: ${formatPrice(payment.availableToAllocate)}. Введите сумму возврата:`,);
         if (raw === null) return;
         const amount = Number(raw.replace(",", "."));
         if (!Number.isFinite(amount) || amount <= 0 || Number(amount.toFixed(2)) !== amount) {
@@ -351,7 +351,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                 <td className="whitespace-nowrap px-4 py-3 text-right text-gray-600 dark:text-gray-300">{formatPrice(row.paidAmount ?? 0)}</td>
                                 <td className="whitespace-nowrap px-4 py-3 text-right text-gray-600 dark:text-gray-300">{formatPrice(row.balance ?? 0)}</td>
                                 <td className="px-4 py-3 text-right">
-                                    {row.kind === "charge" && row.charge?.status === "Accrued" && (
+                                    {row.kind === "charge" && row.charge?.status === "Accrued" && row.charge.type !== "Rental" && (
                                         <div className="flex justify-end gap-1">
                                             <button type="button" title="Отклонить начисление" disabled={busyId === row.id} onClick={() => void runAction(row.id, () => bookingFinanceApi.rejectCharge(bookingId, row.id), "Начисление отклонено.")} className="rounded-lg p-2 text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"><X className="h-4 w-4" /></button>
                                         </div>
@@ -372,15 +372,15 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                     <h3 className="font-medium text-gray-900 dark:text-white">Поступившие платежи</h3>
                     <span className="text-xs text-gray-500 dark:text-gray-400">Не отображаются строками в таблице начислений</span>
                 </div>
-                {payments.filter(payment => payment.type !== "Refund").length === 0 ? (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Платежей пока нет.</p>
+                {payments.filter(payment => payment.type !== "Refund" && payment.availableToAllocate > 0).length === 0 ? (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Нераспределённых остатков нет.</p>
                 ) : (
                     <div className="space-y-2">
-                        {payments.filter(payment => payment.type !== "Refund").map(payment => (
+                        {payments.filter(payment => payment.type !== "Refund" && payment.availableToAllocate > 0).map(payment => (
                             <div key={payment.id} className="flex flex-col gap-2 rounded-lg bg-gray-50 p-3 dark:bg-gray-900/40 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-gray-900 dark:text-white">{paymentTypeLabels[payment.type]} · {formatPrice(payment.amount)}</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">{formatDateTime(new Date(payment.createdAt))}{payment.note ? ` · ${payment.note}` : ""}</p>
+                                    <p className="text-sm font-medium text-gray-900 dark:text-white">{paymentTypeLabels[payment.type]} · доступно {formatPrice(payment.availableToAllocate)}</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">Поступило {formatPrice(payment.amount)} · {formatDateTime(new Date(payment.createdAt))}{payment.note ? ` · ${payment.note}` : ""}</p>
                                 </div>
                                 <div className="flex gap-2">
                                     {accruedCharges.length > 0 && (
@@ -482,7 +482,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             {allocationPayment && (
                 <Modal title="Распределение платежа" onClose={() => setAllocationPayment(null)}>
                     <form className="space-y-4" onSubmit={submitAllocations}>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Платёж: {formatPrice(allocationPayment.amount)}. Укажите, какую сумму направить на каждое подтверждённое начисление. Общая сумма не должна превышать нераспределённый остаток платежа.</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">Доступно для распределения: {formatPrice(allocationPayment.availableToAllocate)} из {formatPrice(allocationPayment.amount)}. Укажите, какую сумму направить на каждое начисление. Общая сумма не должна превышать доступный остаток.</p>
                         {accruedCharges.map(charge => (
                             <Field key={charge.id} label={`${charge.title} · остаток ${formatPrice(charge.balance)}`}>
                                 <input className={inputClass} type="number" min="0" max={charge.balance} step="0.01" value={allocationAmounts[charge.id] ?? ""} onChange={event => setAllocationAmounts(prev => ({ ...prev, [charge.id]: event.target.value }))} />
