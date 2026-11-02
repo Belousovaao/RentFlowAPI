@@ -43,13 +43,9 @@ public sealed class CreateBookingChargeHandler : IRequestHandler<CreateBookingCh
         switch (request.Type)
         {
             case BookingChargeType.LateCancellation:
-                if (booking.Status != BookingStatus.Cancelled)
-                    throw new InvalidOperationException("Late-cancellation charges can be added only to cancelled bookings.");
-
-                title = "Поздняя отмена";
-                unitPrice = booking.Price.RentalPrice.LastSegment.BaseDailyPrice;
-                amount = unitPrice;
-                break;
+                throw new InvalidOperationException(
+                    "Late-cancellation retention is calculated during booking cancellation from the available prepayment. " +
+                    "A separate charge must not be created, because it could create additional debt.");
 
             case BookingChargeType.Refueling:
                 title = "Заправка";
