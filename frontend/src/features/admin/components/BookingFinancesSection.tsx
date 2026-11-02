@@ -245,8 +245,8 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             id: charge.id,
             date: charge.createdAt,
             operation: chargeTypeLabels[charge.type] ?? charge.title,
+            // Details contain the admin-entered description, not the operation title.
             details: [
-                charge.title,
                 charge.description,
                 charge.referenceNumber,
                 charge.quantity > 1 ? `${charge.quantity} ${charge.unit} × ${formatPrice(charge.unitPrice)}` : null,
@@ -266,7 +266,6 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
     const canRegisterPayment = bookingStatus === "Confirmed" || bookingStatus === "Active" || bookingStatus === "Completed";
     const accruedCharges = charges.filter(charge => charge.status === "Accrued" && charge.balance > 0);
     
-
     return (
         <section className="rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-800 sm:p-6 lg:col-span-2">
             <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
