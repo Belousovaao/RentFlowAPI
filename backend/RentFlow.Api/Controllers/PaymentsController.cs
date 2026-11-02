@@ -15,11 +15,13 @@ public sealed class PaymentsController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IPaymentRepository _payments;
+    private readonly IPaymentAllocationRepository _allocations;
 
-    public PaymentsController(IMediator mediator, IPaymentRepository payments)
+    public PaymentsController(IMediator mediator, IPaymentRepository payments, IPaymentAllocationRepository allocations)
     {
         _mediator = mediator;
         _payments = payments;
+        _allocations = allocations;
     }
 
     [HttpGet("booking/{bookingId:guid}/transactions")]
@@ -29,18 +31,36 @@ public sealed class PaymentsController : ControllerBase
             return BadRequest("BookingId is required.");
 
         var payments = await _payments.GetByBookingIdAsync(bookingId, ct);
-        return Ok(payments.Select(p => new PaymentTransactionDto(
-            p.Id,
-            p.BookingId,
-            p.OriginalPaymentId,
-            p.Amount,
-            p.Currency,
-            p.Type,
-            p.Method,
-            p.ExternalOperationId,
-            p.CreatedAt,
-            p.Note
-        )));
+        var allocations = await _allocations.GetByBookingIdAsync(bookingId, ct);
+        var refundsByPayment = payments
+            .Where(p => p.Type == PaymentType.Refund && p.OriginalPaymentId.HasValue)
+            .GroupBy(p => p.OriginalPaymentId!.Value)
+            .ToDictionary(g => g.Key, g => g.Sum(p => p.Amount));
+
+        return Ok(payments.Select(p =>
+        {
+            var allocated = p.Type is PaymentType.Prepayment or PaymentType.AdditionalPayment
+                ? allocations.Where(a => a.PaymentId == p.Id).Sum(a => a.Amount)
+                : 0m;
+            var refunded = refundsByPayment.GetValueOrDefault(p.Id);
+            var availableToAllocate = p.Type is PaymentType.Prepayment or PaymentType.AdditionalPayment
+                ? Math.Max(0m, p.Amount - allocated - refunded)
+                : 0m;
+
+            return new PaymentTransactionDto(
+                p.Id,
+                p.BookingId,
+                p.OriginalPaymentId,
+                p.Amount,
+                p.Currency,
+                p.Type,
+                p.Method,
+                p.ExternalOperationId,
+                p.CreatedAt,
+                p.Note,
+                availableToAllocate
+            );
+        }));
     }
 
     [HttpGet("booking/{bookingId:guid}/summary")]
@@ -81,4 +101,5 @@ public sealed record PaymentTransactionDto(
     PaymentMethod Method,
     string? ExternalOperationId,
     DateTimeOffset CreatedAt,
-    string? Note);
+    string? Note,
+    decimal AvailableToAllocate);
