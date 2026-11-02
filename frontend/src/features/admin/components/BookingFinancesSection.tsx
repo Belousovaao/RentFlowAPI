@@ -331,7 +331,6 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                             <th className="px-4 py-3 font-medium">Дата</th>
                             <th className="px-4 py-3 font-medium">Операция</th>
                             <th className="px-4 py-3 font-medium">Детали</th>
-                            <th className="px-4 py-3 font-medium">Статус</th>
                             <th className="px-4 py-3 text-right font-medium">Начислено</th>
                             <th className="px-4 py-3 text-right font-medium">Оплачено</th>
                             <th className="px-4 py-3 text-right font-medium">Остаток</th>
@@ -344,11 +343,13 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                 <td className="whitespace-nowrap px-4 py-3 text-gray-500 dark:text-gray-400">
                                     {row.date ? formatDateTime(new Date(row.date)) : "—"}
                                 </td>
-                                <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{row.operation}</td>
-                                <td className="max-w-xs px-4 py-3 text-gray-500 dark:text-gray-400">{row.details || "—"}</td>
-                                <td className="px-4 py-3">
-                                    {row.status && <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${statusClass(chargeStatusLabels[row.status])}`}>{chargeStatusLabels[row.status]}</span>}
+                                <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">
+                                    <span className="inline-flex items-center gap-1.5">
+                                        {row.status === "Rejected" && <X className="h-4 w-4 shrink-0 text-red-500" aria-label="Начисление отклонено" title="Начисление отклонено" />}
+                                        {row.operation}
+                                    </span>
                                 </td>
+                                <td className="max-w-xs px-4 py-3 text-gray-500 dark:text-gray-400">{row.details || "—"}</td>
                                 <td className="whitespace-nowrap px-4 py-3 text-right font-medium text-gray-900 dark:text-white">{formatPrice(row.amount)}</td>
                                 <td className="whitespace-nowrap px-4 py-3 text-right text-gray-600 dark:text-gray-300">{formatPrice(row.paidAmount ?? 0)}</td>
                                 <td className="whitespace-nowrap px-4 py-3 text-right text-gray-600 dark:text-gray-300">{formatPrice(row.balance ?? 0)}</td>
@@ -377,7 +378,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                             </tr>
                         ))}
                         {!loading && rows.length === 0 && (
-                            <tr><td colSpan={8} className="px-4 py-10 text-center text-sm text-gray-500 dark:text-gray-400">Финансовых операций пока нет.</td></tr>
+                            <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500 dark:text-gray-400">Финансовых операций пока нет.</td></tr>
                         )}
                     </tbody>
                 </table>
