@@ -82,8 +82,8 @@ public sealed class ChangeBookingPeriodHandler: IRequestHandler<ChangeBookingPer
         }
         else
         {
-            // Compatibility fallback for bookings created before initial charges existed.
-            // The one-off backfill should use the original booking creation timestamp.
+            // Compatibility fallback for legacy bookings not covered by the backfill.
+            // The backfill uses the booking start date because the true creation time is unavailable.
             await _bookingCharges.AddAsync(BookingCharge.Create(
                 booking.Id, BookingChargeType.Rental, "Аренда", null, null,
                 1m, "услуга", rentalAmount, rentalAmount, _dateTimeProvider.UtcNow), ct);
