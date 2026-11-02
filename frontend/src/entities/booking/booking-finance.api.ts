@@ -49,6 +49,7 @@ export interface PaymentTransactionDto {
     bookingId: string;
     originalPaymentId: string | null;
     amount: number;
+    availableToAllocate: number;
     currency: string;
     type: PaymentType;
     method: PaymentMethod;
