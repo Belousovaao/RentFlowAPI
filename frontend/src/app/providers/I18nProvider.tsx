@@ -152,6 +152,11 @@ const financeTranslations: Record<Language, Translations> = {
         "verification.status.pending": "Under review",
         "verification.status.approved": "Approved",
         "verification.status.rejected": "Rejected",
+        "booking.statusModal.title": "Change booking status",
+        "booking.statusModal.description": "Select a new booking status.",
+        "verification.modal.title": "Customer verification status",
+        "verification.modal.description": "Select a new verification status",
+        "common.current": "Current",
     },
     "ru": {
         "finance.charge.rental": "Аренда",
@@ -303,6 +308,11 @@ const financeTranslations: Record<Language, Translations> = {
         "verification.status.pending": "На проверке",
         "verification.status.approved": "Одобрен",
         "verification.status.rejected": "Отказ",
+        "booking.statusModal.title": "Изменить статус",
+        "booking.statusModal.description": "Выберите новый статус бронирования.",
+        "verification.modal.title": "Статус клиента",
+        "verification.modal.description": "Выберите новый статус верификации",
+        "common.current": "Текущий",
     },
     "zh": {
         "finance.charge.rental": "租金",
@@ -411,6 +421,11 @@ const financeTranslations: Record<Language, Translations> = {
         "verification.status.pending": "审核中",
         "verification.status.approved": "已通过",
         "verification.status.rejected": "已拒绝",
+        "booking.statusModal.title": "更改预订状态",
+        "booking.statusModal.description": "请选择新的预订状态。",
+        "verification.modal.title": "客户验证状态",
+        "verification.modal.description": "请选择新的验证状态",
+        "common.current": "当前",
     }
 };
 
