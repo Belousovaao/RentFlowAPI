@@ -101,7 +101,7 @@ export const AdminAccountPage = () => {
             setStats({
                 availableAssets,
                 activeBookings,
-                totalCustomers: customersRes.data.totalCount,
+                totalCustomers: customersRes.data?.totalCount ?? customersRes.data?.data?.length ?? 0,
                 uniqueCustomers,
                 monthlyRevenue,
             });
@@ -166,11 +166,11 @@ export const AdminAccountPage = () => {
                         </div>
                     ) : (
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                            <StatCard label="Активных бронирований" value={stats.activeBookings.toString()} icon={Calendar} />
-                            <StatCard label="Доступно автомобилей" value={stats.availableAssets.toString()} icon={Car} />
-                            <StatCard label="Всего клиентов" value={stats.totalCustomers.toString()} icon={Users} />
-                            <StatCard label="Количество уникальных клиентов" value={stats.uniqueCustomers.toString()} icon={Users} />
-                            <StatCard label="Сумма бронирований за месяц" value={formatCurrency(stats.monthlyRevenue)} icon={TrendingUp} />
+                            <StatCard label="Активных бронирований" value={(stats.activeBookings ?? 0).toString()} icon={Calendar} />
+                            <StatCard label="Доступно автомобилей" value={(stats.availableAssets ?? 0).toString()} icon={Car} />
+                            <StatCard label="Всего клиентов" value={(stats.totalCustomers ?? 0).toString()} icon={Users} />
+                            <StatCard label="Количество уникальных клиентов" value={(stats.uniqueCustomers ?? 0).toString()} icon={Users} />
+                            <StatCard label="Сумма бронирований за месяц" value={formatCurrency(stats.monthlyRevenue ?? 0)} icon={TrendingUp} />
                             <StatCard label="Расходы на содержание и обслуживание" value="—" icon={TrendingUp} />
                         </div>
                     )}
