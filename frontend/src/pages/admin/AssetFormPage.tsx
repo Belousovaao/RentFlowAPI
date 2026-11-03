@@ -705,14 +705,14 @@ export const AssetFormPage = () => {
                     <>
                         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                             <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                                📸 Экстерьер (360° обзор) - {exteriorPhotos.length}/36 фото
+                                📸 {t("asset.exterior")} (360°) — {exteriorPhotos.length}/36 {t("admin.assetForm.photosCount")}
                             </h2>
                             <div className="mb-4">
                                 <label className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-primary-500 transition-colors">
                                     <div className="text-center">
                                         <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                                         <span className="text-sm text-gray-500">
-                                            {uploadingExterior ? t('common.loading') : t('admin.assetForm.uploadExterior')}
+                                            {uploadingExterior ? t('common.uploading') : t('admin.assetForm.uploadExterior')}
                                         </span>
                                     </div>
                                     <input
@@ -756,14 +756,14 @@ export const AssetFormPage = () => {
                         {/* Фото интерьера для 360-обзора */}
                         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                             <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                                🪑 Интерьер (360° обзор) - {interiorPhotos.length}/36 фото
+                                🪑 {t("asset.interior")} (360°) — {interiorPhotos.length}/36 {t("admin.assetForm.photosCount")}
                             </h2>
                             <div className="mb-4">
                                 <label className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-primary-500 transition-colors">
                                     <div className="text-center">
                                         <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                                         <span className="text-sm text-gray-500">
-                                            {uploadingInterior ? t('common.loading') : t('admin.assetForm.uploadInterior')}
+                                            {uploadingInterior ? t('common.uploading') : t('admin.assetForm.uploadInterior')}
                                         </span>
                                     </div>
                                     <input
