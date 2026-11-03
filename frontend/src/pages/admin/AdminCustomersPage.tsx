@@ -4,12 +4,13 @@ import { ArrowLeft, } from 'lucide-react';
 import { adminCustomersApi } from '@/features/admin/api/adminCustomers.api';
 import { CustomerShortDto, CustomerType, VerificationStatus } from '@/entities/customer/customer.type';
 import { CreateCustomerModal } from '@/features/customer/components/CreateCustomerModal';
+import { useI18n } from '@/app/providers/I18nProvider';
 
-const statusLabels: Record<VerificationStatus, string> = {
-    NotSubmitted: "Не установлен",
-    Pending: "На проверке",
-    Approved: "Одобрен",
-    Rejected: "Отказ"
+const statusTranslationKeys: Record<VerificationStatus, string> = {
+    NotSubmitted: "verification.status.notSubmitted",
+    Pending: "verification.status.pending",
+    Approved: "verification.status.approved",
+    Rejected: "verification.status.rejected"
 };
 
 const statusColors: Record<VerificationStatus, string> = {
@@ -20,6 +21,7 @@ const statusColors: Record<VerificationStatus, string> = {
 };
 
 export const AdminCustomersPage = () => {
+    const { t } = useI18n();
 
     const [customers, setCustomers] = useState<CustomerShortDto[]>([]);
     const [loading, setLoading] = useState(true);
@@ -49,7 +51,7 @@ export const AdminCustomersPage = () => {
 
         } catch (err) {
             console.error(err);
-            alert('Ошибка загрузки клиентов');
+            alert(t('admin.customers.loadError'));
 
         } finally {
             setLoading(false);
@@ -64,13 +66,13 @@ export const AdminCustomersPage = () => {
     const getCustomerTypeLabel = (type: CustomerType) => {
         switch (type) {
             case CustomerType.Individual:
-                return 'ФЛ';
+                return t('customer.type.individualShort');
 
             case CustomerType.IndividualEntrepreneur:
-                return 'ИП';
+                return t('customer.type.entrepreneurShort');
 
             case CustomerType.Organization:
-                return 'ЮЛ';
+                return t('customer.type.organizationShort');
 
             default:
                 return '';
@@ -107,7 +109,7 @@ export const AdminCustomersPage = () => {
                         <div className="flex-1">
                             <input
                                 type="text"
-                                placeholder="Поиск по имени, телефону или email..."
+                                placeholder={t("admin.customers.searchPlaceholder")}
                                 value={searchTerm}
                                 onChange={(e) => {
                                     setSearchTerm(e.target.value);
@@ -261,7 +263,7 @@ export const AdminCustomersPage = () => {
                                                 statusColors[customer.verificationStatus]
                                             }`}
                                         >
-                                            {statusLabels[customer.verificationStatus]}
+                                            {t(statusTranslationKeys[customer.verificationStatus])}
                                         </span>
                                     </div>
                                 </div>
@@ -282,7 +284,7 @@ export const AdminCustomersPage = () => {
                             ← Назад
                         </button>
                         <span className="px-4 py-2 text-gray-600 dark:text-gray-400">
-                            Страница {page} из {totalPages}
+                            {t("common.pageOf", { page, totalPages })}
                         </span>
                         <button
                             onClick={() =>
