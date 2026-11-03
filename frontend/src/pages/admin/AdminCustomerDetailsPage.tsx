@@ -8,9 +8,11 @@ import { BookingListItemDto } from '@/entities/booking/booking.types';
 import { bookingApi } from '@/entities/booking/booking.api';
 import { statusLabels } from './AdminBookingsPage';
 import { StatusModal } from '@/features/admin/components/StatusModal';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 
 export const AdminCustomerDetailsPage = () => {
+    const { t, language } = useI18n();
 
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
@@ -38,7 +40,7 @@ export const AdminCustomerDetailsPage = () => {
                 setBookings(bookingsResponse);
             } catch (error) {
                 console.error(error);
-                alert('Ошибка загрузки клиента');
+                alert(t("admin.customerDetails.loadError"));
                 navigate('/admin/customers');
             } finally {
                 setLoading(false);
@@ -58,7 +60,7 @@ export const AdminCustomerDetailsPage = () => {
             setEditing(false);
         } catch (error) {
             console.error(error);
-            alert('Ошибка сохранения клиента');
+            alert(t("admin.customerDetails.saveError"));
         } finally {
             setSaving(false);
         }
@@ -78,7 +80,7 @@ export const AdminCustomerDetailsPage = () => {
             setStatusModalOpen(false);
         } catch (error) {
             console.error(error);
-            alert("Ошибка изменения статуса");
+            alert(t("admin.customerDetails.statusError"));
         } finally {
             setStatusUpdating(false);
         }
@@ -91,7 +93,7 @@ export const AdminCustomerDetailsPage = () => {
 
         if (!document) return;
 
-        const confirmed = window.confirm(`Удалить документ «${document.type}»? Это действие нельзя отменить.`);
+        const confirmed = window.confirm(`${t("admin.customerDetails.deleteDocument")} «${document.type}»? ${t("common.irreversible")}`);
 
         if (!confirmed) return;
 
@@ -112,7 +114,7 @@ export const AdminCustomerDetailsPage = () => {
             });
         } catch (error) {
             console.error(error);
-            alert('Не удалось удалить документ');
+            alert(t("admin.customerDetails.deleteDocumentError"));
         } finally {
             setDeletingDocumentId(null);
         }
@@ -121,15 +123,15 @@ export const AdminCustomerDetailsPage = () => {
     const verificationSteps = [
         {
             status: VerificationStatus.NotSubmitted,
-            label: 'Не установлен',
+            label: t('verification.status.notSubmitted'),
         },
         {
             status: VerificationStatus.Pending,
-            label: 'На проверке',
+            label: t('verification.status.pending'),
         },
         {
             status: VerificationStatus.Approved,
-            label: 'Одобрен',
+            label: t('verification.status.approved'),
         }
     ];
 
@@ -314,7 +316,7 @@ export const AdminCustomerDetailsPage = () => {
                         </h2>
 
                         <span className="text-sm text-gray-500 dark:text-gray-400">
-                            Всего: {bookings.length}
+                            {t("common.total")}: {bookings.length}
                         </span>
                     </div>
 
@@ -359,7 +361,7 @@ export const AdminCustomerDetailsPage = () => {
                                             <div className="text-sm text-gray-600 dark:text-gray-300">
                                                 {new Date(
                                                     booking.rentalPeriod.startDate
-                                                ).toLocaleDateString('ru-RU')}
+                                                ).toLocaleDateString(language === 'zh' ? 'zh-CN' : language === 'en' ? 'en-GB' : 'ru-RU')}
                                                 {' — '}
                                                 {new Date(
                                                     booking.rentalPeriod.endDate
@@ -368,7 +370,7 @@ export const AdminCustomerDetailsPage = () => {
 
                                             <div className="font-semibold text-gray-900 dark:text-white">
                                                 {booking.price.totalToPay.toLocaleString(
-                                                    'ru-RU'
+                                                    language === 'zh' ? 'zh-CN' : language === 'en' ? 'en-GB' : 'ru-RU'
                                                 )}{' '}
                                                 ₽
                                             </div>
@@ -387,7 +389,7 @@ export const AdminCustomerDetailsPage = () => {
                                                                         : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                                                     }`}
                                                 >
-                                                    {statusLabels[booking.status]}
+                                                    {t(statusLabels[booking.status])}
                                                 </span>
                                             </div>
                                         </div>
@@ -411,7 +413,7 @@ export const AdminCustomerDetailsPage = () => {
                         </div>
 
                         <span className="text-sm text-gray-500 dark:text-gray-400">
-                            Всего: {customer.documents?.length ?? 0}
+                            {t("common.total")}: {customer.documents?.length ?? 0}
                         </span>
                     </div>
 
