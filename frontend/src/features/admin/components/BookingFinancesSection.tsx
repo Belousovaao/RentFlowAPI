@@ -311,11 +311,11 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             </div>
 
             <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-                <SummaryCard label={t("finance.rentalCost)} value={formatPrice(price.total)} hint=t("finance.withoutDeposit") />
-                <SummaryCard label=t("finance.totalWithDeposit") value={formatPrice(price.totalToPay)} hint="" />
-                <SummaryCard label=t("finance.received") value={formatPrice(summary?.totalReceived ?? 0)} hint="" />
-                <SummaryCard label=t("finance.refunded") value={formatPrice(summary?.totalRefunded ?? 0)} hint="" />
-                <SummaryCard label=t("finance.netPaid") value={formatPrice(summary?.netPaid ?? 0)} hint="" />
+                <SummaryCard label={t("finance.rentalCost)} value={formatPrice(price.total)} hint={t("finance.withoutDeposit")} />
+                <SummaryCard label={t("finance.totalWithDeposit")} value={formatPrice(price.totalToPay)} hint="" />
+                <SummaryCard label={t("finance.received")} value={formatPrice(summary?.totalReceived ?? 0)} hint="" />
+                <SummaryCard label={t("finance.refunded")} value={formatPrice(summary?.totalRefunded ?? 0)} hint="" />
+                <SummaryCard label={t("finance.netPaid")} value={formatPrice(summary?.netPaid ?? 0)} hint="" />
             </div>
 
 
@@ -411,13 +411,13 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             {settingsModalOpen && (
                 <Modal title={t("finance.tariffSettings") onClose={() => setSettingsModalOpen(false)}>
                     <form className="space-y-4" onSubmit={submitSettings}>
-                        <Field label=t("finance.fuelTariff")>
+                        <Field label={t("finance.fuelTariff")}>
                             <input className={inputClass} type="number" min="0" step="0.01" required value={rentalTariffs.fuel_per_liter ?? ""} onChange={event => setRentalTariffs(prev => ({ ...prev, fuel_per_liter: event.target.value }))} />
                         </Field>
-                        <Field label=t("finance.mileageTariff")>
+                        <Field label={t("finance.mileageTariff")}>
                             <input className={inputClass} type="number" min="0" step="0.01" required value={rentalTariffs.excess_mileage_per_km ?? ""} onChange={event => setRentalTariffs(prev => ({ ...prev, excess_mileage_per_km: event.target.value }))} />
                         </Field>
-                        <Field label=t("finance.washTariff")>
+                        <Field label={t("finance.washTariff")}>
                             <input className={inputClass} type="number" min="0" step="0.01" required value={rentalTariffs.body_wash ?? ""} onChange={event => setRentalTariffs(prev => ({ ...prev, body_wash: event.target.value }))} />
                         </Field>
                         <p className="text-xs text-gray-500 dark:text-gray-400">{t("finance.tariffHint")}</p>
@@ -430,9 +430,9 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             )}
 
             {chargeModalOpen && (
-                <Modal title=t("finance.newCharge") onClose={() => setChargeModalOpen(false)}>
+                <Modal title={t("finance.newCharge")} onClose={() => setChargeModalOpen(false)}>
                     <form className="space-y-4" onSubmit={submitCharge}>
-                        <Field label=t("finance.chargeType")>
+                        <Field label={t("finance.chargeType")}>
                             <select className={inputClass} value={chargeForm.type} onChange={event => setChargeForm(prev => ({ ...prev, type: event.target.value as BookingChargeType }))}>
                                 {Object.entries(chargeTypeLabels).filter(([value]) => !["Rental", "AdditionalServices", "RouteSurcharge", "Deposit"].includes(value)).map(([value, label]) => <option key={value} value={value} disabled={value === "LateCancellation" && bookingStatus !== "Cancelled"}>{label}</option>)}
                             </select>
@@ -442,20 +442,20 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                 <input className={inputClass} type="number" min="0.001" step="0.001" required value={chargeForm.quantity} onChange={event => setChargeForm(prev => ({ ...prev, quantity: event.target.value }))} />
                             </Field>
                         ) : chargeForm.type !== "LateCancellation" ? (
-                            <Field label=t("finance.amountRub")>
+                            <Field label={t("finance.amountRub")}>
                                 <input className={inputClass} type="number" min="0.01" step="0.01" required={chargeForm.type !== "Cleaning"} value={chargeForm.amount} onChange={event => setChargeForm(prev => ({ ...prev, amount: event.target.value }))} />
                                 {chargeForm.type === "Cleaning" && <span className="text-xs text-gray-500">{t("finance.washHint")}</span>}
                             </Field>
                         ) : (
                             <p className="rounded-lg bg-blue-50 p-3 text-sm text-blue-800 dark:bg-blue-950/30 dark:text-blue-200">{t("finance.chargePriceHint")}</p>
                         )}
-                        {chargeForm.type === "Other" && <Field label=t("common.title")><input className={inputClass} required value={chargeForm.title} onChange={event => setChargeForm(prev => ({ ...prev, title: event.target.value }))} /></Field>}
+                        {chargeForm.type === "Other" && <Field label={t("common.title")}><input className={inputClass} required value={chargeForm.title} onChange={event => setChargeForm(prev => ({ ...prev, title: event.target.value }))} /></Field>}
                         {(chargeForm.type === "TrafficFine" || chargeForm.type === "Cleaning" || chargeForm.type === "PropertyLossOrDamage" || chargeForm.type === "Other") && (
                             <Field label={chargeForm.type === "TrafficFine" ? t("finance.fineDescription") : t("common.description")}>
                                 <textarea className={inputClass} required={chargeForm.type === "Cleaning" || chargeForm.type === "PropertyLossOrDamage"} rows={3} value={chargeForm.description} onChange={event => setChargeForm(prev => ({ ...prev, description: event.target.value }))} />
                             </Field>
                         )}
-                        {chargeForm.type === "TrafficFine" && <Field label=t("finance.fineNumber")><input className={inputClass} value={chargeForm.referenceNumber} onChange={event => setChargeForm(prev => ({ ...prev, referenceNumber: event.target.value }))} /></Field>}
+                        {chargeForm.type === "TrafficFine" && <Field label={t("finance.fineNumber")}><input className={inputClass} value={chargeForm.referenceNumber} onChange={event => setChargeForm(prev => ({ ...prev, referenceNumber: event.target.value }))} /></Field>}
                         <p className="text-xs text-gray-500 dark:text-gray-400">{t("finance.chargeHint")}</p>
                         <div className="flex justify-end gap-2">
                             <button type="button" className={`${buttonClass} border border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-200`} onClick={() => setChargeModalOpen(false)}>{t("common.cancel")}</button>
@@ -466,22 +466,22 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             )}
 
             {paymentModalOpen && (
-                <Modal title=t("finance.registerPayment") onClose={() => setPaymentModalOpen(false)}>
+                <Modal title={t("finance.registerPayment")} onClose={() => setPaymentModalOpen(false)}>
                     <form className="space-y-4" onSubmit={submitPayment}>
-                        <Field label=t("finance.paymentType")>
+                        <Field label={t("finance.paymentType")}>
                             <select className={inputClass} value={paymentType} onChange={event => setPaymentType(event.target.value as typeof paymentType)}>
                                 <option value="Prepayment" disabled={bookingStatus !== "Confirmed"}>{t("finance.payment.prepayment")}</option>
                                 <option value="AdditionalPayment">Доплата</option>
                             </select>
                         </Field>
-                        <Field label=t("finance.amountRub")><input className={inputClass} type="number" min="0.01" step="0.01" required value={paymentAmount} onChange={event => setPaymentAmount(event.target.value)} /></Field>
-                        <Field label=t("finance.paymentMethod")>
+                        <Field label={t("finance.amountRub")}><input className={inputClass} type="number" min="0.01" step="0.01" required value={paymentAmount} onChange={event => setPaymentAmount(event.target.value)} /></Field>
+                        <Field label={t("finance.paymentMethod")}>
                             <select className={inputClass} value={paymentMethod} onChange={event => setPaymentMethod(event.target.value as PaymentMethod)}>
                                 <option value="BankTransfer">{t("finance.bankTransfer")}</option>
                                 <option value="Online">{t("finance.online")}</option>
                             </select>
                         </Field>
-                        <Field label=t("common.commentOptional")><textarea className={inputClass} rows={2} value={paymentNote} onChange={event => setPaymentNote(event.target.value)} /></Field>
+                        <Field label={t("common.commentOptional")}><textarea className={inputClass} rows={2} value={paymentNote} onChange={event => setPaymentNote(event.target.value)} /></Field>
                         <p className="text-xs text-gray-500 dark:text-gray-400">{t("finance.paymentHint")}</p>
                         <div className="flex justify-end gap-2">
                             <button type="button" className={`${buttonClass} border border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-200`} onClick={() => setPaymentModalOpen(false)}>{t("common.cancel")}</button>
@@ -492,7 +492,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             )}
 
             {allocationPayment && (
-                <Modal title=t("finance.allocationTitle") onClose={() => setAllocationPayment(null)}>
+                <Modal title={t("finance.allocationTitle")} onClose={() => setAllocationPayment(null)}>
                     <form className="space-y-4" onSubmit={submitAllocations}>
                         <p className="text-sm text-gray-600 dark:text-gray-300">Доступно для распределения: {formatPrice(allocationPayment.availableToAllocate)} из {formatPrice(allocationPayment.amount)}. Укажите, какую сумму направить на каждое начисление. Общая сумма не должна превышать доступный остаток.</p>
                         {accruedCharges.map(charge => (
@@ -535,7 +535,7 @@ function Modal({ title, children, onClose }: { title: string; children: ReactNod
             <div role="dialog" aria-modal="true" aria-label={title} className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-xl dark:bg-gray-800 sm:p-6">
                 <div className="mb-5 flex items-center justify-between gap-3">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
-                    <button type="button" onClick={onClose} aria-label=t("common.close") className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"><X className="h-4 w-4" /></button>
+                    <button type="button" onClick={onClose} aria-label={t("common.close")} className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"><X className="h-4 w-4" /></button>
                 </div>
                 {children}
             </div>
