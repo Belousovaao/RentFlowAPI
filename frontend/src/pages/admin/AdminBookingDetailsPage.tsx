@@ -115,7 +115,7 @@ export const AdminBookingDetailsPage = () => {
         } catch (error) {
             console.error("Failed to change booking status:", error);
 
-            toast.error("Не удалось изменить статус бронирования.");
+            toast.error(t("admin.bookingDetails.statusError"));
         } finally {
             setChangingStatus(false);
         }
@@ -157,10 +157,10 @@ export const AdminBookingDetailsPage = () => {
         booking.status === "Active";
     const destinationZone = travelZones.find((zone) => zone.type === booking.destination.type);
     const routeReviewStatusLabels: Record<RouteReviewStatus, string> = {
-        NotRequired: "Проверка не требуется",
-        Pending: "На проверке",
-        Approved: "Одобрен",
-        Rejected: "Отклонён",
+        NotRequired: "route.status.notRequired",
+        Pending: "route.status.pending",
+        Approved: "route.status.approved",
+        Rejected: "route.status.rejected",
     };
     const rentalSegments = booking.price.rentalPrice.segments ?? [];
 
@@ -320,7 +320,7 @@ export const AdminBookingDetailsPage = () => {
                                             )}
 
                                             <p>
-                                                Статус:{" "}
+                                                {t("common.status")}:{" "}
                                                 <span className="font-medium text-gray-700 dark:text-gray-200">
                                                     {
                                                         customerStatusLabels[
@@ -419,7 +419,7 @@ export const AdminBookingDetailsPage = () => {
                                                             {formatPrice(
                                                                 segment.discountedDailyPrice
                                                             )}{" "}
-                                                            / день
+                                                            / {t("common.day")}
                                                         </p>
 
                                                         <p className="mt-1 font-semibold text-gray-900 dark:text-white">
