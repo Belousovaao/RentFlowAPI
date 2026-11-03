@@ -101,7 +101,7 @@ export const AdminAccountPage = () => {
             setStats({
                 availableAssets,
                 activeBookings,
-                totalCustomers: customersRes.data?.totalCount ?? customersRes.data?.data?.length ?? 0,
+                totalCustomers: customersRes.data?.total ?? customersRes.data?.data?.length ?? 0,
                 uniqueCustomers,
                 monthlyRevenue,
             });
