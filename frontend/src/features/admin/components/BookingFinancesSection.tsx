@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { CircleDollarSign, Loader2, Plus, RefreshCw, X } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useI18n } from "@/app/providers/I18nProvider";
 import { formatDateTime, formatPrice } from "@/shared/utils/formatters";
 import type { BookingPriceDto, BookingServiceDto, BookingStatus } from "@/entities/booking/booking.types";
 import { bookingFinanceApi, type BookingChargeDto, type BookingChargeStatus, type BookingChargeType, type BookingPaymentSummaryDto, type CreateBookingChargeRequest, type PaymentMethod, type PaymentTransactionDto, } from "@/entities/booking/booking-finance.api";
@@ -28,23 +29,23 @@ type FinanceRow = {
 };
 
 const chargeTypeLabels: Record<BookingChargeType, string> = {
-    Rental: "Аренда",
-    AdditionalServices: "Дополнительные услуги",
-    RouteSurcharge: "Доплата за маршрут",
-    Deposit: "Депозит",
-    LateCancellation: "Поздняя отмена",
-    TrafficFine: "Штраф ГИБДД",
-    Cleaning: "Мойка кузова / уборка",
-    Refueling: "Заправка",
-    ExcessMileage: "Перепробег",
-    PropertyLossOrDamage: "Утрата имущества / повреждение",
-    Other: "Прочее начисление",
+    Rental: t("finance.charge.rental"),
+    AdditionalServices: t("finance.charge.services"),
+    RouteSurcharge: t("finance.charge.route"),
+    Deposit: t("finance.charge.deposit"),
+    LateCancellation: t("finance.charge.lateCancellation"),
+    TrafficFine: t("finance.charge.trafficFine"),
+    Cleaning: t("finance.charge.cleaning"),
+    Refueling: t("finance.charge.refueling"),
+    ExcessMileage: t("finance.charge.excessMileage"),
+    PropertyLossOrDamage: t("finance.charge.damage"),
+    Other: t("finance.charge.other"),
 };
 
 const paymentTypeLabels = {
-    Prepayment: "Предоплата",
-    AdditionalPayment: "Оплата",
-    Refund: "Возврат",
+    Prepayment: t("finance.payment.prepayment"),
+    AdditionalPayment: t("finance.payment.additional"),
+    Refund: t("finance.payment.refund"),
 } as const;
 
 
@@ -62,6 +63,7 @@ const emptyChargeForm = {
 };
 
 export const BookingFinancesSection = ({ bookingId, price, services, bookingStatus }: Props) => {
+    const { t } = useI18n();
     const [charges, setCharges] = useState<BookingChargeDto[]>([]);
     const [payments, setPayments] = useState<PaymentTransactionDto[]>([]);
     const [summary, setSummary] = useState<BookingPaymentSummaryDto | null>(null);
@@ -98,7 +100,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             setRentalTariffs(Object.fromEntries(settingsResult.map(tariff => [tariff.code, String(tariff.price)])));
         } catch (error) {
             console.error("Failed to load booking finance:", error);
-            toast.error("Не удалось загрузить финансовые данные бронирования.");
+            toast.error(t("finance.error.load"));
         } finally {
             setLoading(false);
         }
@@ -117,7 +119,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             return true;
         } catch (error) {
             console.error("Booking finance action failed:", error);
-            toast.error("Не удалось выполнить финансовую операцию. Проверьте данные и статус бронирования.");
+            toast.error(t("finance.error.action"));
             return false;
         } finally {
             setBusyId(null);
@@ -134,14 +136,14 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
         if (values.some(([, value]) =>
             !Number.isFinite(value) || value < 0 || Number(value.toFixed(2)) !== value
         )) {
-            toast.error("Тарифы должны быть неотрицательными суммами с двумя знаками после запятой.");
+            toast.error(t("finance.error.tariffs"));
             return;
         }
         const succeeded = await runAction("rental-tariffs", async () => {
             for (const [code, value, unit] of values) {
                 await bookingFinanceApi.updateRentalTariff(code, value, unit);
             }
-        }, "Тарифы аренды сохранены.");
+        }, t("finance.success.tariffs"));
         if (succeeded) setSettingsModalOpen(false);
     };
 
@@ -151,16 +153,16 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
         const quantity = chargeForm.quantity.trim() ? Number(chargeForm.quantity) : undefined;
 
         if (amount !== undefined && (!Number.isFinite(amount) || amount <= 0 || Number(amount.toFixed(2)) !== amount)) {
-            toast.error("Введите положительную сумму начисления с двумя знаками после запятой.");
+            toast.error(t("finance.error.chargeAmount"));
             return;
         }
         if (quantity !== undefined && (!Number.isFinite(quantity) || quantity <= 0 || Number(quantity.toFixed(3)) !== quantity)) {
-            toast.error("Введите положительное количество с точностью до 0,001.");
+            toast.error(t("finance.error.quantity"));
             return;
         }
 
         if (chargeForm.type === "TrafficFine" && !chargeForm.description.trim() && !chargeForm.referenceNumber.trim()) {
-            toast.error("Для штрафа укажите описание или номер постановления.");
+            toast.error(t("finance.error.fineDetails"));
             return;
         }
 
@@ -174,7 +176,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             ...(chargeForm.referenceNumber.trim() ? { referenceNumber: chargeForm.referenceNumber.trim() } : {}),
         };
 
-        const succeeded = await runAction("create-charge", () => bookingFinanceApi.createCharge(bookingId, request), "Начисление создано.");
+        const succeeded = await runAction("create-charge", () => bookingFinanceApi.createCharge(bookingId, request), t("finance.success.charge"));
         if (succeeded) {
             setChargeModalOpen(false);
             setChargeForm(emptyChargeForm);
@@ -185,7 +187,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
         event.preventDefault();
         const amount = Number(paymentAmount);
         if (!Number.isFinite(amount) || amount <= 0 || Number(amount.toFixed(2)) !== amount) {
-            toast.error("Введите положительную сумму с точностью до двух знаков после запятой.");
+            toast.error(t("finance.error.paymentAmount"));
             return;
         }
         const succeeded = await runAction("register-payment", () => bookingFinanceApi.registerIncoming({
@@ -194,7 +196,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             type: paymentType,
             method: paymentMethod,
             note: paymentNote.trim() || null,
-        }), "Платёж зарегистрирован.");
+        }), t("finance.success.payment"));
         if (succeeded) {
             setPaymentModalOpen(false);
             setPaymentAmount("");
@@ -205,7 +207,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
     const createRefund = async (payment: PaymentTransactionDto) => {
         const maxRefund = Math.min(payment.availableToAllocate, summary?.availableToRefund ?? 0);
         if (maxRefund <= 0) {
-            toast.error("Возврат невозможен: сначала необходимо погасить задолженность по начислениям.");
+            toast.error(t("finance.error.refundDebt"));
             return;
         }
         const raw = window.prompt(`Максимально доступно к возврату с учётом задолженности: ${formatPrice(maxRefund)}. Введите сумму возврата:`);
@@ -218,8 +220,8 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
         await runAction(`refund-${payment.id}`, () => bookingFinanceApi.createRefund({
             originalPaymentId: payment.id,
             amount,
-            note: "Возврат по бронированию",
-        }), "Возврат зарегистрирован.");
+            note: t("finance.refundNote"),
+        }), t("finance.success.refund"));
     };
 
     const submitAllocations = async (event: FormEvent<HTMLFormElement>) => {
@@ -229,11 +231,11 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             .map(([bookingChargeId, value]) => ({ bookingChargeId, amount: Number(value) }))
             .filter(item => valueIsPositive(item.amount));
         if (!allocations.length) {
-            toast.error("Укажите сумму хотя бы для одного начисления.");
+            toast.error(t("finance.error.allocation"));
             return;
         }
         const succeeded = await runAction(`allocate-${allocationPayment.id}`, () =>
-            bookingFinanceApi.allocatePayment(allocationPayment.id, allocations), "Платёж распределён по начислениям.");
+            bookingFinanceApi.allocatePayment(allocationPayment.id, allocations), t("finance.success.allocation"));
         if (succeeded) {
             setAllocationPayment(null);
             setAllocationAmounts({});
@@ -270,7 +272,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
         <section className="rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-800 sm:p-6 lg:col-span-2">
             <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Финансы бронирования</h2>
+                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("finance.title")}</h2>
                 </div>
                 <div className="flex flex-wrap gap-2">
                     <button 
@@ -278,7 +280,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                         onClick={() => setPaymentModalOpen(true)} 
                         disabled={!canRegisterPayment} 
                         title={!canRegisterPayment 
-                            ? "Платежи доступны только для подтверждённого, активного или завершенного бронирования" 
+                            ? t("finance.payment.disabled") 
                             : undefined} 
                         className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>
                         <CircleDollarSign className="h-4 w-4" /> 
@@ -301,7 +303,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                         type="button" 
                         onClick={() => void loadFinance()} 
                         disabled={loading} 
-                        aria-label="Обновить финансы" 
+                        aria-label=t("finance.refresh") 
                         className={`${buttonClass} border border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300`}>
                         <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                     </button>
@@ -309,11 +311,11 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             </div>
 
             <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-                <SummaryCard label="Стоимость аренды" value={formatPrice(price.total)} hint="Без депозита" />
-                <SummaryCard label="К оплате с депозитом" value={formatPrice(price.totalToPay)} hint="" />
-                <SummaryCard label="Поступило" value={formatPrice(summary?.totalReceived ?? 0)} hint="" />
-                <SummaryCard label="Возвращено" value={formatPrice(summary?.totalRefunded ?? 0)} hint="" />
-                <SummaryCard label="Чистая оплата" value={formatPrice(summary?.netPaid ?? 0)} hint="" />
+                <SummaryCard label=t("finance.rentalCost") value={formatPrice(price.total)} hint=t("finance.withoutDeposit") />
+                <SummaryCard label=t("finance.totalWithDeposit") value={formatPrice(price.totalToPay)} hint="" />
+                <SummaryCard label=t("finance.received") value={formatPrice(summary?.totalReceived ?? 0)} hint="" />
+                <SummaryCard label=t("finance.refunded") value={formatPrice(summary?.totalRefunded ?? 0)} hint="" />
+                <SummaryCard label=t("finance.netPaid") value={formatPrice(summary?.netPaid ?? 0)} hint="" />
             </div>
 
 
@@ -322,13 +324,13 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                 <table className="min-w-[1000px] w-full text-left text-sm">
                     <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500 dark:bg-gray-900/60 dark:text-gray-400">
                         <tr>
-                            <th className="px-4 py-3 font-medium">Дата</th>
-                            <th className="px-4 py-3 font-medium">Операция</th>
-                            <th className="px-4 py-3 font-medium">Детали</th>
-                            <th className="px-4 py-3 text-right font-medium">Начислено</th>
-                            <th className="px-4 py-3 text-right font-medium">Оплачено</th>
-                            <th className="px-4 py-3 text-right font-medium">Остаток</th>
-                            <th className="px-4 py-3 text-right font-medium">Действия</th>
+                            <th className="px-4 py-3 font-medium">{t("common.date")}</th>
+                            <th className="px-4 py-3 font-medium">{t("finance.operation")}</th>
+                            <th className="px-4 py-3 font-medium">{t("common.details")}</th>
+                            <th className="px-4 py-3 text-right font-medium">{t("finance.accrued")}</th>
+                            <th className="px-4 py-3 text-right font-medium">{t("finance.paid")}</th>
+                            <th className="px-4 py-3 text-right font-medium">{t("finance.balance")}</th>
+                            <th className="px-4 py-3 text-right font-medium">{t("common.actions")}</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -339,7 +341,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                 </td>
                                 <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">
                                     <span className="inline-flex items-center gap-1.5">
-                                        {row.status === "Rejected" && <X className="h-4 w-4 shrink-0 text-red-500" aria-label="Начисление отклонено" />}
+                                        {row.status === "Rejected" && <X className="h-4 w-4 shrink-0 text-red-500" aria-label=t("finance.chargeRejected") />}
                                         {row.operation}
                                     </span>
                                 </td>
@@ -372,7 +374,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                             </tr>
                         ))}
                         {!loading && rows.length === 0 && (
-                            <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500 dark:text-gray-400">Финансовых операций пока нет.</td></tr>
+                            <tr><td colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500 dark:text-gray-400">{t("finance.empty")}</td></tr>
                         )}
                     </tbody>
                 </table>
@@ -380,10 +382,10 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
 
             <div className="mt-5 rounded-xl border border-gray-200 p-4 dark:border-gray-700">
                 <div className="mb-3 flex items-center justify-between gap-3">
-                    <h3 className="font-medium text-gray-900 dark:text-white">Поступившие платежи</h3>
+                    <h3 className="font-medium text-gray-900 dark:text-white">{t("finance.incomingPayments")}</h3>
                 </div>
                 {payments.filter(payment => payment.type !== "Refund" && payment.availableToAllocate > 0).length === 0 ? (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Нераспределённых остатков нет.</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t("finance.noUnallocated")}</p>
                 ) : (
                     <div className="space-y-2">
                         {payments.filter(payment => payment.type !== "Refund" && payment.availableToAllocate > 0).map(payment => (
@@ -394,9 +396,9 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                 </div>
                                 <div className="flex gap-2">
                                     {accruedCharges.length > 0 && (
-                                        <button type="button" onClick={() => { setAllocationPayment(payment); setAllocationAmounts({}); }} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-950/30">Распределить</button>
+                                        <button type="button" onClick={() => { setAllocationPayment(payment); setAllocationAmounts({}); }} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-950/30">{t("finance.allocate")}</button>
                                     )}
-                                    <button type="button" onClick={() => void createRefund(payment)} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100 dark:text-red-300 dark:hover:bg-red-950/30">Возврат</button>
+                                    <button type="button" onClick={() => void createRefund(payment)} className="whitespace-nowrap rounded-lg px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100 dark:text-red-300 dark:hover:bg-red-950/30">{t("finance.payment.refund")}</button>
                                 </div>
                             </div>
                         ))}
@@ -404,23 +406,23 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                 )}
             </div>
 
-            {loading && <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">Обновление финансовых данных…</p>}
+            {loading && <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">{t("finance.updating")}</p>}
 
             {settingsModalOpen && (
-                <Modal title="Тарифы начислений" onClose={() => setSettingsModalOpen(false)}>
+                <Modal title=t("finance.tariffSettings") onClose={() => setSettingsModalOpen(false)}>
                     <form className="space-y-4" onSubmit={submitSettings}>
-                        <Field label="Топливо, 1 литр — ₽">
+                        <Field label=t("finance.fuelTariff")>
                             <input className={inputClass} type="number" min="0" step="0.01" required value={rentalTariffs.fuel_per_liter ?? ""} onChange={event => setRentalTariffs(prev => ({ ...prev, fuel_per_liter: event.target.value }))} />
                         </Field>
-                        <Field label="Перепробег, 1 км — ₽">
+                        <Field label=t("finance.mileageTariff")>
                             <input className={inputClass} type="number" min="0" step="0.01" required value={rentalTariffs.excess_mileage_per_km ?? ""} onChange={event => setRentalTariffs(prev => ({ ...prev, excess_mileage_per_km: event.target.value }))} />
                         </Field>
-                        <Field label="Мойка кузова — ₽">
+                        <Field label=t("finance.washTariff")>
                             <input className={inputClass} type="number" min="0" step="0.01" required value={rentalTariffs.body_wash ?? ""} onChange={event => setRentalTariffs(prev => ({ ...prev, body_wash: event.target.value }))} />
                         </Field>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Тарифы применяются к новым начислениям. Уже созданные начисления сохраняют исходные цены и суммы.</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("finance.tariffHint")}</p>
                         <div className="flex justify-end gap-2">
-                            <button type="button" className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200" onClick={() => setSettingsModalOpen(false)}>Отмена</button>
+                            <button type="button" className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200" onClick={() => setSettingsModalOpen(false)}>{t("common.cancel")}</button>
                             <button type="submit" disabled={busyId === "charge-settings"} className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">{busyId === "charge-settings" && <Loader2 className="h-4 w-4 animate-spin" />} Сохранить</button>
                         </div>
                     </form>
@@ -428,35 +430,35 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             )}
 
             {chargeModalOpen && (
-                <Modal title="Новое начисление" onClose={() => setChargeModalOpen(false)}>
+                <Modal title=t("finance.newCharge") onClose={() => setChargeModalOpen(false)}>
                     <form className="space-y-4" onSubmit={submitCharge}>
-                        <Field label="Тип начисления">
+                        <Field label=t("finance.chargeType")>
                             <select className={inputClass} value={chargeForm.type} onChange={event => setChargeForm(prev => ({ ...prev, type: event.target.value as BookingChargeType }))}>
                                 {Object.entries(chargeTypeLabels).filter(([value]) => !["Rental", "AdditionalServices", "RouteSurcharge", "Deposit"].includes(value)).map(([value, label]) => <option key={value} value={value} disabled={value === "LateCancellation" && bookingStatus !== "Cancelled"}>{label}</option>)}
                             </select>
                         </Field>
                         {chargeForm.type === "Refueling" || chargeForm.type === "ExcessMileage" ? (
-                            <Field label={chargeForm.type === "Refueling" ? "Количество литров" : "Количество километров"}>
+                            <Field label={chargeForm.type === "Refueling" ? t("finance.liters") : t("finance.kilometers")}>
                                 <input className={inputClass} type="number" min="0.001" step="0.001" required value={chargeForm.quantity} onChange={event => setChargeForm(prev => ({ ...prev, quantity: event.target.value }))} />
                             </Field>
                         ) : chargeForm.type !== "LateCancellation" ? (
-                            <Field label="Сумма, ₽">
+                            <Field label=t("finance.amountRub")>
                                 <input className={inputClass} type="number" min="0.01" step="0.01" required={chargeForm.type !== "Cleaning"} value={chargeForm.amount} onChange={event => setChargeForm(prev => ({ ...prev, amount: event.target.value }))} />
-                                {chargeForm.type === "Cleaning" && <span className="text-xs text-gray-500">Если оставить поле пустым, применится тариф мойки кузова.</span>}
+                                {chargeForm.type === "Cleaning" && <span className="text-xs text-gray-500">{t("finance.washHint")}</span>}
                             </Field>
                         ) : (
-                            <p className="rounded-lg bg-blue-50 p-3 text-sm text-blue-800 dark:bg-blue-950/30 dark:text-blue-200">Сумма рассчитывается по суточной цене автомобиля, сохранённой в бронировании.</p>
+                            <p className="rounded-lg bg-blue-50 p-3 text-sm text-blue-800 dark:bg-blue-950/30 dark:text-blue-200">{t("finance.chargePriceHint")}</p>
                         )}
-                        {chargeForm.type === "Other" && <Field label="Название"><input className={inputClass} required value={chargeForm.title} onChange={event => setChargeForm(prev => ({ ...prev, title: event.target.value }))} /></Field>}
+                        {chargeForm.type === "Other" && <Field label=t("common.title")><input className={inputClass} required value={chargeForm.title} onChange={event => setChargeForm(prev => ({ ...prev, title: event.target.value }))} /></Field>}
                         {(chargeForm.type === "TrafficFine" || chargeForm.type === "Cleaning" || chargeForm.type === "PropertyLossOrDamage" || chargeForm.type === "Other") && (
-                            <Field label={chargeForm.type === "TrafficFine" ? "Описание или номер постановления" : "Описание"}>
+                            <Field label={chargeForm.type === "TrafficFine" ? t("finance.fineDescription") : t("common.description")}>
                                 <textarea className={inputClass} required={chargeForm.type === "Cleaning" || chargeForm.type === "PropertyLossOrDamage"} rows={3} value={chargeForm.description} onChange={event => setChargeForm(prev => ({ ...prev, description: event.target.value }))} />
                             </Field>
                         )}
-                        {chargeForm.type === "TrafficFine" && <Field label="Номер постановления (если есть)"><input className={inputClass} value={chargeForm.referenceNumber} onChange={event => setChargeForm(prev => ({ ...prev, referenceNumber: event.target.value }))} /></Field>}
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Начисление сразу учитывается в задолженности. При необходимости его можно отклонить.</p>
+                        {chargeForm.type === "TrafficFine" && <Field label=t("finance.fineNumber")><input className={inputClass} value={chargeForm.referenceNumber} onChange={event => setChargeForm(prev => ({ ...prev, referenceNumber: event.target.value }))} /></Field>}
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("finance.chargeHint")}</p>
                         <div className="flex justify-end gap-2">
-                            <button type="button" className={`${buttonClass} border border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-200`} onClick={() => setChargeModalOpen(false)}>Отмена</button>
+                            <button type="button" className={`${buttonClass} border border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-200`} onClick={() => setChargeModalOpen(false)}>{t("common.cancel")}</button>
                             <button type="submit" disabled={busyId === "create-charge"} className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>{busyId === "create-charge" && <Loader2 className="h-4 w-4 animate-spin" />} Создать</button>
                         </div>
                     </form>
@@ -464,25 +466,25 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             )}
 
             {paymentModalOpen && (
-                <Modal title="Регистрация платежа" onClose={() => setPaymentModalOpen(false)}>
+                <Modal title=t("finance.registerPayment") onClose={() => setPaymentModalOpen(false)}>
                     <form className="space-y-4" onSubmit={submitPayment}>
-                        <Field label="Тип платежа">
+                        <Field label=t("finance.paymentType")>
                             <select className={inputClass} value={paymentType} onChange={event => setPaymentType(event.target.value as typeof paymentType)}>
-                                <option value="Prepayment" disabled={bookingStatus !== "Confirmed"}>Предоплата</option>
+                                <option value="Prepayment" disabled={bookingStatus !== "Confirmed"}>{t("finance.payment.prepayment")}</option>
                                 <option value="AdditionalPayment">Доплата</option>
                             </select>
                         </Field>
-                        <Field label="Сумма, ₽"><input className={inputClass} type="number" min="0.01" step="0.01" required value={paymentAmount} onChange={event => setPaymentAmount(event.target.value)} /></Field>
-                        <Field label="Способ оплаты">
+                        <Field label=t("finance.amountRub")><input className={inputClass} type="number" min="0.01" step="0.01" required value={paymentAmount} onChange={event => setPaymentAmount(event.target.value)} /></Field>
+                        <Field label=t("finance.paymentMethod")>
                             <select className={inputClass} value={paymentMethod} onChange={event => setPaymentMethod(event.target.value as PaymentMethod)}>
-                                <option value="BankTransfer">Банковский перевод</option>
-                                <option value="Online">Онлайн</option>
+                                <option value="BankTransfer">{t("finance.bankTransfer")}</option>
+                                <option value="Online">{t("finance.online")}</option>
                             </select>
                         </Field>
-                        <Field label="Комментарий (необязательно)"><textarea className={inputClass} rows={2} value={paymentNote} onChange={event => setPaymentNote(event.target.value)} /></Field>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Платёж сразу учитывается в поступлениях и доступном для распределения остатке.</p>
+                        <Field label=t("common.commentOptional")><textarea className={inputClass} rows={2} value={paymentNote} onChange={event => setPaymentNote(event.target.value)} /></Field>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{t("finance.paymentHint")}</p>
                         <div className="flex justify-end gap-2">
-                            <button type="button" className={`${buttonClass} border border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-200`} onClick={() => setPaymentModalOpen(false)}>Отмена</button>
+                            <button type="button" className={`${buttonClass} border border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-200`} onClick={() => setPaymentModalOpen(false)}>{t("common.cancel")}</button>
                             <button type="submit" disabled={busyId === "register-payment"} className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>{busyId === "register-payment" && <Loader2 className="h-4 w-4 animate-spin" />} Зарегистрировать</button>
                         </div>
                     </form>
@@ -490,7 +492,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             )}
 
             {allocationPayment && (
-                <Modal title="Распределение платежа" onClose={() => setAllocationPayment(null)}>
+                <Modal title=t("finance.allocationTitle") onClose={() => setAllocationPayment(null)}>
                     <form className="space-y-4" onSubmit={submitAllocations}>
                         <p className="text-sm text-gray-600 dark:text-gray-300">Доступно для распределения: {formatPrice(allocationPayment.availableToAllocate)} из {formatPrice(allocationPayment.amount)}. Укажите, какую сумму направить на каждое начисление. Общая сумма не должна превышать доступный остаток.</p>
                         {accruedCharges.map(charge => (
@@ -499,8 +501,8 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                             </Field>
                         ))}
                         <div className="flex justify-end gap-2">
-                            <button type="button" className={`${buttonClass} border border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-200`} onClick={() => setAllocationPayment(null)}>Отмена</button>
-                            <button type="submit" disabled={busyId === `allocate-${allocationPayment.id}`} className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>Сохранить распределение</button>
+                            <button type="button" className={`${buttonClass} border border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-200`} onClick={() => setAllocationPayment(null)}>{t("common.cancel")}</button>
+                            <button type="submit" disabled={busyId === `allocate-${allocationPayment.id}`} className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>{t("finance.saveAllocation")}</button>
                         </div>
                     </form>
                 </Modal>
@@ -533,7 +535,7 @@ function Modal({ title, children, onClose }: { title: string; children: ReactNod
             <div role="dialog" aria-modal="true" aria-label={title} className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-xl dark:bg-gray-800 sm:p-6">
                 <div className="mb-5 flex items-center justify-between gap-3">
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
-                    <button type="button" onClick={onClose} aria-label="Закрыть" className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"><X className="h-4 w-4" /></button>
+                    <button type="button" onClick={onClose} aria-label=t("common.close") className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700"><X className="h-4 w-4" /></button>
                 </div>
                 {children}
             </div>
@@ -542,7 +544,7 @@ function Modal({ title, children, onClose }: { title: string; children: ReactNod
 }
 
 function statusClass(status: string) {
-    if (status === "Начислено") return "bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300";
-    if (status === "Отклонено") return "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400";
+    if (status === t("finance.accrued")) return "bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300";
+    if (status === t("finance.status.rejected")) return "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400";
     return "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200";
 }
