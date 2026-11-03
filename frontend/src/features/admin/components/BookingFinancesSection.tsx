@@ -129,9 +129,9 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
     const submitSettings = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const values = [
-            ["fuel_per_liter", Number(rentalTariffs.fuel_per_liter), "л"],
-            ["excess_mileage_per_km", Number(rentalTariffs.excess_mileage_per_km), "км"],
-            ["body_wash", Number(rentalTariffs.body_wash), "услуга"],
+            ["fuel_per_liter", Number(rentalTariffs.fuel_per_liter), t("finance.unit.liter")],
+            ["excess_mileage_per_km", Number(rentalTariffs.excess_mileage_per_km), t("finance.unit.km")],
+            ["body_wash", Number(rentalTariffs.body_wash), t("finance.unit.service")],
         ] as const;
         if (values.some(([, value]) =>
             !Number.isFinite(value) || value < 0 || Number(value.toFixed(2)) !== value
@@ -210,11 +210,11 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             toast.error(t("finance.error.refundDebt"));
             return;
         }
-        const raw = window.prompt(`Максимально доступно к возврату с учётом задолженности: ${formatPrice(maxRefund)}. Введите сумму возврата:`);
+        const raw = window.prompt(`${t("finance.refundMaxPrefix")} ${formatPrice(maxRefund)}. ${t("finance.refundPrompt")}`);
         if (raw === null) return;
         const amount = Number(raw.replace(",", "."));
         if (!Number.isFinite(amount) || amount <= 0 || amount > maxRefund || Number(amount.toFixed(2)) !== amount) {
-            toast.error(`Введите сумму от 0,01 до ${formatPrice(maxRefund)} с точностью до двух знаков после запятой.`);
+            toast.error(`${t("finance.refundAmountPrefix")} ${formatPrice(maxRefund)} ${t("finance.error.paymentAmount")}`);
             return;
         }
         await runAction(`refund-${payment.id}`, () => bookingFinanceApi.createRefund({
@@ -354,15 +354,15 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                         <div className="flex justify-end gap-1">
                                             <button
                                                 type="button"
-                                                title="Отклонить начисление"
+                                                title=t("finance.rejectCharge")
                                                 disabled={busyId === row.id}
                                                 onClick={() => {
                                                     const paidAmount = row.charge?.paidAmount ?? 0;
                                                     const message = paidAmount > 0
-                                                        ? `Отклонить начисление «${row.charge?.title}» на ${formatPrice(row.charge?.amount ?? 0)}? Распределённая оплата ${formatPrice(paidAmount)} будет возвращена в нераспределённый остаток платежа.`
-                                                        : `Отклонить начисление «${row.charge?.title}» на ${formatPrice(row.charge?.amount ?? 0)}?`;
+                                                        ? `${t("finance.rejectConfirm")} «${row.charge?.title}» (${formatPrice(row.charge?.amount ?? 0)})? ${t("finance.rejectRefundAllocated")} ${formatPrice(paidAmount)}.`
+                                                        : `${t("finance.rejectConfirm")} «${row.charge?.title}» (${formatPrice(row.charge?.amount ?? 0)})?`;
                                                     if (window.confirm(message)) {
-                                                        void runAction(row.id, () => bookingFinanceApi.rejectCharge(bookingId, row.id), "Начисление отклонено. Распределённая оплата освобождена.");
+                                                        void runAction(row.id, () => bookingFinanceApi.rejectCharge(bookingId, row.id), t("finance.success.rejectCharge"));
                                                     }
                                                 }}
                                                 className="rounded-lg p-2 text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950/30"
@@ -391,8 +391,8 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                         {payments.filter(payment => payment.type !== "Refund" && payment.availableToAllocate > 0).map(payment => (
                             <div key={payment.id} className="flex flex-col gap-2 rounded-lg bg-gray-50 p-3 dark:bg-gray-900/40 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-gray-900 dark:text-white">{t(paymentTypeLabels[payment.type])} · доступно {formatPrice(payment.availableToAllocate)}</p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">Поступило {formatPrice(payment.amount)} · {formatDateTime(new Date(payment.createdAt))}{payment.note ? ` · ${payment.note}` : ""}</p>
+                                    <p className="text-sm font-medium text-gray-900 dark:text-white">{t(paymentTypeLabels[payment.type])} · {t("finance.available")} {formatPrice(payment.availableToAllocate)}</p>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400">{t("finance.received")} {formatPrice(payment.amount)} · {formatDateTime(new Date(payment.createdAt))}{payment.note ? ` · ${payment.note}` : ""}</p>
                                 </div>
                                 <div className="flex gap-2">
                                     {accruedCharges.length > 0 && (
@@ -471,7 +471,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                         <Field label={t("finance.paymentType")}>
                             <select className={inputClass} value={paymentType} onChange={event => setPaymentType(event.target.value as typeof paymentType)}>
                                 <option value="Prepayment" disabled={bookingStatus !== "Confirmed"}>{t("finance.payment.prepayment")}</option>
-                                <option value="AdditionalPayment">Доплата</option>
+                                <option value="AdditionalPayment">{t("finance.payment.additional")}</option>
                             </select>
                         </Field>
                         <Field label={t("finance.amountRub")}><input className={inputClass} type="number" min="0.01" step="0.01" required value={paymentAmount} onChange={event => setPaymentAmount(event.target.value)} /></Field>
@@ -494,9 +494,9 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             {allocationPayment && (
                 <Modal title={t("finance.allocationTitle")} onClose={() => setAllocationPayment(null)}>
                     <form className="space-y-4" onSubmit={submitAllocations}>
-                        <p className="text-sm text-gray-600 dark:text-gray-300">Доступно для распределения: {formatPrice(allocationPayment.availableToAllocate)} из {formatPrice(allocationPayment.amount)}. Укажите, какую сумму направить на каждое начисление. Общая сумма не должна превышать доступный остаток.</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{t("finance.allocation.available")} {formatPrice(allocationPayment.availableToAllocate)} {t("finance.allocation.of")} {formatPrice(allocationPayment.amount)}. {t("finance.allocation.instruction")}</p>
                         {accruedCharges.map(charge => (
-                            <Field key={charge.id} label={`${charge.title} · остаток ${formatPrice(charge.balance)}`}>
+                            <Field key={charge.id} label={`${charge.title} · ${t("finance.balance")} ${formatPrice(charge.balance)}`}>
                                 <input className={inputClass} type="number" min="0" max={charge.balance} step="0.01" value={allocationAmounts[charge.id] ?? ""} onChange={event => setAllocationAmounts(prev => ({ ...prev, [charge.id]: event.target.value }))} />
                             </Field>
                         ))}
