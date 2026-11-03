@@ -293,6 +293,7 @@ const financeTranslations: Record<Language, Translations> = {
         "asset.driveTypeOption.1": "Front-wheel drive",
         "asset.driveTypeOption.2": "Rear-wheel drive",
         "asset.driveTypeOption.3": "All-wheel drive",
+        "admin.bookingDetails.statusChangedPrefix": "Status changed to",
     },
     "ru": {
         "finance.charge.rental": "Аренда",
@@ -585,6 +586,7 @@ const financeTranslations: Record<Language, Translations> = {
         "asset.driveTypeOption.1": "Передний",
         "asset.driveTypeOption.2": "Задний",
         "asset.driveTypeOption.3": "Полный",
+        "admin.bookingDetails.statusChangedPrefix": "Статус изменён на",
     },
     "zh": {
         "finance.charge.rental": "租金",
@@ -834,6 +836,7 @@ const financeTranslations: Record<Language, Translations> = {
         "asset.driveTypeOption.1": "前轮驱动",
         "asset.driveTypeOption.2": "后轮驱动",
         "asset.driveTypeOption.3": "全轮驱动",
+        "admin.bookingDetails.statusChangedPrefix": "状态已更改为",
     }
 };
 
