@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminAssetsApi } from '@/features/admin/api/adminAsset.api';
-import { Asset, AssetStatus, AssetStatusColors, AssetStatusLabels } from '@/entities/asset/asset.types';
+import { Asset, AssetStatus, AssetStatusColors } from '@/entities/asset/asset.types';
 import { Pencil, Plus, Image, ArrowLeft, } from 'lucide-react';
 import { getPhotoUrl } from '@/shared/utils/photoUrl';
 import { useI18n } from '@/app/providers/I18nProvider';
@@ -80,7 +80,7 @@ export const AdminAssetsListPage = () => {
             to="/admin/assets/new" 
             className="bg-primary-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-primary-700 transition-colors"
           >
-            <Plus className="w-4 h-4" /> Добавить автомобиль
+            <Plus className="w-4 h-4" /> {t("admin.assets.add")}
           </Link>
         </div>
 
@@ -90,7 +90,7 @@ export const AdminAssetsListPage = () => {
             <div className="flex-1">
               <input
                 type="text"
-                placeholder="Поиск по марке, модели или году..."
+                placeholder={t("admin.assets.searchPlaceholder")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
@@ -119,7 +119,7 @@ export const AdminAssetsListPage = () => {
           </div>
         ) : !assets || assets.length === 0 ? (
           <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl">
-            <p className="text-gray-500">Автомобили не найдены</p>
+            <p className="text-gray-500">{t("admin.assets.empty")}</p>
             <Link to="/admin/assets/new" className="text-primary-600 hover:underline mt-2 inline-block">
               {t("admin.assets.addFirst")}
             </Link>
