@@ -205,8 +205,8 @@ export const CheckoutPage = () => {
         if (!routeIsValid) {
             setError(
                 requiresCatalogDestination
-                    ? 'Выберите город назначения.'
-                    : 'Укажите описание маршрута.'
+                    ? t('checkout.error.destinationRequired')
+                    : t('checkout.error.routeDescriptionRequired')
             );
             return;
         }
@@ -340,7 +340,7 @@ export const CheckoutPage = () => {
         const customer = await loadCurrentCustomer();
 
         if (!customer) {
-            setError("Не удалось определить профиль клиента.");
+            setError(t("checkout.error.profile"));
             return;
         }
 
@@ -500,8 +500,8 @@ export const CheckoutPage = () => {
                                         >
                                             <option value="" disabled>
                                                 {destinationsLoading
-                                                    ? 'Загружаем направления...'
-                                                    : 'Выберите город'}
+                                                    ? t('checkout.loadingDestinations')
+                                                    : t('checkout.selectCity')}
                                             </option>
 
                                             {destinations.map(destination => (
@@ -530,7 +530,7 @@ export const CheckoutPage = () => {
                                     {selectedDestination && (
                                         <div className="text-sm text-gray-600 dark:text-gray-300">
                                             <p>
-                                                Доплата за маршрут:{' '}
+                                                {t('checkout.routeSurcharge')}{' '}
                                                 {formatPrice(selectedDestination.routeSurcharge)}
                                             </p>
                                         </div>
