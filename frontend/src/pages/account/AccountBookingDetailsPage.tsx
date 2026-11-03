@@ -242,10 +242,7 @@ export const AccountBookingDetailsPage = () => {
                                         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                             {booking.services.length}{" "}
                                             {booking.services.length === 1
-                                                ? "услуга"
-                                                : booking.services.length < 5
-                                                  ? "услуги"
-                                                  : "услуг"}
+                                                ? t("common.service") : booking.services.length < 5 ? t("common.servicesFew") : t("common.services")}
                                         </p>
                                     )}
                                 </div>
@@ -345,11 +342,7 @@ export const AccountBookingDetailsPage = () => {
                                                                 }{" "}
                                                                 {segment.days ===
                                                                 1
-                                                                    ? "день"
-                                                                    : segment.days <
-                                                                        5
-                                                                      ? "дня"
-                                                                      : "дней"}
+                                                                    ? t("common.day") : segment.days < 5 ? t("common.daysFew") : t("common.days")}
                                                             </span>
 
                                                             {segment.durationDiscountPercent >
@@ -531,8 +524,7 @@ export const AccountBookingDetailsPage = () => {
                                                 }{" "}
                                                 {booking.price.penalties
                                                     .length === 1
-                                                    ? "начисление"
-                                                    : "начисления"}
+                                                    ? t("finance.chargeOne") : t("finance.chargeMany")}
                                             </p>
                                         )}
                                     </div>
