@@ -110,7 +110,7 @@ export const AdminBookingDetailsPage = () => {
             );
 
             toast.success(
-                `Статус изменён на «${t(statusLabels[status])}»`
+                `${t("admin.bookingDetails.statusChangedPrefix")} «${t(statusLabels[status])}»`
             );
         } catch (error) {
             console.error("Failed to change booking status:", error);
