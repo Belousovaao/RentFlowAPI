@@ -1,6 +1,7 @@
 import type { BookingStatus } from "@/entities/booking/booking.types"; 
 import { CheckCircle, EyeIcon, LucideIcon, PlayCircle, XCircle, } from "lucide-react"; 
-import { statusLabels } from "@/pages/admin/AdminBookingsPage"; 
+import { statusLabels } from "@/pages/admin/AdminBookingsPage";
+import { useI18n } from "@/app/providers/I18nProvider"; 
 
 interface BookingStatusModalProps 
 { 
@@ -64,6 +65,7 @@ export const BookingStatusModal = (
         onChange, 
     }: BookingStatusModalProps) => 
         { 
+            const { t } = useI18n();
             if (!open) 
                 { return null; } 
 
@@ -93,10 +95,10 @@ export const BookingStatusModal = (
                             className="mb-6 flex items-start justify-between"> 
                         <div> 
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white"> 
-                                Изменить статус 
+                                {t("booking.statusModal.title")} 
                             </h2> 
                             <p className="mt-1 text-sm text-gray-500 dark:text-gray-400"> 
-                                Выберите новый статус бронирования. 
+                                {t("booking.statusModal.description")} 
                             </p> 
                         </div> 
                         <button 
@@ -131,12 +133,12 @@ export const BookingStatusModal = (
                                     /> 
                                     <div className="flex-1"> 
                                         <p className="font-semibold text-gray-900 dark:text-white"> 
-                                            {statusLabels[status]} 
+                                            {t(statusLabels[status])} 
                                         </p> 
                                     </div> 
                                     {isCurrent && ( 
                                         <span className="text-xs font-medium text-primary-600"> 
-                                            Текущий 
+                                            {t("common.current")} 
                                         </span> 
                                     )} 
                                 </button> 
@@ -148,7 +150,7 @@ export const BookingStatusModal = (
                             type="button" 
                             onClick={onClose} 
                             className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700" > 
-                                Отмена 
+                                {t("common.cancel")} 
                         </button> 
                     </div> 
                 </div> 
