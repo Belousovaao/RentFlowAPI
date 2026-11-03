@@ -17,14 +17,12 @@ const principles: Principle[] = [
     },
     {
         titleKey: 'about.principle.vehicleTitle',
-        description:
-            descriptionKey: 'about.principle.vehicleDescription',
+        descriptionKey: 'about.principle.vehicleDescription',
         icon: CarFront,
     },
     {
         titleKey: 'about.principle.contactTitle',
-        description:
-            descriptionKey: 'about.principle.contactDescription',
+        descriptionKey: 'about.principle.contactDescription',
         icon: MessageCircle,
     },
 ];
