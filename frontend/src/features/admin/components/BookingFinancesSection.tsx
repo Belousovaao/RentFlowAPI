@@ -284,20 +284,20 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                             : undefined} 
                         className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>
                         <CircleDollarSign className="h-4 w-4" /> 
-                            Добавить платёж
+                            {t("finance.addPayment")}
                     </button>
                     <button 
                         type="button" 
                         onClick={() => setChargeModalOpen(true)} 
                         className={`${buttonClass} border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700`}>
                         <Plus className="h-4 w-4" /> 
-                            Добавить начисление
+                            {t("finance.addCharge")}
                     </button>
                     <button 
                         type="button" 
                         onClick={() => setSettingsModalOpen(true)} 
                         className={`${buttonClass} border border-gray-200 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-700`}>
-                            Тарифы
+                            {t("finance.tariffs")}
                     </button>
                     <button 
                         type="button" 
@@ -423,7 +423,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                         <p className="text-xs text-gray-500 dark:text-gray-400">{t("finance.tariffHint")}</p>
                         <div className="flex justify-end gap-2">
                             <button type="button" className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 px-3 py-2 text-sm font-medium text-gray-700 dark:border-gray-700 dark:text-gray-200" onClick={() => setSettingsModalOpen(false)}>{t("common.cancel")}</button>
-                            <button type="submit" disabled={busyId === "charge-settings"} className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">{busyId === "charge-settings" && <Loader2 className="h-4 w-4 animate-spin" />} Сохранить</button>
+                            <button type="submit" disabled={busyId === "charge-settings"} className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700">{busyId === "charge-settings" && <Loader2 className="h-4 w-4 animate-spin" />} {t("common.save")}</button>
                         </div>
                     </form>
                 </Modal>
@@ -459,7 +459,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                         <p className="text-xs text-gray-500 dark:text-gray-400">{t("finance.chargeHint")}</p>
                         <div className="flex justify-end gap-2">
                             <button type="button" className={`${buttonClass} border border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-200`} onClick={() => setChargeModalOpen(false)}>{t("common.cancel")}</button>
-                            <button type="submit" disabled={busyId === "create-charge"} className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>{busyId === "create-charge" && <Loader2 className="h-4 w-4 animate-spin" />} Создать</button>
+                            <button type="submit" disabled={busyId === "create-charge"} className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>{busyId === "create-charge" && <Loader2 className="h-4 w-4 animate-spin" />} {t("common.create")}</button>
                         </div>
                     </form>
                 </Modal>
@@ -485,7 +485,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                         <p className="text-xs text-gray-500 dark:text-gray-400">{t("finance.paymentHint")}</p>
                         <div className="flex justify-end gap-2">
                             <button type="button" className={`${buttonClass} border border-gray-200 text-gray-700 dark:border-gray-700 dark:text-gray-200`} onClick={() => setPaymentModalOpen(false)}>{t("common.cancel")}</button>
-                            <button type="submit" disabled={busyId === "register-payment"} className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>{busyId === "register-payment" && <Loader2 className="h-4 w-4 animate-spin" />} Зарегистрировать</button>
+                            <button type="submit" disabled={busyId === "register-payment"} className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>{busyId === "register-payment" && <Loader2 className="h-4 w-4 animate-spin" />} {t("finance.register")}</button>
                         </div>
                     </form>
                 </Modal>
