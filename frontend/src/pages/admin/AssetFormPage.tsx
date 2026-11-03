@@ -177,7 +177,6 @@ export const AssetFormPage = () => {
         "fuelType",
         "transmission",
         "driveType",
-        "category",
         "type"
     ]);
 
