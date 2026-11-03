@@ -511,6 +511,7 @@ const financeTranslations: Record<Language, Translations> = {
         "contact.ctaTitle": "Already choosing a vehicle?",
         "contact.ctaDescription": "Browse available vehicles or review the rental terms in advance.",
         "footer.rentalTerms": "Rental terms",
+        "account.profile.myProfile": "My profile",
     },
     "ru": {
         "finance.charge.rental": "Аренда",
@@ -1021,6 +1022,7 @@ const financeTranslations: Record<Language, Translations> = {
         "contact.ctaTitle": "Уже выбираете автомобиль?",
         "contact.ctaDescription": "Посмотрите доступные автомобили или заранее ознакомьтесь с правилами аренды.",
         "footer.rentalTerms": "Условия аренды",
+        "account.profile.myProfile": "Мой профиль",
     },
     "zh": {
         "finance.charge.rental": "租金",
@@ -1488,6 +1490,7 @@ const financeTranslations: Record<Language, Translations> = {
         "contact.ctaTitle": "已经开始挑选车辆了吗？",
         "contact.ctaDescription": "查看可用车辆，或提前了解租赁规则。",
         "footer.rentalTerms": "租赁条款",
+        "account.profile.myProfile": "我的资料",
     }
 };
 
