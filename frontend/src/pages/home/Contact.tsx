@@ -52,7 +52,7 @@ export const ContactPage = () => {
             ? [
                   {
                       title: 'MAX',
-                      description: 'Напишите по вопросам бронирования и аренды.',
+                      description: t('contact.messageDescription'),
                       value: t('contact.maxAction'),
                       href: contactDetails.max,
                       icon: MessageCircle,
@@ -154,7 +154,7 @@ export const ContactPage = () => {
                             <div className="flex items-start gap-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-gray-800">
                                 <MapPin className="mt-1 h-5 w-5 shrink-0 text-primary-700 dark:text-primary-300" aria-hidden="true" />
                                 <div>
-                                    <h2 className="font-semibold text-black dark:text-white">Мы находимся</h2>
+                                    <h2 className="font-semibold text-black dark:text-white">{t("contact.location")}</h2>
                                     <p className="mt-1 leading-7 text-gray-600 dark:text-gray-300">
                                         {contactDetails.city}
                                     </p>
@@ -165,7 +165,7 @@ export const ContactPage = () => {
                             <div className="flex items-start gap-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 dark:bg-gray-900 dark:ring-gray-800">
                                 <Clock3 className="mt-1 h-5 w-5 shrink-0 text-primary-700 dark:text-primary-300" aria-hidden="true" />
                                 <div>
-                                    <h2 className="font-semibold text-black dark:text-white">Лучшее время для звонка</h2>
+                                    <h2 className="font-semibold text-black dark:text-white">{t("contact.bestTime")}</h2>
                                     <p className="mt-1 leading-7 text-gray-600 dark:text-gray-300">
                                         {contactDetails.workingHours}
                                     </p>
