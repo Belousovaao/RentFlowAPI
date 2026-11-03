@@ -13,8 +13,10 @@ import { formatDate, formatDateTime, formatPrice, } from "@/shared/utils/formatt
 import { travelZones } from "@/entities/destination/destination.constants";
 import { RouteReviewStatus } from "@/entities/destination/destination.type";
 import { BookingFinancesSection } from "@/features/admin/components/BookingFinancesSection";
+import { useI18n } from "@/app/providers/I18nProvider";
 
 export const AdminBookingDetailsPage = () => {
+    const { t, language } = useI18n();
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
@@ -27,10 +29,10 @@ export const AdminBookingDetailsPage = () => {
     const [serviceModalOpen, setServiceModalOpen] = useState(false);
 
     const customerStatusLabels: Record<VerificationStatus, string> = {
-        NotSubmitted: "Не установлен",
-        Pending: "На проверке",
-        Approved: "Одобрен",
-        Rejected: "Отказ",
+        NotSubmitted: "verification.status.notSubmitted",
+        Pending: "verification.status.pending",
+        Approved: "verification.status.approved",
+        Rejected: "verification.status.rejected",
     };
 
     const requiresApprovedCustomer = (status: BookingStatus) =>
@@ -47,7 +49,7 @@ export const AdminBookingDetailsPage = () => {
             setBooking(response);
         } catch (error) {
             console.error("Failed to load booking details:", error);
-            toast.error("Не удалось загрузить бронирование.");
+            toast.error(t("admin.bookingDetails.loadError"));
         } finally {
             setLoading(false);
         }
@@ -56,7 +58,7 @@ export const AdminBookingDetailsPage = () => {
     const handleCancelBooking = async () => {
         if (!id || cancelLoading) return;
 
-        const confirmed = window.confirm("Вы действительно хотите отменить бронирование?");
+        const confirmed = window.confirm(t("admin.bookingDetails.cancelConfirm"));
 
         if (!confirmed) return;
 
@@ -65,12 +67,12 @@ export const AdminBookingDetailsPage = () => {
 
             await bookingApi.cancel(id);
 
-            toast.success("Бронирование отменено.");
+            toast.success(t("admin.bookingDetails.cancelled"));
 
             await loadBooking();
         } catch (error) {
             console.error("Failed to cancel booking:", error);
-            toast.error("Не удалось отменить бронирование.");
+            toast.error(t("admin.bookingDetails.cancelError"));
         } finally {
             setCancelLoading(false);
         }
@@ -87,7 +89,7 @@ export const AdminBookingDetailsPage = () => {
             booking.customer.verificationStatus !== VerificationStatus.Approved
         ) {
             toast.error(
-                "Клиент не одобрен. Подтвердить или активировать бронирование можно только после одобрения клиента."
+                t("admin.bookingDetails.customerNotApproved")
             );
 
             return;
@@ -108,7 +110,7 @@ export const AdminBookingDetailsPage = () => {
             );
 
             toast.success(
-                `Статус изменён на «${statusLabels[status]}»`
+                `Статус изменён на «${t(statusLabels[status])}»`
             );
         } catch (error) {
             console.error("Failed to change booking status:", error);
@@ -133,7 +135,7 @@ export const AdminBookingDetailsPage = () => {
                 <div className="container mx-auto max-w-5xl px-4">
                     <div className="rounded-2xl bg-white p-8 text-center shadow-sm dark:bg-gray-800">
                         <p className="text-gray-600 dark:text-gray-300">
-                            Бронирование не найдено.
+                            {t("admin.bookingDetails.notFound")}
                         </p>
 
                         <button
@@ -141,7 +143,7 @@ export const AdminBookingDetailsPage = () => {
                             onClick={() => navigate("/admin/bookings")}
                             className="mt-4 text-sm font-medium text-blue-600 hover:text-blue-700"
                         >
-                            Вернуться к списку
+                            {t("admin.bookingDetails.backToList")}
                         </button>
                     </div>
                 </div>
@@ -203,7 +205,7 @@ export const AdminBookingDetailsPage = () => {
                         className="flex w-fit items-center gap-2 text-sm font-medium text-gray-600 transition hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
                     >
                         <ArrowLeft className="h-4 w-4" />
-                        Список всех бронирований
+                        {t("admin.bookings.title")}
                     </button>
 
                     <div className="flex flex-wrap items-center gap-3">
@@ -220,7 +222,7 @@ export const AdminBookingDetailsPage = () => {
                                     <XCircle className="h-4 w-4" />
                                 )}
 
-                                Отменить бронирование
+                                {t("admin.bookingDetails.cancel")}
                             </button>
                         )}
                         <button
@@ -235,7 +237,7 @@ export const AdminBookingDetailsPage = () => {
                                 <RefreshCw className="h-4 w-4" />
                             )}
 
-                            Изменить статус
+                            {t("booking.statusModal.title")}
                         </button>
 
                         <button
@@ -245,7 +247,7 @@ export const AdminBookingDetailsPage = () => {
                             className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             <CalendarDays className="h-4 w-4" />
-                            Изменить срок
+                            {t("admin.bookingDetails.changePeriod")}
                         </button>
                     </div>
                 </div>
@@ -265,7 +267,7 @@ export const AdminBookingDetailsPage = () => {
                                 <div className="flex items-start justify-between">
                                     <div>
                                         <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                            Автомобиль
+                                            {t("common.vehicle")}
                                         </h2>
 
                                         <p className="mt-2 text-xl font-semibold text-gray-900 dark:text-white">
@@ -297,12 +299,12 @@ export const AdminBookingDetailsPage = () => {
                                 <div className="flex items-start justify-between">
                                     <div className="min-w-0">
                                         <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                            Клиент
+                                            {t("common.customer")}
                                         </h2>
 
                                         <p className="mt-2 text-xl font-semibold text-gray-900 dark:text-white">
                                             {booking.customer.displayName ??
-                                                "Без имени"}
+                                                t("common.unnamed")}
                                         </p>
 
                                         <div className="mt-2 space-y-1 text-sm text-gray-500 dark:text-gray-400">
@@ -342,7 +344,7 @@ export const AdminBookingDetailsPage = () => {
                         <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
                             <div className="mb-6">
                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    Период аренды
+                                    {t("admin.bookingDetails.rentalPeriod")}
                                 </h2>
                             </div>
 
@@ -356,7 +358,7 @@ export const AdminBookingDetailsPage = () => {
 
                                     <div className="pb-5">
                                         <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                                            Начало аренды
+                                            {t("admin.bookingDetails.rentalStart")}
                                         </p>
 
                                         <p className="mt-1 font-medium text-gray-900 dark:text-white">
@@ -382,11 +384,11 @@ export const AdminBookingDetailsPage = () => {
                                                                 {segment.days}{" "}
                                                                 {segment.days ===
                                                                 1
-                                                                    ? "день"
+                                                                    ? t("common.day")
                                                                     : segment.days <
                                                                         5
-                                                                    ? "дня"
-                                                                    : "дней"}
+                                                                    ? t("common.daysFew")
+                                                                    : t("common.days")}
                                                             </span>
 
                                                             {segment.durationDiscountPercent >
@@ -438,7 +440,7 @@ export const AdminBookingDetailsPage = () => {
 
                                     <div>
                                         <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                                            Конец аренды
+                                            {t("admin.bookingDetails.rentalEnd")}
                                         </p>
 
                                         <p className="mt-1 font-medium text-gray-900 dark:text-white">
@@ -459,7 +461,7 @@ export const AdminBookingDetailsPage = () => {
 
                                 <div>
                                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                        Маршрут
+                                        {t("admin.bookingDetails.route")}
                                     </h2>
 
                                     <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
@@ -471,7 +473,7 @@ export const AdminBookingDetailsPage = () => {
                             {booking.destination.destinationNameSnapshot && (
                                 <div className="mb-4">
                                     <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                                        Направление
+                                        {t("admin.bookingDetails.destination")}
                                     </p>
                                     <p className="mt-1 font-medium text-gray-900 dark:text-white">
                                         {booking.destination.destinationNameSnapshot}
@@ -485,7 +487,7 @@ export const AdminBookingDetailsPage = () => {
                                         {booking.destinationDetails.region}
                                     </p>
                                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                        Расстояние: {booking.destinationDetails.distanceKm} км
+                                        {t("admin.bookingDetails.distance")}: {booking.destinationDetails.distanceKm} {t("common.km")}
                                     </p>
                                 </div>
                             )}
@@ -493,7 +495,7 @@ export const AdminBookingDetailsPage = () => {
                             {booking.destination.customRouteDescription && (
                                 <div className="mb-4">
                                     <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                                        Описание маршрута
+                                        {t("admin.bookingDetails.routeDescription")}
                                     </p>
                                     <p className="mt-1 whitespace-pre-wrap break-words text-sm text-gray-700 dark:text-gray-300">
                                         {booking.destination.customRouteDescription}
@@ -504,7 +506,7 @@ export const AdminBookingDetailsPage = () => {
                             <div className="border-t border-gray-100 pt-4 dark:border-gray-700">
                                 <div className="flex items-center justify-between gap-3">
                                     <span className="text-sm text-gray-500 dark:text-gray-400">
-                                        Статус проверки
+                                        {t("admin.bookingDetails.verificationStatus")}
                                     </span>
                                     <span className="text-right text-sm font-medium text-gray-900 dark:text-white">
                                         {routeReviewStatusLabels[booking.destination.reviewStatus]}
@@ -519,17 +521,17 @@ export const AdminBookingDetailsPage = () => {
                         <div className="mb-5 flex items-center justify-between gap-4">
                             <div>
                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    Дополнительные услуги
+                                    {t("checkout.additionalServices")}
                                 </h2>
 
                                 {booking.services.length > 0 && (
                                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                         {booking.services.length}{" "}
                                         {booking.services.length === 1
-                                            ? "услуга"
+                                            ? t("common.service")
                                             : booking.services.length < 5
-                                                ? "услуги"
-                                                : "услуг"}
+                                                ? t("common.servicesFew")
+                                                : t("common.services")}
                                     </p>
                                 )}
                             </div>
@@ -541,14 +543,14 @@ export const AdminBookingDetailsPage = () => {
                                 className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-750"
                             >
                                 <Plus className="h-4 w-4" />
-                                Добавить
+                                {t("common.add")}
                             </button>
                         </div>
 
                         {booking.services.length === 0 ? (
                             <div className="rounded-xl border border-dashed border-gray-200 px-4 py-8 text-center dark:border-gray-700">
                                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    Дополнительные услуги не выбраны.
+                                    {t("admin.bookingDetails.noServices")}
                                 </p>
                             </div>
                         ) : (
