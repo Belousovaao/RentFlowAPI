@@ -443,6 +443,11 @@ const financeTranslations: Record<Language, Translations> = {
         "account.stats.carOne": "vehicle",
         "account.stats.carMany": "vehicles",
         "customer.type.customer": "Customer",
+        "consent.checkbox.prefix": "I consent to the processing of my personal data and confirm that I have read the",
+        "consent.policyLink": "Personal Data Processing Policy",
+        "consent.readText": "Read the consent text",
+        "consent.loading": "Loading consent text…",
+        "common.closePrivacy": "Close privacy policy",
     },
     "ru": {
         "finance.charge.rental": "Аренда",
@@ -885,6 +890,11 @@ const financeTranslations: Record<Language, Translations> = {
         "account.stats.carOne": "автомобиль",
         "account.stats.carMany": "автомобилей",
         "customer.type.customer": "Клиент",
+        "consent.checkbox.prefix": "Я даю согласие на обработку персональных данных и подтверждаю, что ознакомился(-ась) с",
+        "consent.policyLink": "Политикой обработки персональных данных",
+        "consent.readText": "Прочитать текст согласия",
+        "consent.loading": "Загружаем текст согласия…",
+        "common.closePrivacy": "Закрыть политику конфиденциальности",
     },
     "zh": {
         "finance.charge.rental": "租金",
@@ -1284,6 +1294,11 @@ const financeTranslations: Record<Language, Translations> = {
         "account.stats.carOne": "辆车",
         "account.stats.carMany": "辆车",
         "customer.type.customer": "客户",
+        "consent.checkbox.prefix": "我同意处理我的个人数据，并确认已阅读",
+        "consent.policyLink": "个人数据处理政策",
+        "consent.readText": "阅读同意书内容",
+        "consent.loading": "正在加载同意书文本…",
+        "common.closePrivacy": "关闭隐私政策",
     }
 };
 
