@@ -291,7 +291,6 @@ export const UploadDocumentsModal = ({
 
                             <p className="mt-1 text-xs leading-5 text-gray-500">
                                 {t("customer.documents.nextDescription")}
-                                на проверку. Внимание! Отправка заявки и документов не гарантирует подтверждение бронировния. Менеджер свяжется с вами в ближайшее время.
                             </p>
                         </div>
                     </div>
