@@ -1,11 +1,13 @@
 import { CalendarDays, Car, Route } from 'lucide-react';
 import type { BookingListItemDto } from '@/entities/booking/booking.types';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 interface Props {
     bookings: BookingListItemDto[];
 }
 
 export const CustomerStats = ({ bookings }: Props) => {
+    const { t, language } = useI18n();
     const totalTrips = bookings.length;
     const totalDays = bookings.reduce((sum, booking) => {
         const start = new Date(booking.rentalPeriod.startDate);
@@ -23,19 +25,19 @@ export const CustomerStats = ({ bookings }: Props) => {
                 <StatCard
                     icon={Route}
                     value={totalTrips}
-                    label={getTripsLabel(totalTrips)}
+                    label={getTripsLabel(totalTrips, t, language)}
                 />
 
                 <StatCard
                     icon={CalendarDays}
                     value={totalDays}
-                    label={getDaysLabel(totalDays)}
+                    label={getDaysLabel(totalDays, t, language)}
                 />
 
                 <StatCard
                     icon={Car}
                     value={uniqueCars}
-                    label={getCarsLabel(uniqueCars)}
+                    label={getCarsLabel(uniqueCars, t, language)}
                 />
             </div>
         </section>
@@ -74,7 +76,8 @@ const StatCard = ({
     );
 };
 
-const getTripsLabel = (count: number): string => {
+const getTripsLabel = (count: number, t: (key: string) => string, language: string): string => {
+    if (language !== "ru") return count === 1 ? t("account.stats.tripOne") : t("account.stats.tripMany");
     if (count % 10 === 1 && count % 100 !== 11) {
         return 'поездка';
     }
@@ -90,7 +93,8 @@ const getTripsLabel = (count: number): string => {
     return 'поездок';
 };
 
-const getDaysLabel = (count: number): string => {
+const getDaysLabel = (count: number, t: (key: string) => string, language: string): string => {
+    if (language !== "ru") return t("account.stats.rentalDays");
     if (count % 10 === 1 && count % 100 !== 11) {
         return 'день аренды';
     }
@@ -106,7 +110,8 @@ const getDaysLabel = (count: number): string => {
     return 'дней аренды';
 };
 
-const getCarsLabel = (count: number): string => {
+const getCarsLabel = (count: number, t: (key: string) => string, language: string): string => {
+    if (language !== "ru") return count === 1 ? t("account.stats.carOne") : t("account.stats.carMany");
     if (count % 10 === 1 && count % 100 !== 11) {
         return 'автомобиль';
     }
