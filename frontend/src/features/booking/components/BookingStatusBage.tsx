@@ -5,7 +5,7 @@ interface Props {
     status: BookingStatus;
 }
 
-const statusConfig: Record<BookingStatus, { label: string; className: string }> = 
+const statusConfig: Record<BookingStatus, { labelKey: string; className: string }> = 
 {
     Pending: {
         labelKey: 'booking.status.pending',
