@@ -9,7 +9,7 @@ import { useI18n } from "@/app/providers/I18nProvider";
 
 /* ЛК Админа */
 export const AdminAccountPage = () => {
-    const { t } = useI18n();
+    const { t, language } = useI18n();
     const StatCard = ({ label, value, icon: Icon }: { label: string; value: string; icon: any }) => (
         <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
             <div className="rounded-lg bg-primary-100 p-2 text-primary-600 dark:bg-primary-900/30">
@@ -115,7 +115,7 @@ export const AdminAccountPage = () => {
     };
 
     const formatCurrency = (amount: number) =>
-        new Intl.NumberFormat('ru-RU', {
+        new Intl.NumberFormat(language === 'zh' ? 'zh-CN' : language === 'en' ? 'en-GB' : 'ru-RU', {
             style: 'currency',
             currency: 'RUB',
             maximumFractionDigits: 0,
@@ -160,7 +160,7 @@ export const AdminAccountPage = () => {
                 {/* Быстрая статистика */}
                 <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
                     <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-                        Статистика
+                        {t("admin.stats.title")}
                     </h3>
                     {loading ? (
                         <div className="flex justify-center py-8">
