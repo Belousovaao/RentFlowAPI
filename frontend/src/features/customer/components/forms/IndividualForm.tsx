@@ -102,19 +102,19 @@ export const IndividualForm = ({
                 }
             }
             const passportFields = [
-                { key: 'passportSerial', label: 'Серия паспорта', value: passportSerial },
-                { key: 'passportNumber', label: 'Номер паспорта', value: passportNumber },
-                { key: 'passportIssuedBy', label: 'Кем выдан паспорт', value: passportIssuedBy },
-                { key: 'passportIssuedDate', label: 'Дата выдачи паспорта', value: passportIssuedDate },
-                { key: 'registrationAddress', label: 'Адрес регистрации', value: registrationAddress },
+                { key: 'passportSerial', label: t('customer.form.passportSeries'), value: passportSerial },
+                { key: 'passportNumber', label: t('customer.form.passportNumber'), value: passportNumber },
+                { key: 'passportIssuedBy', label: t('customer.form.passportIssuedBy'), value: passportIssuedBy },
+                { key: 'passportIssuedDate', label: t('customer.form.passportIssueDate'), value: passportIssuedDate },
+                { key: 'registrationAddress', label: t('customer.form.registrationAddress'), value: registrationAddress },
             ];
 
             const driverLicenseFields = [
-                { key: 'driverLicenseNumber', label: 'Номер ВУ', value: driverLicenseNumber },
-                { key: 'driverLicenseCategories', label: 'Категории ВУ', value: driverLicenseCategories },
-                { key: 'driverLicenseIssuedDate', label: 'Дата выдачи ВУ', value: driverLicenseIssuedDate },
-                { key: 'driverLicenseValidUntil', label: 'Срок действия ВУ', value: driverLicenseValidUntil },
-                { key: 'driverLicenseExperienceFrom', label: 'Стаж с', value: driverLicenseExperienceFrom },
+                { key: 'driverLicenseNumber', label: t('customer.form.driverLicenseNumber'), value: driverLicenseNumber },
+                { key: 'driverLicenseCategories', label: t('customer.form.driverLicenseCategories'), value: driverLicenseCategories },
+                { key: 'driverLicenseIssuedDate', label: t('customer.form.driverLicenseIssueDate'), value: driverLicenseIssuedDate },
+                { key: 'driverLicenseValidUntil', label: t('customer.form.driverLicenseValidUntil'), value: driverLicenseValidUntil },
+                { key: 'driverLicenseExperienceFrom', label: t('customer.form.experienceFrom'), value: driverLicenseExperienceFrom },
             ];
             const missingPassport = passportStarted
                 ? passportFields.filter(field => field.value.trim() === '')
@@ -566,8 +566,8 @@ export const IndividualForm = ({
                         <Save className="w-4 h-4" />
 
                         {isEditMode
-                            ? 'Сохранить изменения'
-                            : 'Создать клиента'}
+                            ? t('common.saveChanges')
+                            : t('customer.create.submit')}
                     </button>
                 </div>
             )}
