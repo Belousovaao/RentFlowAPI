@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Clock3, Mail, MapPin, MessageCircle, Phone, } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { contactDetails } from '@/shared/types/contacts';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 type ContactMethod = {
     title: string;
@@ -12,12 +13,13 @@ type ContactMethod = {
 };
 
 export const ContactPage = () => {
+    const { t } = useI18n();
     const methods: ContactMethod[] = [
         ...(contactDetails.phone.trim()
             ? [
                   {
-                      title: 'Телефон',
-                      description: 'Позвоните, чтобы уточнить детали аренды.',
+                      title: t('contact.phone'),
+                      description: t('contact.phoneDescription'),
                       value: contactDetails.phone,
                       href: `tel:${contactDetails.phone.replace(/[\s()-]/g, '')}`,
                       icon: Phone,
@@ -28,8 +30,8 @@ export const ContactPage = () => {
             ? [
                   {
                       title: 'Telegram',
-                      description: 'Напишите по вопросам бронирования и аренды.',
-                      value: 'Написать в Telegram',
+                      description: t('contact.messageDescription'),
+                      value: t('contact.telegramAction'),
                       href: contactDetails.telegram,
                       icon: MessageCircle,
                   },
@@ -38,8 +40,8 @@ export const ContactPage = () => {
         ...(contactDetails.email.trim()
             ? [
                   {
-                      title: 'Электронная почта',
-                      description: 'Для вопросов, которые удобнее обсудить письменно.',
+                      title: t('contact.email'),
+                      description: t('contact.emailDescription'),
                       value: contactDetails.email,
                       href: `mailto:${contactDetails.email}`,
                       icon: Mail,
@@ -51,7 +53,7 @@ export const ContactPage = () => {
                   {
                       title: 'MAX',
                       description: 'Напишите по вопросам бронирования и аренды.',
-                      value: 'Написать в MAX',
+                      value: t('contact.maxAction'),
                       href: contactDetails.max,
                       icon: MessageCircle,
                   },
@@ -69,15 +71,13 @@ export const ContactPage = () => {
                     />
                     <div className="relative max-w-3xl">
                         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-black dark:text-white">
-                            Контакты
+                            {t("contact.title")}
                         </h1>
                         <p className="mt-4 text-lg font-medium text-gray-700 dark:text-gray-200 sm:text-xl">
-                            Остались вопросы по аренде?
+                            {t("contact.subtitle")}
                         </p>
                         <p className="mt-4 max-w-2xl leading-7 text-gray-600 dark:text-gray-300 sm:text-lg">
-                            Свяжитесь с нами, чтобы уточнить условия, доступность
-                            автомобиля и детали бронирования. Мы поможем разобраться в
-                            вопросах до начала аренды.
+                            {t("contact.intro")}
                         </p>
                     </div>
                 </section>
@@ -86,7 +86,7 @@ export const ContactPage = () => {
                     <section className="mb-8" aria-labelledby="contact-methods-heading">
                         <div className="mb-5 max-w-2xl">
                             <p className="text-sm font-semibold uppercase tracking-wider text-primary-700 dark:text-primary-300">
-                                Мы всегда на связи
+                                {t("contact.availability")}
                             </p>
                         </div>
 
@@ -138,12 +138,10 @@ export const ContactPage = () => {
                                     id="contact-details-heading"
                                     className="text-xl font-bold tracking-tight"
                                 >
-                                    Контактные данные
+                                    {t("contact.details")}
                                 </h2>
                                 <p className="mt-2 max-w-3xl leading-7 text-gray-600 dark:text-gray-300">
-                                    Контактные данные арендодателя будут опубликованы здесь.
-                                    Пока вы можете ознакомиться с автомобилями и условиями
-                                    аренды на сайте.
+                                    {t("contact.detailsPlaceholder")}
                                 </p>
                             </div>
                         </div>
@@ -181,11 +179,10 @@ export const ContactPage = () => {
                     <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
                         <div className="max-w-2xl">
                             <h2 className="text-xl font-bold tracking-tight sm:text-2xl text-black dark:text-white">
-                                Уже выбираете автомобиль?
+                                {t("contact.ctaTitle")}
                             </h2>
                             <p className="mt-2 leading-7 text-gray-600 dark:text-gray-300">
-                                Посмотрите доступные автомобили или заранее ознакомьтесь с
-                                правилами аренды.
+                                {t("contact.ctaDescription")}
                             </p>
                         </div>
                         <div className="flex flex-col gap-3 sm:flex-row">
@@ -193,14 +190,14 @@ export const ContactPage = () => {
                                 to="/assets"
                                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
                             >
-                                Выбрать автомобиль
+                                {t("account.bookings.chooseVehicle")}
                                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
                             </Link>
                             <Link
                                 to="/rental-terms"
                                 className="inline-flex items-center justify-center rounded-xl border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-800 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
                             >
-                                Условия аренды
+                                {t("footer.rentalTerms")}
                             </Link>
                         </div>
                     </div>
