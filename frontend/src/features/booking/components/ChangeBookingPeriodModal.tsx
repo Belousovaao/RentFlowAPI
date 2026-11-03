@@ -84,7 +84,7 @@ export const ChangeBookingPeriodModal = ({
             } 
             catch (err) {
                 console.error('Failed to preview booking period change:', err);
-                setError('Не удалось рассчитать стоимость нового периода.');
+                setError(t("booking.period.errorPreview"));
             } 
             finally {
                 setPreviewLoading(false);
@@ -146,12 +146,12 @@ export const ChangeBookingPeriodModal = ({
                 formatDateForBack(startDate),
                 formatDateForBack(endDate)
             );
-            toast.success('Срок бронирования изменён.');
+            toast.success(t("booking.period.success"));
             await onSuccess();
             onClose();
         } catch (err) {
             console.error('Failed to change booking period:', err);
-            toast.error('Не удалось изменить срок бронирования.');
+            toast.error(t("booking.period.errorSave"));
         } finally {
             setSaving(false);
         }
@@ -235,7 +235,7 @@ export const ChangeBookingPeriodModal = ({
                         <div className="flex items-center gap-3">
                             <CalendarDays className="h-5 w-5 dark:text-white" />
                             <h2 className="text-lg font-semibold dark:text-white">
-                                Изменить срок аренды
+                                {t("booking.period.title")}
                             </h2>
                         </div>
 
@@ -244,7 +244,7 @@ export const ChangeBookingPeriodModal = ({
                             onClick={onClose}
                             disabled={saving}
                             className="rounded-full p-2 transition-colors hover:bg-gray-100 disabled:opacity-40 dark:hover:bg-gray-700"
-                            aria-label="Закрыть"
+                            aria-label={t("common.close")}
                         >
                             <X className="h-5 w-5" />
                         </button>
@@ -256,7 +256,7 @@ export const ChangeBookingPeriodModal = ({
                             {/* Current */}
                             <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-700/50">
                                 <p className="text-xs font-medium uppercase tracking-wide text-gray-600 dark:text-gray-200">
-                                    Текущий период
+                                    {t("booking.period.current")}
                                 </p>
 
                                 <p className="mt-2 font-semibold dark:text-gray-200">
@@ -280,7 +280,7 @@ export const ChangeBookingPeriodModal = ({
                             {/* New */}
                             <div className="rounded-xl border border-primary-200 bg-primary-50/50 p-4 dark:border-primary-800 dark:bg-primary-900/20">
                                 <p className="text-xs font-medium uppercase tracking-wide text-primary-600 dark:text-primary-400">
-                                    Новый период
+                                    {t("booking.period.new")}
                                 </p>
 
                                 <p className="mt-2 font-semibold text-gray-800 dark:text-gray-200">
@@ -316,7 +316,7 @@ export const ChangeBookingPeriodModal = ({
                         {previewLoading && (
                             <div className="flex items-center gap-2 rounded-xl bg-gray-50 p-4 text-sm text-gray-700 dark:bg-gray-700/50 dark:text-gray-300">
                                 <Loader2 className="h-4 w-4 animate-spin" />
-                                Рассчитываем новую стоимость...
+                                {t("booking.period.calculating")}
                             </div>
                         )}
 
@@ -332,7 +332,7 @@ export const ChangeBookingPeriodModal = ({
                             <div className="rounded-xl border border-gray-200 bg-gray-50 p-5 dark:border-gray-700 dark:bg-gray-700/50">
                                 <div className="mb-4 flex items-center justify-between">
                                     <h3 className="font-semibold dark:text-white">
-                                        Расчёт стоимости
+                                        {t("booking.period.priceCalculation")}
                                     </h3>
                                 </div>
 
@@ -345,7 +345,7 @@ export const ChangeBookingPeriodModal = ({
                                             className="flex w-full items-center justify-between gap-4 text-left"
                                         >
                                             <span className="text-sm text-gray-800 dark:text-gray-200">
-                                                Текущая арендная плата
+                                                {t("booking.period.currentRent")}
                                             </span>
 
                                             <span className="flex shrink-0 items-center gap-2 font-semibold text-gay-800 dark:text-gray-200">
@@ -391,8 +391,8 @@ export const ChangeBookingPeriodModal = ({
                                         >
                                             <span className="text-sm text-gray-800 dark:text-gray-200">
                                                 {preview.isExtension
-                                                    ? 'Арендная плата за период продления'
-                                                    : 'Арендная плата за новый период'}
+                                                    ? t('booking.period.extensionRent')
+                                                    : t('booking.period.newRent')}
                                             </span>
 
                                             <span className="flex shrink-0 items-center gap-2 font-semibold text-gray-800 dark:text-gray-200">
@@ -434,14 +434,14 @@ export const ChangeBookingPeriodModal = ({
                                             <div className="relative min-w-0">
                                                 <div className="flex items-center gap-1.5">
                                                     <span className="text-sm text-gray-800 dark:text-gray-200">
-                                                        Штраф за сокращение срока
+                                                        {t("booking.period.shorteningPenalty")}
                                                     </span>
 
                                                     <button
                                                         type="button"
                                                         onClick={() => setShowPenaltyInfo((value) => !value)}
                                                         className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-200"
-                                                        aria-label="Информация о штрафе"
+                                                        aria-label={t("booking.period.penaltyInfo")}
                                                     >
                                                         <Info className="h-4 w-4" />
                                                     </button>
@@ -465,11 +465,11 @@ export const ChangeBookingPeriodModal = ({
                                                             className="absolute left-0 top-7 z-20 w-72 rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-700 shadow-xl dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
                                                         >
                                                             <p className="font-medium text-gray-900 dark:text-gray-100">
-                                                                Штраф за сокращение срока
+                                                                {t("booking.period.shorteningPenalty")}
                                                             </p>
 
                                                             <p className="mt-2 leading-relaxed">
-                                                                Согласно п. 4.12 Договора аренды, при сокращении срока аренды применяется штраф в размере стоимости 1 суток аренды.
+                                                                {t("booking.period.penaltyDescription")}
                                                             </p>
                                                         </motion.div>
                                                     )}
@@ -489,8 +489,8 @@ export const ChangeBookingPeriodModal = ({
                                             <div>
                                                 <p className="text-base font-semibold text-gray-800 dark:text-white">
                                                     {preview.isRefund
-                                                        ? 'К возврату'
-                                                        : 'Доплата'}
+                                                        ? t('booking.refund')
+                                                        : t('booking.additionalPayment')}
                                                 </p>
                                             </div>
 
@@ -505,7 +505,7 @@ export const ChangeBookingPeriodModal = ({
                                             <div className="mt-4 border-t border-gray-300 pt-4 dark:border-gray-600">
                                                 <div className="flex items-center justify-between">
                                                     <span className="text-base font-semibold text-gray-800 dark:text-gray-200">
-                                                        Стоимость не изменилась
+                                                        {t("booking.noPriceChange")}
                                                     </span>
 
                                                     <span className="font-semibold text-gray-800 dark:text-gray-200">
@@ -526,7 +526,7 @@ export const ChangeBookingPeriodModal = ({
                                 disabled={saving}
                                 className="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 dark:text-gray-300 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-600 dark:hover:bg-gray-700"
                             >
-                                Отмена
+                                {t("common.cancel")}
                             </button>
 
                             <button
@@ -544,12 +544,12 @@ export const ChangeBookingPeriodModal = ({
                                 {saving ? (
                                     <>
                                         <Loader2 className="h-4 w-4 animate-spin" />
-                                        Сохраняем...
+                                        {t("common.saving")}
                                     </>
                                 ) : (
                                     <>
                                         <Check className="h-4 w-4" />
-                                        Подтвердить изменение
+                                        {t("booking.period.confirm")}
                                     </>
                                 )}
                             </button>
