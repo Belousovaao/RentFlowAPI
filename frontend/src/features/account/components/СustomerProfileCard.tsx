@@ -104,6 +104,6 @@ const getCustomerTypeLabel = (type: CustomerType, t: (key: string) => string): s
             return t('customer.type.organization');
 
         default:
-            return 'Клиент';
+            return t('customer.type.customer');
     }
 };
