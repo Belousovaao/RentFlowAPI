@@ -108,13 +108,13 @@ export const AssetsPage = () => {
                             </div>
                         ) : error ? (
                             <div className="text-center py-12 text-red-500">
-                                Ошибка загрузки автомобилей
+                                {t('asset.page.loadError')}
                             </div>
                         ) : assets.length === 0 ? (
                             <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl">
                                 <p className="text-gray-500">{t('asset.notfound')}</p>
                                 <p className="text-sm text-gray-400 mt-2">
-                                    Попробуйте изменить параметры поиска
+                                    {t('asset.page.emptyHint')}
                                 </p>
                             </div>
                         ) : (
