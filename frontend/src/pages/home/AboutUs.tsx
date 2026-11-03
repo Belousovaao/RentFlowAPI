@@ -12,8 +12,7 @@ type Principle = {
 const principles: Principle[] = [
     {
         titleKey: 'about.principle.clearTitle',
-        description:
-            descriptionKey: 'about.principle.clearDescription',
+        descriptionKey: 'about.principle.clearDescription',
         icon: ClipboardList,
     },
     {
