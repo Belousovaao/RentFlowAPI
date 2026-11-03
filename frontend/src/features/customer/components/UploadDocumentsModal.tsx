@@ -5,6 +5,7 @@ import { customerApi } from "@/features/customer/api/customerApi";
 import { DocumentType } from "@/entities/customer/customer.type";
 import { Button } from "@/features/ui/components/Button";
 import { DocumentUploadField } from "./DocumentUploadField";
+import { useI18n } from "@/app/providers/I18nProvider";
 
 interface Props {
     open: boolean;
@@ -17,6 +18,7 @@ export const UploadDocumentsModal = ({
     onClose,
     onSuccess
 }: Props) => {
+    const { t } = useI18n();
     const [loading, setLoading] = useState(false);
     const [passportFront, setPassportFront] = useState<File | null>(null);
     const [passportRegistration, setPassportRegistration] = useState<File | null>(null);
@@ -42,7 +44,7 @@ export const UploadDocumentsModal = ({
 
     const upload = async () => {
         if (uploadedCount !== 4) {
-            toast.error("Загрузите все четыре документа перед отправкой");
+            toast.error(t("customer.documents.errorRequired"));
             return;
         }
 
@@ -78,7 +80,7 @@ export const UploadDocumentsModal = ({
                 driverBack
             );
 
-            toast.success("Документы отправлены на проверку");
+            toast.success(t("customer.documents.success"));
             onClose();
             await onSuccess();
         } catch (err: any) {
@@ -86,7 +88,7 @@ export const UploadDocumentsModal = ({
             console.error("status:", err?.response?.status);
             console.error("data:", err?.response?.data);
             console.error("message:", err?.message);
-            toast.error("Не удалось загрузить документы. Попробуйте ещё раз.");
+            toast.error(t("customer.documents.errorUpload"));
         } finally {
             setLoading(false);
         }
@@ -102,15 +104,15 @@ export const UploadDocumentsModal = ({
 
     const steps = [
         {
-            title: "Паспорт",
+            titleKey: "customer.documents.passport",
             icon: SquareUserRound,
         },
         {
-            title: "Водительское",
+            titleKey: "customer.documents.driverLicenseShort",
             icon: ShieldCheck,
         },
         {
-            title: "Проверка",
+            titleKey: "customer.documents.review",
             icon: FileCheck2,
         },
     ];
@@ -129,12 +131,12 @@ export const UploadDocumentsModal = ({
                                 </div>
 
                                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                                    Проверка документов
+                                    {t("customer.documents.title")}
                                 </h2>
                             </div>
 
                             <p className="mt-2 text-sm text-gray-500">
-                                Для завершения регистрации, необходимо загрузить паспорт и водительское удостоверение. После отправки менеджер проверит документы и свяжется с вами.
+                                {t("customer.documents.intro")}
                             </p>
                         </div>
                     </div>
@@ -155,7 +157,7 @@ export const UploadDocumentsModal = ({
 
                                 return (
                                     <div
-                                        key={step.title}
+                                        key={t(step.titleKey)}
                                         className="flex flex-1 items-center"
                                     >
                                         <div className="flex flex-col items-center">
@@ -212,11 +214,11 @@ export const UploadDocumentsModal = ({
                     <div className="mb-6">
                         <div className="mb-2 flex items-center justify-between">
                             <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                                Документы загружены
+                                {t("customer.documents.uploaded")}
                             </span>
 
                             <span className="text-sm font-semibold text-primary-600">
-                                {uploadedCount} из 4
+                                {uploadedCount} {t("common.of")} 4
                             </span>
                         </div>
 
@@ -235,19 +237,19 @@ export const UploadDocumentsModal = ({
                         <div className="rounded-2xl border border-gray-100 bg-gray-50/70 p-4 dark:border-gray-800 dark:bg-gray-800/30">
                             <div className="mb-4">
                                 <h3 className="font-semibold text-gray-900 dark:text-white">
-                                    Паспорт
+                                    {t("customer.documents.passport")}
                                 </h3>
                             </div>
 
                             <div className="space-y-4">
                                 <DocumentUploadField
-                                    title="Разворот с фотографией"
+                                    title={t("customer.documents.passportPhotoPage")}
                                     file={passportFront}
                                     onChange={setPassportFront}
                                 />
 
                                 <DocumentUploadField
-                                    title="Страница с регистрацией"
+                                    title={t("customer.documents.passportRegistrationPage")}
                                     file={passportRegistration}
                                     onChange={setPassportRegistration}
                                 />
@@ -258,19 +260,19 @@ export const UploadDocumentsModal = ({
                         <div className="rounded-2xl border border-gray-100 bg-gray-50/70 p-4 dark:border-gray-800 dark:bg-gray-800/30">
                             <div className="mb-4">
                                 <h3 className="font-semibold text-gray-900 dark:text-white">
-                                    Водительское удостоверение
+                                    {t("customer.documents.driverLicense")}
                                 </h3>
                             </div>
 
                             <div className="space-y-4">
                                 <DocumentUploadField
-                                    title="Лицевая сторона"
+                                    title={t("customer.documents.frontSide")}
                                     file={driverFront}
                                     onChange={setDriverFront}
                                 />
 
                                 <DocumentUploadField
-                                    title="Оборотная сторона"
+                                    title={t("customer.documents.backSide")}
                                     file={driverBack}
                                     onChange={setDriverBack}
                                 />
@@ -284,11 +286,11 @@ export const UploadDocumentsModal = ({
 
                         <div>
                             <p className="text-sm font-medium text-gray-800">
-                                Что будет дальше?
+                                {t("customer.documents.nextTitle")}
                             </p>
 
                             <p className="mt-1 text-xs leading-5 text-gray-500">
-                                После отправки документы поступят менеджеру
+                                {t("customer.documents.nextDescription")}
                                 на проверку. Внимание! Отправка заявки и документов не гарантирует подтверждение бронировния. Менеджер свяжется с вами в ближайшее время.
                             </p>
                         </div>
@@ -299,12 +301,8 @@ export const UploadDocumentsModal = ({
                 <div className="flex items-center justify-between gap-3 border-t border-gray-100 px-6 py-4 dark:border-gray-800">
                     <p className="text-xs text-gray-400">
                         {uploadedCount === 4
-                            ? "Все документы готовы к отправке"
-                            : `Осталось загрузить ${4 - uploadedCount} ${
-                                  4 - uploadedCount === 1
-                                      ? "документ"
-                                      : "документа"
-                              }`}
+                            ? t("customer.documents.ready")
+                            : `${t("customer.documents.remaining")} ${4 - uploadedCount}`}
                     </p>
 
                     <div className="flex gap-3">
@@ -313,7 +311,7 @@ export const UploadDocumentsModal = ({
                             onClick={handleClose}
                             disabled={loading}
                         >
-                            Отмена
+                            {t("common.cancel")}
                         </Button>
 
                         <Button
@@ -321,8 +319,8 @@ export const UploadDocumentsModal = ({
                             disabled={loading || uploadedCount !== 4}
                         >
                             {loading
-                                ? "Отправка..."
-                                : "Отправить документы"}
+                                ? t("customer.documents.sending")
+                                : t("customer.documents.submit")}
                         </Button>
                     </div>
                 </div>
