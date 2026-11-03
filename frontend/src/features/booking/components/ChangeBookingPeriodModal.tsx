@@ -31,7 +31,7 @@ export const ChangeBookingPeriodModal = ({
     const [showCurrentDetails, setShowCurrentDetails] = useState(false);
     const [showNewDetails, setShowNewDetails] = useState(false);
     const [showPenaltyInfo, setShowPenaltyInfo] = useState(false);
-    const { t } = useI18n();
+    const { t, language } = useI18n();
     const { data: busyPeriods = [] } = useBusyPeriods(booking.asset.id,booking.id);
 
     useEffect(() => {
@@ -157,7 +157,7 @@ export const ChangeBookingPeriodModal = ({
         }
     };
 
-    const formatPrice = (value: number) => value.toLocaleString('ru-RU') + ' ₽';
+    const formatPrice = (value: number) => value.toLocaleString(language === 'zh' ? 'zh-CN' : language === 'en' ? 'en-GB' : 'ru-RU') + ' ₽';
 
     const getCalendarDays = (start: Date, end: Date) => {
         const startDay = new Date(
@@ -260,7 +260,7 @@ export const ChangeBookingPeriodModal = ({
                                 </p>
 
                                 <p className="mt-2 font-semibold dark:text-gray-200">
-                                    {new Date(booking.rentalPeriod.startDate).toLocaleDateString('ru-RU')}
+                                    {new Date(booking.rentalPeriod.startDate).toLocaleDateString(language === 'zh' ? 'zh-CN' : language === 'en' ? 'en-GB' : 'ru-RU')}
                                     {' — '}
                                     {new Date(booking.rentalPeriod.endDate).toLocaleDateString('ru-RU')}
                                 </p>
