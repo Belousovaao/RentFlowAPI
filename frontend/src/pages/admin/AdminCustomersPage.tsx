@@ -92,13 +92,13 @@ export const AdminCustomersPage = () => {
                             <ArrowLeft className="w-5 h-5" />
                         </button>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                            Управление клиентами
+                            {t("admin.customers.title")}
                         </h1>
                     </div>
                     <button
                         onClick={() => setCreateModalOpen(true)}
                         className="mt-2 px-3 py-1 bg-blue-600 text-white rounded-lg">
-                        Добавить клиента
+                        {t("admin.customers.add")}
                     </button>
                 </div>
 
@@ -130,7 +130,7 @@ export const AdminCustomersPage = () => {
                             />
 
                             <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                                Показывать отклонённых
+                                {t("admin.customers.showRejected")}
                             </span>
                         </label>
 
@@ -150,7 +150,7 @@ export const AdminCustomersPage = () => {
                                     }
                                 `}
                             >
-                                Все
+                                {t("common.all")}
                             </button>
                             <button
                                 type="button"
@@ -167,7 +167,7 @@ export const AdminCustomersPage = () => {
                                     }
                                 `}
                             >
-                                ФЛ
+                                {t("customer.type.individualShort")}
                             </button>
                             <button
                                 type="button"
@@ -184,7 +184,7 @@ export const AdminCustomersPage = () => {
                                     }
                                 `}
                             >
-                                ИП
+                                {t("customer.type.entrepreneurShort")}
                             </button>
                             <button
                                 type="button"
@@ -201,7 +201,7 @@ export const AdminCustomersPage = () => {
                                     }
                                 `}
                             >
-                                ЮЛ
+                                {t("customer.type.organizationShort")}
                             </button>
                         </div>
                     </div>
@@ -215,7 +215,7 @@ export const AdminCustomersPage = () => {
                 ) : !customers || customers.length === 0 ? (
                     <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl">
                         <p className="text-gray-700 dark:text-gray-300">
-                            Клиенты не найдены
+                            {t("admin.customers.empty")}
                         </p>
                     </div>
                 ) : (
@@ -223,19 +223,19 @@ export const AdminCustomersPage = () => {
                         <div className="grid min-w-max grid-cols-[auto_auto_auto_auto_auto]">
                             {/* Header */}
                             <div className="border-b border-gray-200 bg-gray-50 px-5 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800/50">
-                                Клиент
+                                {t("common.customer")}
                             </div>
                             <div className="border-b border-gray-200 bg-gray-50 px-5 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800/50">
-                                Тип
+                                {t("common.type")}
                             </div>
                             <div className="border-b border-gray-200 bg-gray-50 px-5 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800/50">
-                                Телефон
+                                {t("common.phone")}
                             </div>
                             <div className="border-b border-gray-200 bg-gray-50 px-5 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800/50">
                                 Email
                             </div>
                             <div className="border-b border-gray-200 bg-gray-50 px-5 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800/50">
-                                Статус
+                                {t("common.status")}
                             </div>
 
                             {/* Rows */}
@@ -281,7 +281,7 @@ export const AdminCustomersPage = () => {
                             disabled={page === 1}
                             className="px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                         >
-                            ← Назад
+                            {t("common.previous")}
                         </button>
                         <span className="px-4 py-2 text-gray-600 dark:text-gray-400">
                             {t("common.pageOf", { page, totalPages })}
@@ -293,7 +293,7 @@ export const AdminCustomersPage = () => {
                             disabled={page === totalPages}
                             className="px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
                         >
-                            Вперед →
+                            {t("common.next")}
                         </button>
                     </div>
                 )}
