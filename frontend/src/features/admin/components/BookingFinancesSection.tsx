@@ -29,23 +29,23 @@ type FinanceRow = {
 };
 
 const chargeTypeLabels: Record<BookingChargeType, string> = {
-    Rental: t("finance.charge.rental"),
-    AdditionalServices: t("finance.charge.services"),
-    RouteSurcharge: t("finance.charge.route"),
-    Deposit: t("finance.charge.deposit"),
-    LateCancellation: t("finance.charge.lateCancellation"),
-    TrafficFine: t("finance.charge.trafficFine"),
-    Cleaning: t("finance.charge.cleaning"),
-    Refueling: t("finance.charge.refueling"),
-    ExcessMileage: t("finance.charge.excessMileage"),
-    PropertyLossOrDamage: t("finance.charge.damage"),
-    Other: t("finance.charge.other"),
+    Rental: "finance.charge.rental",
+    AdditionalServices: "finance.charge.services",
+    RouteSurcharge: "finance.charge.route",
+    Deposit: "finance.charge.deposit",
+    LateCancellation: "finance.charge.lateCancellation",
+    TrafficFine: "finance.charge.trafficFine",
+    Cleaning: "finance.charge.cleaning",
+    Refueling: "finance.charge.refueling",
+    ExcessMileage: "finance.charge.excessMileage",
+    PropertyLossOrDamage: "finance.charge.damage",
+    Other: "finance.charge.other",
 };
 
 const paymentTypeLabels = {
-    Prepayment: t("finance.payment.prepayment"),
-    AdditionalPayment: t("finance.payment.additional"),
-    Refund: t("finance.payment.refund"),
+    Prepayment: "finance.payment.prepayment",
+    AdditionalPayment: "finance.payment.additional",
+    Refund: "finance.payment.refund",
 } as const;
 
 
@@ -246,7 +246,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
         charges.map(charge => ({
             id: charge.id,
             date: charge.createdAt,
-            operation: chargeTypeLabels[charge.type] ?? charge.title,
+            operation: t(chargeTypeLabels[charge.type]) || charge.title,
             // Details contain the admin-entered description, not the operation title.
             details: [
                 charge.description,
@@ -280,7 +280,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                         onClick={() => setPaymentModalOpen(true)} 
                         disabled={!canRegisterPayment} 
                         title={!canRegisterPayment 
-                            ? t("finance.payment.disabled") 
+                            ? t("finance.payment.disabled")} 
                             : undefined} 
                         className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>
                         <CircleDollarSign className="h-4 w-4" /> 
@@ -303,7 +303,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                         type="button" 
                         onClick={() => void loadFinance()} 
                         disabled={loading} 
-                        aria-label=t("finance.refresh") 
+                        aria-label={t("finance.refresh")} 
                         className={`${buttonClass} border border-gray-200 text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300`}>
                         <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                     </button>
@@ -311,7 +311,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             </div>
 
             <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-                <SummaryCard label=t("finance.rentalCost") value={formatPrice(price.total)} hint=t("finance.withoutDeposit") />
+                <SummaryCard label={t("finance.rentalCost)} value={formatPrice(price.total)} hint=t("finance.withoutDeposit") />
                 <SummaryCard label=t("finance.totalWithDeposit") value={formatPrice(price.totalToPay)} hint="" />
                 <SummaryCard label=t("finance.received") value={formatPrice(summary?.totalReceived ?? 0)} hint="" />
                 <SummaryCard label=t("finance.refunded") value={formatPrice(summary?.totalRefunded ?? 0)} hint="" />
@@ -341,7 +341,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                 </td>
                                 <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">
                                     <span className="inline-flex items-center gap-1.5">
-                                        {row.status === "Rejected" && <X className="h-4 w-4 shrink-0 text-red-500" aria-label=t("finance.chargeRejected") />}
+                                        {row.status === "Rejected" && <X className="h-4 w-4 shrink-0 text-red-500" aria-label={t("finance.chargeRejected")} />}
                                         {row.operation}
                                     </span>
                                 </td>
@@ -391,7 +391,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                         {payments.filter(payment => payment.type !== "Refund" && payment.availableToAllocate > 0).map(payment => (
                             <div key={payment.id} className="flex flex-col gap-2 rounded-lg bg-gray-50 p-3 dark:bg-gray-900/40 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-gray-900 dark:text-white">{paymentTypeLabels[payment.type]} · доступно {formatPrice(payment.availableToAllocate)}</p>
+                                    <p className="text-sm font-medium text-gray-900 dark:text-white">{t(paymentTypeLabels[payment.type])} · доступно {formatPrice(payment.availableToAllocate)}</p>
                                     <p className="text-xs text-gray-500 dark:text-gray-400">Поступило {formatPrice(payment.amount)} · {formatDateTime(new Date(payment.createdAt))}{payment.note ? ` · ${payment.note}` : ""}</p>
                                 </div>
                                 <div className="flex gap-2">
@@ -409,7 +409,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             {loading && <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">{t("finance.updating")}</p>}
 
             {settingsModalOpen && (
-                <Modal title=t("finance.tariffSettings") onClose={() => setSettingsModalOpen(false)}>
+                <Modal title={t("finance.tariffSettings") onClose={() => setSettingsModalOpen(false)}>
                     <form className="space-y-4" onSubmit={submitSettings}>
                         <Field label=t("finance.fuelTariff")>
                             <input className={inputClass} type="number" min="0" step="0.01" required value={rentalTariffs.fuel_per_liter ?? ""} onChange={event => setRentalTariffs(prev => ({ ...prev, fuel_per_liter: event.target.value }))} />
