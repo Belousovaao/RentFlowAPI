@@ -5,13 +5,14 @@ import { bookingApi } from "@/entities/booking/booking.api";
 import type { AdminBookingListItemDto } from "@/entities/booking/booking.types";
 import type { BookingStatus } from "@/entities/booking/booking.types";
 import { formatPrice } from "@/shared/utils/formatters";
+import { useI18n } from "@/app/providers/I18nProvider";
 
-export const statusLabels: Record<BookingStatus, string> = {
-    Pending: "На рассмотрении",
-    Confirmed: "Подтверждено",
-    Cancelled: "Отменено",
-    Completed: "Завершено",
-    Active: "Активно",
+const statusTranslationKeys: Record<BookingStatus, string> = {
+    Pending: "booking.status.pending",
+    Confirmed: "booking.status.confirmed",
+    Cancelled: "booking.status.cancelled",
+    Completed: "booking.status.completed",
+    Active: "booking.status.active",
 };
 
 const statusColors: Record<BookingStatus, string> = {
@@ -28,6 +29,7 @@ const statusColors: Record<BookingStatus, string> = {
 };
 
 export const AdminBookingsPage = () => {
+    const { t, language } = useI18n();
     const [bookings, setBookings] = useState<AdminBookingListItemDto[]>([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -66,7 +68,7 @@ export const AdminBookingsPage = () => {
                         <ArrowLeft className="w-5 h-5" />
                     </button>
                     <h1 className="text-2xl font-bold text-gray-700 dark:text-gray-300">
-                        Список бронирований
+                        {t("admin.bookings.title")}
                     </h1>
                 </div>
                 <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800">
@@ -75,19 +77,19 @@ export const AdminBookingsPage = () => {
                     >
                         {/* Header */}
                         <div className="border-b border-gray-200 bg-gray-50 px-5 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800/50">
-                            Автомобиль
+                            {t("common.vehicle")}
                         </div>
                         <div className="border-b border-gray-200 bg-gray-50 px-5 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800/50">
-                            Клиент
+                            {t("common.customer")}
                         </div>
                         <div className="border-b border-gray-200 bg-gray-50 px-5 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800/50">
-                            Период
+                            {t("common.period")}
                         </div>
                         <div className="border-b border-gray-200 bg-gray-50 px-5 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800/50">
-                            Сумма
+                            {t("common.amount")}
                         </div>
                         <div className="border-b border-gray-200 bg-gray-50 px-5 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 dark:border-gray-700 dark:bg-gray-800/50">
-                            Статус
+                            {t("common.status")}
                         </div>
 
                         {/* Rows */}
@@ -109,7 +111,7 @@ export const AdminBookingsPage = () => {
 
                                 <div className="px-5 py-5">
                                     <p className="font-medium whitespace-nowrap text-gray-700 dark:text-gray-300">
-                                        {booking.customer.displayName ?? "Без имени"}
+                                        {booking.customer.displayName ?? t("common.unnamed")}
                                     </p>
 
                                     <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-nowrap">
@@ -122,7 +124,7 @@ export const AdminBookingsPage = () => {
                                 </div>
 
                                 <div className="px-5 py-5 text-sm whitespace-nowrap text-gray-700 dark:text-gray-300">
-                                    {new Date(booking.rentalPeriod.startDate).toLocaleDateString()}
+                                    {new Date(booking.rentalPeriod.startDate).toLocaleDateString(language === "zh" ? "zh-CN" : language === "en" ? "en-GB" : "ru-RU")}
                                     {" — "}
                                     {new Date(booking.rentalPeriod.endDate).toLocaleDateString()}
                                 </div>
@@ -134,7 +136,7 @@ export const AdminBookingsPage = () => {
                                     <span
                                         className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap ${statusColors[booking.status]}`}
                                     >
-                                        {statusLabels[booking.status]}
+                                        {t(statusTranslationKeys[booking.status])}
                                     </span>
                                 </div>
                             </div>
