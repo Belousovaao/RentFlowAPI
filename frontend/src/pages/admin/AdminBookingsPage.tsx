@@ -7,7 +7,7 @@ import type { BookingStatus } from "@/entities/booking/booking.types";
 import { formatPrice } from "@/shared/utils/formatters";
 import { useI18n } from "@/app/providers/I18nProvider";
 
-const statusTranslationKeys: Record<BookingStatus, string> = {
+export const statusLabels: Record<BookingStatus, string> = {
     Pending: "booking.status.pending",
     Confirmed: "booking.status.confirmed",
     Cancelled: "booking.status.cancelled",
@@ -136,7 +136,7 @@ export const AdminBookingsPage = () => {
                                     <span
                                         className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium whitespace-nowrap ${statusColors[booking.status]}`}
                                     >
-                                        {t(statusTranslationKeys[booking.status])}
+                                        {t(statusLabels[booking.status])}
                                     </span>
                                 </div>
                             </div>
