@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { CheckCircle2, FileText, Image as ImageIcon, UploadCloud, X } from "lucide-react";
+import { useI18n } from "@/app/providers/I18nProvider";
 
 interface Props {
     title: string;
@@ -20,18 +21,19 @@ export const DocumentUploadField = ({
     file,
     onChange,
 }: Props) => {
+    const { t } = useI18n();
     const inputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const validateFile = (selectedFile: File): boolean => {
         if (!ACCEPTED_TYPES.includes(selectedFile.type)) {
-            setError("Можно загрузить JPG, PNG или PDF");
+            setError(t("customer.document.errorType"));
             return false;
         }
 
         if (selectedFile.size > MAX_FILE_SIZE) {
-            setError("Размер файла не должен превышать 10 МБ");
+            setError(t("customer.document.errorSize"));
             return false;
         }
 
@@ -77,7 +79,7 @@ export const DocumentUploadField = ({
                 {file && (
                     <span className="flex items-center gap-1 text-xs text-green-600">
                         <CheckCircle2 className="w-4 h-4" />
-                        Загружен
+                        {t("customer.document.uploaded")}
                     </span>
                 )}
             </div>
@@ -110,11 +112,11 @@ export const DocumentUploadField = ({
                     />
 
                     <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                        Перетащите документ сюда
+                        {t("customer.document.dropHere")}
                     </p>
 
                     <p className="text-xs text-gray-400 my-1">
-                        или
+                        {t("common.or")}
                     </p>
 
                     <button
@@ -125,11 +127,11 @@ export const DocumentUploadField = ({
                         }}
                         className="text-sm font-medium text-primary-600 hover:text-primary-700"
                     >
-                        Выбрать файл
+                        {t("customer.document.chooseFile")}
                     </button>
 
                     <p className="mt-3 text-xs text-gray-400">
-                        JPG, PNG или PDF · до 10 МБ
+                        {t("customer.document.fileHint")}
                     </p>
 
                     <input
@@ -173,8 +175,8 @@ export const DocumentUploadField = ({
                             </div>
 
                             <p className="mt-1 text-xs text-gray-400">
-                                {isPdf ? "PDF" : "Изображение"} ·{" "}
-                                {(file.size / 1024 / 1024).toFixed(1)} МБ
+                                {isPdf ? "PDF" : t("customer.document.image")} ·{" "}
+                                {(file.size / 1024 / 1024).toFixed(1)} {t("customer.document.mb")}
                             </p>
                         </div>
 
@@ -184,14 +186,14 @@ export const DocumentUploadField = ({
                                 onClick={() => inputRef.current?.click()}
                                 className="rounded-lg px-3 py-2 text-xs font-medium text-primary-600 transition hover:bg-primary-50 dark:hover:bg-primary-950/30"
                             >
-                                Заменить
+                                {t("common.replace")}
                             </button>
 
                             <button
                                 type="button"
                                 onClick={() => onChange(null)}
                                 className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600 dark:hover:bg-gray-700"
-                                aria-label="Удалить файл"
+                                aria-label={t("customer.document.removeFile")}
                             >
                                 <X className="w-4 h-4" />
                             </button>
