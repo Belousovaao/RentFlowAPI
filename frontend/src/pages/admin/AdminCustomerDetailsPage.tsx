@@ -332,10 +332,10 @@ export const AdminCustomerDetailsPage = () => {
                         <div className="overflow-x-auto">
                             <div className="min-w-[700px]">
                                 <div className="grid grid-cols-[1.5fr_1fr_1fr_1fr] border-b border-gray-200 dark:border-gray-700 pb-3 px-3 text-sm font-medium text-gray-500">
-                                    <span>Автомобиль</span>
-                                    <span>Период</span>
-                                    <span>Сумма</span>
-                                    <span>Статус</span>
+                                    <span>{t("common.vehicle")}</span>
+                                    <span>{t("common.period")}</span>
+                                    <span>{t("common.amount")}</span>
+                                    <span>{t("common.status")}</span>
                                 </div>
 
                                 <div className="divide-y divide-gray-200 dark:divide-gray-700">
