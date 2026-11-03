@@ -150,7 +150,7 @@ export const AdminCustomerDetailsPage = () => {
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-24">
                 <div className="container mx-auto px-4">
                     <p className="text-gray-500">
-                        Клиент не найден
+                        {t("admin.customerDetails.notFound")}
                     </p>
                 </div>
             </div>
@@ -168,7 +168,7 @@ export const AdminCustomerDetailsPage = () => {
                             className="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
                         >
                         <ArrowLeft className="w-5 h-5" />
-                            Назад
+                            {t("common.back")}
                         </button>
                     </div>
                     <div className="flex items-center gap-4 ml-auto">
@@ -178,7 +178,7 @@ export const AdminCustomerDetailsPage = () => {
                             className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
                         >
                             <UserCheck className="w-4 h-4" />
-                            Изменить статус
+                            {t("admin.customerDetails.changeStatus")}
                         </button>
                         {!editing ? (
 
@@ -188,7 +188,7 @@ export const AdminCustomerDetailsPage = () => {
                                 className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
                             >
                                 <Pencil className="w-4 h-4" />
-                                Редактировать
+                                {t("common.edit")}
                             </button>
 
                         ) : (
@@ -200,7 +200,7 @@ export const AdminCustomerDetailsPage = () => {
                                 className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
                             >
                                 <X className="w-4 h-4" />
-                                Отмена
+                                {t("common.cancel")}
                             </button>
 
                         )}
@@ -212,13 +212,13 @@ export const AdminCustomerDetailsPage = () => {
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h2 className="font-semibold text-gray-900 dark:text-white">
-                                Статус клиента
+                                {t("verification.modal.title")}
                             </h2>
                         </div>
 
                         {customer.verificationStatus === VerificationStatus.Rejected && (
                             <span className="px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
-                                Отклонен
+                                {t("verification.status.rejected")}
                             </span>
                         )}
                     </div>
@@ -228,10 +228,10 @@ export const AdminCustomerDetailsPage = () => {
                                 <div className="w-3 h-3 rounded-full bg-red-500" />
                                 <div>
                                     <div className="font-medium text-red-800 dark:text-red-300">
-                                        Верификация отклонена
+                                        {t("admin.customerDetails.verificationRejected")}
                                     </div>
                                     <div className="text-sm text-red-600 dark:text-red-400 mt-1">
-                                        Клиент не прошел проверку документов
+                                        {t("admin.customerDetails.verificationRejectedDescription")}
                                     </div>
                                 </div>
                             </div>
@@ -312,7 +312,7 @@ export const AdminCustomerDetailsPage = () => {
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 mt-6">
                     <div className="flex items-center justify-between mb-6">
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                            Бронирования клиента
+                            {t("admin.customerDetails.bookings")}
                         </h2>
 
                         <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -326,7 +326,7 @@ export const AdminCustomerDetailsPage = () => {
                         </div>
                     ) : bookings.length === 0 ? (
                         <p className="text-gray-500 dark:text-gray-400">
-                            У клиента пока нет бронирований.
+                            {t("admin.customerDetails.noBookings")}
                         </p>
                     ) : (
                         <div className="overflow-x-auto">
@@ -405,10 +405,10 @@ export const AdminCustomerDetailsPage = () => {
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                Документы клиента
+                                {t("admin.customerDetails.documents")}
                             </h2>
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                Документы, отправленные клиентом для верификации
+                                {t("admin.customerDetails.documentsDescription")}
                             </p>
                         </div>
 
@@ -422,11 +422,11 @@ export const AdminCustomerDetailsPage = () => {
                             <FileText className="w-10 h-10 text-gray-400 mb-3" />
 
                             <p className="font-medium text-gray-700 dark:text-gray-300">
-                                Документы не загружены
+                                {t("admin.customerDetails.noDocuments")}
                             </p>
 
                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                Клиент ещё не отправлял документы для проверки.
+                                {t("admin.customerDetails.documentsNotSubmitted")}
                             </p>
                         </div>
                     ) : (
@@ -447,7 +447,7 @@ export const AdminCustomerDetailsPage = () => {
                                             </p>
 
                                             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                                Загружен{' '}
+                                                {t('common.uploaded')}{' '}
                                                 {new Date(document.uploadedAt).toLocaleString(
                                                     'ru-RU',
                                                     {
@@ -469,7 +469,7 @@ export const AdminCustomerDetailsPage = () => {
                                         className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shrink-0"
                                     >
                                         <ExternalLink className="w-4 h-4" />
-                                        Открыть документ
+                                        {t("admin.customerDetails.openDocument")}
                                     </a>
 
                                     <button
@@ -480,8 +480,8 @@ export const AdminCustomerDetailsPage = () => {
                                     >
                                         <Trash2 className="w-4 h-4" />
                                         {deletingDocumentId === document.id
-                                            ? 'Удаление…'
-                                            : 'Удалить'}
+                                            ? t('common.deleting')
+                                            : t('common.delete')}
                                     </button>
                                 </div>
                             ))}
