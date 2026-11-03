@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useI18n } from '@/app/providers/I18nProvider';
 import { CustomerDetailsDto, CustomerType, UpdateCustomerRequest, type CreateCustomerRequest } from '@/entities/customer/customer.type';
 import toast from 'react-hot-toast';
 import { Car, Save, User, SquareUser } from 'lucide-react';
@@ -24,6 +25,7 @@ export const IndividualForm = ({
     readOnly = false,
     onCreate,
     onUpdate }: IndividualFormProps) => {
+        const { t } = useI18n();
         const isEditMode = !!customer;
 
         const [showPersonalInfo, setShowPersonalInfo] = useState(true);
@@ -86,13 +88,13 @@ export const IndividualForm = ({
 
                 if (missingFields.length > 0) {
                     const labels: Record<string, string> = {
-                        firstName: 'имя',
-                        lastName: 'фамилию',
-                        phone: 'номер телефона',
+                        firstName: t('customer.form.firstNameLower'),
+                        lastName: t('customer.form.lastNameAccusative'),
+                        phone: t('customer.form.phoneLower'),
                     };
 
                     toast.error(
-                        `Заполните обязательные поля: ${missingFields
+                        `${t("customer.form.requiredFieldsPrefix")} ${missingFields
                             .map(field => labels[field])
                             .join(', ')}`
                     );
@@ -135,7 +137,7 @@ export const IndividualForm = ({
 
                 const missingLabels = missingFields.map(field => field.label).join(', ');
 
-                toast.error(`Заполните обязательные поля: ${missingLabels}`);
+                toast.error(`${t("customer.form.requiredFieldsPrefix")} ${missingLabels}`);
 
                 const firstField = missingFields[0].key;
 
@@ -201,7 +203,7 @@ export const IndividualForm = ({
                         : {}),
                 };
                 await onUpdate?.(request);
-                toast("Изменения сохранены");
+                toast(t("customer.form.saved"));
             }
             else
             {
@@ -239,21 +241,21 @@ export const IndividualForm = ({
         <div className="space-y-4">
             {/* Личные данные */}
             <FormSection
-                title="Личные данные"
+                title={t("customer.form.personalData")}
                 icon={User}
                 open={showPersonalInfo}
                 onToggle={() => setShowPersonalInfo(prev => !prev)}
             >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div id="customer-field-lastName">
-                        <CustomerFormField label="Фамилия *">
+                        <CustomerFormField label={t("customer.form.lastName")}>
                             <input
                                 className={`${customerInputClass} ${
                                     invalidFields.includes('lastName')
                                         ? 'border-red-500 ring-1 ring-red-500'
                                         : ''
                                 }`}
-                                placeholder="Фамилия"
+                                placeholder={t("customer.form.lastName")}
                                 value={lastName}
                                 readOnly={readOnly}
                                 onChange={e => {
@@ -266,14 +268,14 @@ export const IndividualForm = ({
                         </CustomerFormField>
                     </div>
                         <div id="customer-field-firstName">
-                            <CustomerFormField label="Имя *">
+                            <CustomerFormField label={t("customer.form.firstName")}>
                                 <input
                                     className={`${customerInputClass} ${
                                         invalidFields.includes('firstName')
                                             ? 'border-red-500 ring-1 ring-red-500'
                                             : ''
                                     }`}
-                                    placeholder="Имя"
+                                    placeholder={t("customer.form.firstName")}
                                     value={firstName}
                                     readOnly={readOnly}
                                     onChange={e => {
@@ -286,17 +288,17 @@ export const IndividualForm = ({
                             </CustomerFormField>
                         </div>
 
-                    <CustomerFormField label="Отчество">
+                    <CustomerFormField label={t("customer.form.middleName")}>
                         <input
                             className={customerInputClass}
-                            placeholder="Отчество"
+                            placeholder={t("customer.form.middleName")}
                             value={middleName}
                             readOnly={readOnly}
                             onChange={e => setMiddleName(e.target.value)}
                         />
                     </CustomerFormField>
 
-                    <CustomerFormField label="Дата рождения">
+                    <CustomerFormField label={t("customer.form.birthDate")}>
                         <div className="relative">
                             <DateInput
                                 value={birthDate}
@@ -308,7 +310,7 @@ export const IndividualForm = ({
                     </CustomerFormField>
 
                     <div id="customer-field-phone">
-                        <CustomerFormField label="Телефон *">
+                        <CustomerFormField label={t("common.phone")}>
                             <PhoneInput
                                 className={`${customerInputClass} ${
                                     invalidFields.includes('phone')
@@ -343,15 +345,15 @@ export const IndividualForm = ({
 
             {/* Паспорт */}
             <FormSection
-                title="Паспорт"
-                description="Паспортные данные и регистрация"
+                title={t("customer.form.passport")}
+                description={t("customer.form.passportDescription")}
                 icon={SquareUser}
                 open={showPassport}
                 onToggle={() => setShowPassport(prev => !prev)}
             >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div id="customer-field-passportSerial">
-                        <CustomerFormField label={`Серия${passportStarted ? ' *' : ''}`}>
+                        <CustomerFormField label={`${t("customer.form.series")}${passportStarted ? " *" : ""}`}>
                             <DigitsInput
                                 className={customerInputClass}
                                 placeholder="0000"
@@ -368,7 +370,7 @@ export const IndividualForm = ({
                     </div>
                     
                     <div id="customer-field-passportNumber">
-                        <CustomerFormField label={`Номер${passportStarted ? ' *' : ''}`}>
+                        <CustomerFormField label={`${t("customer.form.number")}${passportStarted ? " *" : ""}`}>
                             <DigitsInput
                                 className={customerInputClass}
                                 placeholder="000000"
@@ -386,7 +388,7 @@ export const IndividualForm = ({
                     
                     <div id="customer-field-passportIssuedBy">
                         <CustomerFormField
-                            label={`Кем выдан${passportStarted ? ' *' : ''}`}
+                            label={`${t("customer.form.issuedBy")}${passportStarted ? " *" : ""}`}
                             className="md:col-span-2"
                         >
                             <input
@@ -395,7 +397,7 @@ export const IndividualForm = ({
                                         ? 'border-red-500 ring-1 ring-red-500'
                                         : ''
                                 }`}
-                                placeholder="Наименование подразделения"
+                                placeholder={t("customer.form.issuingAuthorityPlaceholder")}
                                 value={passportIssuedBy}
                                 readOnly={readOnly}
                                 onChange={e => {
@@ -410,7 +412,7 @@ export const IndividualForm = ({
                     
                     <div id="customer-field-passportIssuedDate">
                         <CustomerFormField
-                            label={`Дата выдачи${passportStarted ? ' *' : ''}`}
+                            label={`${t("customer.form.issueDate")}${passportStarted ? " *" : ""}`}
                         >
                             <DateInput
                                 className={customerInputClass}
@@ -429,7 +431,7 @@ export const IndividualForm = ({
                    
                     <div id="customer-field-registrationAddress">
                         <CustomerFormField
-                            label={`Адрес регистрации${passportStarted ? ' *' : ''}`}
+                            label={`${t("customer.form.registrationAddress")}${passportStarted ? " *" : ""}`}
                             className="md:col-span-2"
                         >
                             <textarea
@@ -439,7 +441,7 @@ export const IndividualForm = ({
                                         : ''
                                 }`}
                                 rows={3}
-                                placeholder="Введите адрес регистрации"
+                                placeholder={t("customer.form.registrationAddressPlaceholder")}
                                 value={registrationAddress}
                                 readOnly={readOnly}
                                 onChange={e => {
@@ -456,15 +458,15 @@ export const IndividualForm = ({
 
             {/* Водительское удостоверение */}
             <FormSection
-                title="Водительское удостоверение"
-                description="Данные водительских прав"
+                title={t("customer.form.driverLicense")}
+                description={t("customer.form.driverLicenseDescription")}
                 icon={Car}
                 open={showDriverLicense}
                 onToggle={() => setShowDriverLicense(prev => !prev)}
             >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div id="customer-field-driverLicenseNumber">
-                        <CustomerFormField label={`Номер ВУ${driverLicenseStarted ? ' *' : ''}`}>
+                        <CustomerFormField label={`${t("customer.form.driverLicenseNumber")}${driverLicenseStarted ? " *" : ""}`}>
                             <DriverLicenseInput
                                 className={customerInputClass}
                                 placeholder="00 00 000000"
@@ -482,7 +484,7 @@ export const IndividualForm = ({
                     </div>
                     
                     <div id="customer-field-driverLicenseCategories">
-                        <CustomerFormField label={`Категории${driverLicenseStarted ? ' *' : ''}`}>
+                        <CustomerFormField label={`${t("customer.form.categories")}${driverLicenseStarted ? " *" : ""}`}>
                             <DriverLicenseCategoriesInput
                                 className={customerInputClass}
                                 placeholder="B, BE"
@@ -500,7 +502,7 @@ export const IndividualForm = ({
                     </div>
                     
                     <div id="customer-field-driverLicenseIssuedDate">
-                        <CustomerFormField label={`Дата выдачи${driverLicenseStarted ? ' *' : ''}`}>
+                        <CustomerFormField label={`${t("customer.form.issueDate")}${driverLicenseStarted ? " *" : ""}`}>
                             <DateInput
                                 className={customerInputClass}
                                 value={driverLicenseIssuedDate}
@@ -516,7 +518,7 @@ export const IndividualForm = ({
                         </CustomerFormField>
                     </div>
                     <div id="customer-field-driverLicenseValidUntil">
-                        <CustomerFormField label={`Действительно до${driverLicenseStarted ? ' *' : ''}`}>
+                        <CustomerFormField label={`${t("customer.form.validUntil")}${driverLicenseStarted ? " *" : ""}`}>
                             <DateInput
                                 className={customerInputClass}
                                 value={driverLicenseValidUntil}
@@ -533,7 +535,7 @@ export const IndividualForm = ({
                     </div>
                     
                     <div id="customer-field-driverLicenseExperienceFrom">
-                        <CustomerFormField label={`Стаж с${driverLicenseStarted ? ' *' : ''}`}>
+                        <CustomerFormField label={`${t("customer.form.experienceFrom")}${driverLicenseStarted ? " *" : ""}`}>
                             <DigitsInput
                                 value={driverLicenseExperienceFrom}
                                 onChange={(value) => {
