@@ -662,6 +662,20 @@ const financeTranslations: Record<Language, Translations> = {
         "common.close": "Close",
         "finance.status.accrued": "Accrued",
         "finance.status.rejected": "Rejected"
+        "finance.rejectCharge": "Reject charge",
+        "finance.success.rejectCharge": "Charge rejected. Allocated payment released.",
+        "finance.refundMaxPrefix": "Maximum refundable amount after outstanding charges:",
+        "finance.refundPrompt": "Enter refund amount:",
+        "finance.refundAmountPrefix": "Enter an amount from 0.01 to",
+        "finance.available": "available",
+        "finance.rejectConfirm": "Reject charge",
+        "finance.rejectRefundAllocated": "Allocated payment of",
+        "finance.allocation.available": "Available to allocate:",
+        "finance.allocation.of": "out of",
+        "finance.allocation.instruction": "Enter the amount to allocate to each charge. The total cannot exceed the available balance.",
+        "finance.unit.liter": "L",
+        "finance.unit.km": "km",
+        "finance.unit.service": "service",
     },
     "ru": {
         "finance.charge.rental": "Аренда",
@@ -751,6 +765,20 @@ const financeTranslations: Record<Language, Translations> = {
         "common.close": "Закрыть",
         "finance.status.accrued": "Начислено",
         "finance.status.rejected": "Отклонено"
+        "finance.rejectCharge": "Отклонить начисление",
+        "finance.success.rejectCharge": "Начисление отклонено. Распределённая оплата освобождена.",
+        "finance.refundMaxPrefix": "Максимально доступно к возврату с учётом задолженности:",
+        "finance.refundPrompt": "Введите сумму возврата:",
+        "finance.refundAmountPrefix": "Введите сумму от 0,01 до",
+        "finance.available": "доступно",
+        "finance.rejectConfirm": "Отклонить начисление",
+        "finance.rejectRefundAllocated": "Распределённая оплата в размере",
+        "finance.allocation.available": "Доступно для распределения:",
+        "finance.allocation.of": "из",
+        "finance.allocation.instruction": "Укажите, какую сумму направить на каждое начисление. Общая сумма не должна превышать доступный остаток.",
+        "finance.unit.liter": "л",
+        "finance.unit.km": "км",
+        "finance.unit.service": "услуга",
     },
     "zh": {
         "finance.charge.rental": "租金",
@@ -868,6 +896,20 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         localStorage.setItem('language', language);
         document.documentElement.lang = language;
+        "finance.rejectCharge": "拒绝费用",
+        "finance.success.rejectCharge": "费用已拒绝，已分配的付款已释放。",
+        "finance.refundMaxPrefix": "扣除未结费用后，最多可退款：",
+        "finance.refundPrompt": "请输入退款金额：",
+        "finance.refundAmountPrefix": "请输入金额，范围为 0.01 至",
+        "finance.available": "可用",
+        "finance.rejectConfirm": "拒绝费用",
+        "finance.rejectRefundAllocated": "已分配付款金额：",
+        "finance.allocation.available": "可分配金额：",
+        "finance.allocation.of": "总额",
+        "finance.allocation.instruction": "请填写分配给每项费用的金额。总额不得超过可用余额。",
+        "finance.unit.liter": "升",
+        "finance.unit.km": "公里",
+        "finance.unit.service": "项",
     }, [language]);
 
     const t = (key: string): string => {
