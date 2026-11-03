@@ -24,7 +24,7 @@ export const MyBookingsPage = () => {
         };
 
         loadBookings();
-    }, []);
+    }, [t]);
 
     return (
         <div className="min-h-screen bg-gray-50 pt-24 pb-16 dark:bg-gray-900">
