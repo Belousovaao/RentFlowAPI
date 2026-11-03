@@ -10,6 +10,8 @@ public sealed class BookingChargeRepository : IBookingChargeRepository
     public Task<BookingCharge?> GetByIdAsync(Guid chargeId, CancellationToken ct = default) => _db.BookingCharges.FirstOrDefaultAsync(x => x.Id == chargeId, ct);
     public async Task<IReadOnlyList<BookingCharge>> GetByBookingIdAsync(Guid bookingId, CancellationToken ct = default)
         => await _db.BookingCharges.AsNoTracking().Where(x => x.BookingId == bookingId).OrderBy(x => x.CreatedAt).ToListAsync(ct);
+    public async Task<IReadOnlyList<BookingCharge>> GetTrackedByBookingIdAsync(Guid bookingId, CancellationToken ct = default)
+        => await _db.BookingCharges.Where(x => x.BookingId == bookingId).OrderBy(x => x.CreatedAt).ToListAsync(ct);
     public Task<BookingChargeSettings?> GetSettingsAsync(CancellationToken ct = default) => _db.BookingChargeSettings.FirstOrDefaultAsync(x => x.Id == 1, ct);
     public async Task SaveSettingsAsync(BookingChargeSettings settings, CancellationToken ct = default)
     {

@@ -732,6 +732,40 @@ namespace RentFlow.Persistance.Migrations
                     b.ToTable("PaymentAllocations", (string)null);
                 });
 
+            modelBuilder.Entity("RentFlow.Domain.Settings.RentalTariff", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTimeOffset>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("RentalTariffs", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RentalTariffs_Price_NonNegative", "\"Price\" >= 0");
+                        });
+                });
+
             modelBuilder.Entity("RentFlow.Domain.Customers.Individual", b =>
                 {
                     b.HasBaseType("RentFlow.Domain.Customers.Customer");

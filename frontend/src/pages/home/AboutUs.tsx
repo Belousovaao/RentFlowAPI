@@ -1,35 +1,34 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, CarFront, CheckCircle2, ClipboardList, MessageCircle, } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 type Principle = {
-    title: string;
-    description: string;
+    titleKey: string;
+    descriptionKey: string;
     icon: LucideIcon;
 };
 
 const principles: Principle[] = [
     {
-        title: 'Понятные условия',
-        description:
-            'Условия аренды и дополнительные расходы согласовываются заранее, чтобы вы понимали, за что платите.',
+        titleKey: 'about.principle.clearTitle',
+        descriptionKey: 'about.principle.clearDescription',
         icon: ClipboardList,
     },
     {
-        title: 'Внимание к автомобилю',
-        description:
-            'Перед передачей автомобиля уделяем внимание его состоянию и готовности к поездке.',
+        titleKey: 'about.principle.vehicleTitle',
+        descriptionKey: 'about.principle.vehicleDescription',
         icon: CarFront,
     },
     {
-        title: 'Связь с арендодателем',
-        description:
-            'Вы можете обратиться с вопросами по бронированию и аренде напрямую к арендодателю.',
+        titleKey: 'about.principle.contactTitle',
+        descriptionKey: 'about.principle.contactDescription',
         icon: MessageCircle,
     },
 ];
 
 export const AboutUsPage = () => {
+    const { t } = useI18n();
     return (
         <main className="min-h-screen bg-gray-50 pb-16 pt-24 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
             <div className="container mx-auto max-w-6xl px-4 sm:px-6">
@@ -40,29 +39,22 @@ export const AboutUsPage = () => {
                     />
                     <div className="relative max-w-3xl">
                         <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl text-black dark:text-white">
-                            Аренда автомобилей без лишних сложностей
+                            {t("about.title")}
                         </h1>
                         <p className="mt-4 text-lg font-medium text-gray-700 dark:text-gray-200 sm:text-xl">
-                            Волнами Драйв — движение на твоей волне.
+                            {t("about.slogan")}
                         </p>
                         <p className="mt-5 max-w-2xl text-base leading-7 text-gray-600 dark:text-gray-300 sm:text-lg">
-                            Мы предоставляем автомобили в аренду для поездок по городу,
-                            путешествий и решения повседневных задач. Наша работа строится
-                            на простых принципах: исправные автомобили, понятные условия
-                            аренды и прозрачный расчёт стоимости.
+                            {t("about.intro")}
                         </p>
                         <p className="mt-4 max-w-2xl leading-7 text-gray-600 dark:text-gray-300">
-                            Мы заранее согласовываем условия, внимательно относимся к
-                            подготовке автомобиля и остаёмся на связи на протяжении всего
-                            срока аренды. Наша цель — сделать аренду удобной и
-                            предсказуемой, чтобы вы могли сосредоточиться на своих планах,
-                            а не на организационных вопросах.
+                            {t("about.secondParagraph")}
                         </p>
                         <Link
                             to="/assets"
                             className="mt-7 inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
                         >
-                            Выбрать автомобиль
+                            {t("account.bookings.chooseVehicle")}
                             <ArrowRight className="h-4 w-4" aria-hidden="true" />
                         </Link>
                     </div>
@@ -71,13 +63,13 @@ export const AboutUsPage = () => {
                 <section className="mb-8" aria-labelledby="principles-heading">
                     <div className="mb-5 max-w-2xl">
                         <p className="text-sm font-semibold uppercase tracking-wider text-primary-700 dark:text-primary-300">
-                            Наш подход
+                            {t("about.approach")}
                         </p>
                         <h2
                             id="principles-heading"
                             className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl text-black dark:text-white"
                         >
-                            На чём строится аренда
+                            {t("about.principlesTitle")}
                         </h2>
                     </div>
 
@@ -87,7 +79,7 @@ export const AboutUsPage = () => {
 
                             return (
                                 <article
-                                    key={principle.title}
+                                    key={t(principle.titleKey)}
                                     className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-800"
                                 >
                                     <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-primary-50 text-primary-700 dark:bg-primary-950/50 dark:text-primary-300">
@@ -97,7 +89,7 @@ export const AboutUsPage = () => {
                                         {principle.title}
                                     </h3>
                                     <p className="mt-2 leading-7 text-gray-600 dark:text-gray-300">
-                                        {principle.description}
+                                        {t(principle.descriptionKey)}
                                     </p>
                                 </article>
                             );
@@ -112,19 +104,16 @@ export const AboutUsPage = () => {
                         </div>
                         <div>
                             <h2 className="text-xl font-bold tracking-tight text-black dark:text-white">
-                                Прозрачность с самого начала
+                                {t("about.transparencyTitle")}
                             </h2>
                             <p className="mt-2 max-w-3xl leading-7 text-gray-600 dark:text-gray-300">
-                                До подтверждения бронирования вы можете ознакомиться с
-                                условиями аренды, стоимостью и размером залога для
-                                выбранного автомобиля. Если что-то остаётся непонятным,
-                                условия можно уточнить до заключения договора.
+                                {t("about.transparencyDescription")}
                             </p>
                             <Link
                                 to="/rental-terms"
                                 className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary-700 transition-colors hover:text-primary-800 dark:text-primary-300 dark:hover:text-primary-200"
                             >
-                                Ознакомиться с условиями аренды
+                                {t("about.rentalTermsLink")}
                                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
                             </Link>
                         </div>
@@ -133,13 +122,10 @@ export const AboutUsPage = () => {
 
                 <section className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-gray-800 sm:p-6">
                     <h2 className="text-base font-semibold text-gray-900 dark:text-white">
-                        Информация об арендодателе
+                        {t("about.lessorTitle")}
                     </h2>
                     <p className="mt-2 leading-7 text-gray-600 dark:text-gray-300">
-                        «Волнами Драйв» (Volnami Drive) — бренд частного автопроката.
-                        Услуги аренды оказывает физическое лицо, применяющее специальный
-                        налоговый режим «Налог на профессиональный доход» (самозанятый).
-                        Договор аренды заключается непосредственно с арендодателем.
+                        {t("about.lessorDescription")}
                     </p>
                 </section>
             </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useI18n } from '@/app/providers/I18nProvider';
 import { CustomerDetailsDto, CustomerType, UpdateCustomerRequest, type CreateCustomerRequest } from '@/entities/customer/customer.type';
 import { Building2, FileText, Landmark, Save } from 'lucide-react';
 import { FormSection } from './FormSection';
@@ -20,6 +21,7 @@ export const OrganizationForm = ({
     readOnly,
     onCreate,
     onUpdate }: OrganizationFormProps) => {
+        const { t } = useI18n();
         const isEditMode = !!customer;
         const [showOrganizationInfo, setShowOrganizationInfo] = useState(true);
         const [showOrganizationDetails, setShowOrganizationDetails] = useState(false);
@@ -99,7 +101,7 @@ export const OrganizationForm = ({
             <div className="space-y-4">
 
                 <FormSection
-                    title="Данные организации"
+                    title={t("customer.form.organizationData")}
                     icon={Building2}
                     open={showOrganizationInfo}
                     onToggle={() =>
@@ -108,20 +110,20 @@ export const OrganizationForm = ({
                 >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                        <CustomerFormField label="ОПФ">
+                        <CustomerFormField label={t("customer.form.legalForm")}>
                             <input
                                 className={customerInputClass}
-                                placeholder="ООО, АО и т.д."
+                                placeholder={t("customer.form.legalFormPlaceholder")}
                                 value={legalForm}
                                 readOnly={readOnly}
                                 onChange={e => setLegalForm(e.target.value)}
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="Краткое наименование (без ОПФ)">
+                        <CustomerFormField label={t("customer.form.shortOrganizationName")}>
                             <input
                                 className={customerInputClass}
-                                placeholder="Название организации"
+                                placeholder={t("customer.form.organizationNamePlaceholder")}
                                 value={shortName}
                                 readOnly={readOnly}
                                 onChange={e => setShortName(e.target.value)}
@@ -129,19 +131,19 @@ export const OrganizationForm = ({
                         </CustomerFormField>
 
                         <CustomerFormField
-                            label="Полное наименование (без ОПФ)"
+                            label={t("customer.form.fullOrganizationName")}
                             className="md:col-span-2"
                         >
                             <input
                                 className={customerInputClass}
-                                placeholder="Полное наименование"
+                                placeholder={t("customer.form.fullNamePlaceholder")}
                                 value={fullName}
                                 readOnly={readOnly}
                                 onChange={e => setFullName(e.target.value)}
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="Телефон">
+                        <CustomerFormField label={t("common.phone")}>
                             <PhoneInput
                                 className={customerInputClass}
                                 placeholder="+7 (___) ___-__-__"
@@ -166,7 +168,7 @@ export const OrganizationForm = ({
 
 
                 <FormSection
-                    title="Реквизиты"
+                    title={t("customer.form.details")}
                     icon={FileText}
                     open={showOrganizationDetails}
                     onToggle={() =>
@@ -175,10 +177,10 @@ export const OrganizationForm = ({
                 >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                        <CustomerFormField label="ИНН">
+                        <CustomerFormField label={t("customer.form.inn")}>
                             <DigitsInput
                                 className={customerInputClass}
-                                placeholder="10 цифр"
+                                placeholder={t("customer.form.tenDigits")}
                                 value={inn}
                                 readOnly={readOnly}
                                 maxLength={10}
@@ -187,10 +189,10 @@ export const OrganizationForm = ({
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="ОГРН">
+                        <CustomerFormField label={t("customer.form.ogrn")}>
                             <DigitsInput
                                 className={customerInputClass}
-                                placeholder="13 цифр"
+                                placeholder={t("customer.form.thirteenDigits")}
                                 value={ogrn}
                                 readOnly={readOnly}
                                 maxLength={13}
@@ -199,10 +201,10 @@ export const OrganizationForm = ({
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="КПП">
+                        <CustomerFormField label={t("customer.form.kpp")}>
                             <DigitsInput
                                 className={customerInputClass}
-                                placeholder="9 цифр"
+                                placeholder={t("customer.form.nineDigits")}
                                 value={kpp}
                                 readOnly={readOnly}
                                 maxLength={9}
@@ -214,13 +216,13 @@ export const OrganizationForm = ({
                         <div />
 
                         <CustomerFormField
-                            label="Юридический адрес"
+                            label={t("customer.form.legalAddress")}
                             className="md:col-span-2"
                         >
                             <textarea
                                 className={`${customerInputClass} resize-none`}
                                 rows={2}
-                                placeholder="Юридический адрес"
+                                placeholder={t("customer.form.legalAddress")}
                                 value={organizationAddress}
                                 readOnly={readOnly}
                                 onChange={e => setOrganizationAddress(e.target.value)}
@@ -228,13 +230,13 @@ export const OrganizationForm = ({
                         </CustomerFormField>
 
                         <CustomerFormField
-                            label="Фактический адрес"
+                            label={t("customer.form.actualAddress")}
                             className="md:col-span-2"
                         >
                             <textarea
                                 className={`${customerInputClass} resize-none`}
                                 rows={2}
-                                placeholder="Фактический адрес"
+                                placeholder={t("customer.form.actualAddress")}
                                 value={factAddress}
                                 readOnly={readOnly}
                                 onChange={e => setFactAddress(e.target.value)}
@@ -246,14 +248,14 @@ export const OrganizationForm = ({
 
 
                 <FormSection
-                    title="Банковские реквизиты"
+                    title={t("customer.form.bankDetails")}
                     icon={Landmark}
                     open={showBankInfo}
                     onToggle={() => setShowBankInfo(prev => !prev)}
                 >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                        <CustomerFormField label="Расчетный счет">
+                        <CustomerFormField label={t("customer.form.bankAccount")}>
                             <input
                                 className={customerInputClass}
                                 value={currentAccount}
@@ -262,7 +264,7 @@ export const OrganizationForm = ({
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="Корреспондентский счет">
+                        <CustomerFormField label={t("customer.form.correspondentAccount")}>
                             <input
                                 className={customerInputClass}
                                 value={correspondentAccount}
@@ -273,7 +275,7 @@ export const OrganizationForm = ({
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="БИК">
+                        <CustomerFormField label={t("customer.form.bik")}>
                             <input
                                 className={customerInputClass}
                                 value={bik}
@@ -282,10 +284,10 @@ export const OrganizationForm = ({
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="Банк">
+                        <CustomerFormField label={t("customer.form.bank")}>
                             <input
                                 className={customerInputClass}
-                                placeholder="Наименование банка"
+                                placeholder={t("customer.form.bankNamePlaceholder")}
                                 value={bankName}
                                 readOnly={readOnly}
                                 onChange={e => setBankName(e.target.value)}
@@ -306,8 +308,8 @@ export const OrganizationForm = ({
                             <Save className="w-4 h-4" />
 
                             {isEditMode
-                                ? 'Сохранить изменения'
-                                : 'Создать клиента'}
+                                ? t('common.saveChanges')
+                                : t('customer.create.submit')}
                         </button>
                     </div>
                 )}

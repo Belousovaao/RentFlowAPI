@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import type { BookingListItemDto } from '@/entities/booking/booking.types';
 import { BookingStatusBadge } from '@/features/booking/components/BookingStatusBage';
 import { getPhotoUrl } from '@/shared/utils/photoUrl';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 interface Props {
     bookings: BookingListItemDto[];
 }
 
 export const UpcomingBookingCard = ({ bookings }: Props) => {
+    const { t, language } = useI18n();
     const booking = getFeaturedBooking(bookings);
 
     if (!booking) {
@@ -17,15 +19,15 @@ export const UpcomingBookingCard = ({ bookings }: Props) => {
                 <div className="flex min-h-[280px] flex-col justify-between p-6 md:p-8">
                     <div>
                         <p className="text-sm font-medium uppercase tracking-wider text-primary-600 dark:text-primary-400">
-                            Следующая поездка
+                            {t("account.upcoming.nextTrip")}
                         </p>
 
                         <h2 className="mt-3 text-2xl font-bold text-gray-900 dark:text-white">
-                            Куда отправимся дальше?
+                            {t("account.upcoming.whereNext")}
                         </h2>
 
                         <p className="mt-2 max-w-md text-gray-500 dark:text-gray-400">
-                            Выберите автомобиль и создайте бронирование для следующей поездки.
+                            {t("account.upcoming.description")}
                         </p>
                     </div>
 
@@ -33,7 +35,7 @@ export const UpcomingBookingCard = ({ bookings }: Props) => {
                         to="/assets"
                         className="mt-8 inline-flex w-fit items-center gap-2 rounded-xl bg-primary-600 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-primary-700"
                     >
-                        Выбрать автомобиль
+                        {t("account.bookings.chooseVehicle")}
                         <ArrowRight className="h-4 w-4" />
                     </Link>
                 </div>
@@ -72,7 +74,7 @@ export const UpcomingBookingCard = ({ bookings }: Props) => {
                     <div>
                         <div className="flex flex-wrap items-center justify-between gap-3">
                             <p className="text-sm font-medium uppercase tracking-wider text-primary-600 dark:text-primary-400">
-                                {isActive ? 'Вы в поездке' : 'Ваша поездка'}
+                                {isActive ? t('account.upcoming.inTrip') : t('account.upcoming.yourTrip')}
                             </p>
 
                             <BookingStatusBadge status={booking.status} />
@@ -83,9 +85,9 @@ export const UpcomingBookingCard = ({ bookings }: Props) => {
                                 <Calendar className="h-5 w-5 text-gray-400" />
 
                                 <span className="text-lg font-medium">
-                                    {formatDate(booking.rentalPeriod.startDate)}
+                                    {formatDate(booking.rentalPeriod.startDate, language)}
                                     {' — '}
-                                    {formatDate(booking.rentalPeriod.endDate)}
+                                    {formatDate(booking.rentalPeriod.endDate, language)}
                                 </span>
                             </div>
 
@@ -94,8 +96,8 @@ export const UpcomingBookingCard = ({ bookings }: Props) => {
 
                                 <span>
                                     {isActive
-                                        ? 'Аренда уже началась'
-                                        : getDaysUntil(booking.rentalPeriod.startDate)}
+                                        ? t('account.upcoming.rentalStarted')
+                                        : getDaysUntil(booking.rentalPeriod.startDate, t, language)}
                                 </span>
                             </div>
                         </div>
@@ -105,7 +107,7 @@ export const UpcomingBookingCard = ({ bookings }: Props) => {
                         to={`/account/bookings/${booking.id}`}
                         className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-primary-600 transition-colors hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                     >
-                        Подробнее
+                        {t("common.details")}
                         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Link>
                 </div>
@@ -142,13 +144,13 @@ const getFeaturedBooking = (bookings: BookingListItemDto[],): BookingListItemDto
     return upcomingBookings[0] ?? null;
 };
 
-const formatDate = (value: string) =>
-    new Intl.DateTimeFormat('ru-RU', {
+const formatDate = (value: string, language: string) =>
+    new Intl.DateTimeFormat(language === 'zh' ? 'zh-CN' : language === 'en' ? 'en-GB' : 'ru-RU', {
         day: 'numeric',
         month: 'long',
     }).format(new Date(value));
 
-const getDaysUntil = (value: string): string => {
+const getDaysUntil = (value: string, t: (key: string) => string, language: string): string => {
     const now = new Date();
     const start = new Date(value);
 
@@ -156,16 +158,16 @@ const getDaysUntil = (value: string): string => {
     const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
 
     if (days <= 0) {
-        return 'Начинается сегодня';
+        return t('account.upcoming.startsToday');
     }
 
     if (days === 1) {
-        return 'До поездки 1 день';
+        return t('account.upcoming.oneDay');
     }
 
     if (days < 5) {
-        return `До поездки ${days} дня`;
+        return `${t('account.upcoming.daysUntil')} ${days}`;
     }
 
-    return `До поездки ${days} дней`;
+    return `${t('account.upcoming.daysUntil')} ${days}`;
 };

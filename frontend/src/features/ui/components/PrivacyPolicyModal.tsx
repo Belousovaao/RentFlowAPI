@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import PrivacyPolicy from '@/pages/home/PrivacyPolicy';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 type PrivacyPolicyModalProps = {
   open: boolean;
@@ -13,6 +14,7 @@ export default function PrivacyPolicyModal({
   open,
   onClose,
 }: PrivacyPolicyModalProps) {
+  const { t } = useI18n();
   useEffect(() => {
     if (!open) return;
 
@@ -50,13 +52,13 @@ export default function PrivacyPolicyModal({
             id="privacy-modal-title"
             className="text-lg font-semibold text-slate-900"
           >
-            Политика обработки персональных данных
+            {t("consent.policyLink")}
           </h2>
 
           <button
             type="button"
             onClick={onClose}
-            aria-label="Закрыть политику конфиденциальности"
+            aria-label={t("common.closePrivacy")}
             className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
           >
             <X size={22} />

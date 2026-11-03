@@ -1,12 +1,15 @@
 import { Asset } from "@/entities/asset/asset.types";
 import { bookingApi } from "@/entities/booking/booking.api";
 import { adminAssetsApi } from "@/features/admin/api/adminAsset.api";
+import { adminCustomersApi } from "@/features/admin/api/adminCustomers.api";
 import { BarChart3, Calendar, Car, TrendingUp, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useI18n } from "@/app/providers/I18nProvider";
 
 /* ЛК Админа */
 export const AdminAccountPage = () => {
+    const { t, language } = useI18n();
     const StatCard = ({ label, value, icon: Icon }: { label: string; value: string; icon: any }) => (
         <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
             <div className="rounded-lg bg-primary-100 p-2 text-primary-600 dark:bg-primary-900/30">
@@ -21,45 +24,50 @@ export const AdminAccountPage = () => {
 
     const adminModules = [
         {
-            title: 'Автомобили',
+            title: t('admin.module.assets'),
             icon: Car,
-            description: 'Добавление, редактирование, удаление, загрузка фото',
+            description: t('admin.module.assetsDescription'),
             link: '/admin/assets',
             color: 'bg-blue-500',
         },
         {
-            title: 'Бронирования',
+            title: t('admin.module.bookings'),
             icon: Calendar,
-            description: 'Просмотр всех бронирований, изменение статусов, отмена',
+            description: t('admin.module.bookingsDescription'),
             link: '/admin/bookings',
             color: 'bg-green-500',
         },
         {
-            title: 'Пользователи',
+            title: t('admin.module.users'),
             icon: Users,
-            description: 'Управление пользователями, роли, блокировки',
+            description: t('admin.module.usersDescription'),
             link: '/admin/users',
             color: 'bg-purple-500',
         },
         {
-            title: 'Статистика',
+            title: t('admin.module.statistics'),
             icon: BarChart3,
-            description: 'Аналитика: загрузка автомобилей, выручка, популярные модели',
+            description: t('admin.module.statisticsDescription'),
             link: '/admin/statistics',
             color: 'bg-orange-500',
         },
         {
-            title: 'Календарь занятости',
+            title: t('admin.module.calendar'),
             icon: TrendingUp,
-            description: 'Просмотр свободных и занятых автомобилей на даты',
+            description: t('admin.module.calendarDescription'),
             link: '/admin/availability',
             color: 'bg-teal-500',
         },
     ];
 
-    const [stats, setStats] = useState({availableAssets: 0,});
+    const [stats, setStats] = useState({
+        availableAssets: 0,
+        activeBookings: 0,
+        totalCustomers: 0,
+        uniqueCustomers: 0,
+        monthlyRevenue: 0,
+    });
     const [loading, setLoading] = useState(true);
-    const [bookingCount, setBookingCount] = useState(0);
     const [pendingBookings, setPendingBookings] = useState(0);
 
     useEffect(() => {
@@ -69,48 +77,50 @@ export const AdminAccountPage = () => {
     const fetchStats = async () => {
         setLoading(true);
         try {
-            // Получаем данные для статистики
-            const [assetsRes, bookingsRes] = await Promise.all([
-                adminAssetsApi.getList({ page: 1, pageSize: 100, showDisabled: true }),
+            const [assetsRes, bookings, customersRes] = await Promise.all([
+                adminAssetsApi.getList({ page: 1, pageSize: 1000, showDisabled: true }),
                 bookingApi.getAdminBookings(),
+                adminCustomersApi.getList({ page: 1, pageSize: 1, showRejected: true }),
             ]);
 
             const allAssets = assetsRes.data.data || [];
-            const pendingBookings = bookingsRes.filter(booking => booking.status === 'Pending').length;
-            const activeBookings = bookingsRes.filter((b: any) => b.status === 'Active').length || 0;
-            const availableAssets = allAssets.filter((a: Asset) => a.status === "Available").length;
-            setPendingBookings(pendingBookings)
-            //const totalCustomers = customersRes.data?.length || 0;
-            //const uniqCustomers = customersRes.data.Distinct().length;
-            
-            // Рассчитываем выручку за месяц (пример)
-            // const monthlyRevenue = calculateMonthlyRevenue(bookingsRes.data);
+            const activeBookings = bookings.filter(booking => booking.status === 'Active').length;
+            const pendingCount = bookings.filter(booking => booking.status === 'Pending').length;
+            const availableAssets = allAssets.filter((asset: Asset) => asset.status === "Available").length;
+            const uniqueCustomers = new Set(bookings.map(booking => booking.customer.id)).size;
+
+            const now = new Date();
+            const monthlyRevenue = bookings
+                .filter(booking => {
+                    const startDate = new Date(booking.rentalPeriod.startDate);
+                    return booking.status !== 'Cancelled' &&
+                        startDate.getMonth() === now.getMonth() &&
+                        startDate.getFullYear() === now.getFullYear();
+                })
+                .reduce((sum, booking) => sum + (booking.price?.total ?? 0), 0);
+
+            setPendingBookings(pendingCount);
             setStats({
-                 availableAssets,
-             });
-        } 
-        catch (err) {
+                availableAssets,
+                activeBookings,
+                totalCustomers: customersRes.data?.total ?? customersRes.data?.data?.length ?? 0,
+                uniqueCustomers,
+                monthlyRevenue,
+            });
+        } catch (err) {
             console.error('Error fetching stats:', err);
-        } 
-        finally {
+        } finally {
             setLoading(false);
         }
     };
 
-    const calculateMonthlyRevenue = (bookings: any[]) => {
-        if (!bookings) return 0;
-        const now = new Date();
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
-        
-        return bookings
-            .filter(b => {
-                const bookingDate = new Date(b.startDate);
-                return bookingDate.getMonth() === currentMonth && 
-                       bookingDate.getFullYear() === currentYear;
-            })
-            .reduce((sum, b) => sum + (b.price.totalPrice || 0), 0);
-    };
+    const formatCurrency = (amount: number) =>
+        new Intl.NumberFormat(language === 'zh' ? 'zh-CN' : language === 'en' ? 'en-GB' : 'ru-RU', {
+            style: 'currency',
+            currency: 'RUB',
+            maximumFractionDigits: 0,
+        }).format(amount);
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-24 pb-16">
             <div className="container mx-auto px-4">
@@ -137,7 +147,7 @@ export const AdminAccountPage = () => {
                                         </p>
                                     </div>
                                 </div>
-                                {module.title === "Бронирования" && pendingBookings > 0 && (
+                                {module.title === t('admin.module.bookings') && pendingBookings > 0 && (
                                     <span className="absolute right-4 top-4 flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-bold text-white shadow-sm">
                                         {pendingBookings}
                                     </span>
@@ -150,20 +160,20 @@ export const AdminAccountPage = () => {
                 {/* Быстрая статистика */}
                 <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
                     <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-                        Статистика
+                        {t("admin.stats.title")}
                     </h3>
-                    {loading? (
+                    {loading ? (
                         <div className="flex justify-center py-8">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
                         </div>
                     ) : (
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                            <StatCard label="Активных бронирований" value='0' icon={Calendar} />
-                            <StatCard label="Доступно автомобилей" value={stats.availableAssets.toString()} icon={Car} />
-                            <StatCard label="Всего клиентов" value='0' icon={Users} />
-                            <StatCard label="Количество уникальных клиентов" value='0' icon={Users} />
-                            <StatCard label="Выручка за месяц" value="₽ 342 500" icon={TrendingUp} />
-                            <StatCard label="Расходы на содержание и обслуживание" value="₽ 342 500" icon={TrendingUp} />
+                            <StatCard label={t("admin.stats.activeBookings")} value={(stats.activeBookings ?? 0).toString()} icon={Calendar} />
+                            <StatCard label={t("admin.stats.availableAssets")} value={(stats.availableAssets ?? 0).toString()} icon={Car} />
+                            <StatCard label={t("admin.stats.totalCustomers")} value={(stats.totalCustomers ?? 0).toString()} icon={Users} />
+                            <StatCard label={t("admin.stats.uniqueCustomers")} value={(stats.uniqueCustomers ?? 0).toString()} icon={Users} />
+                            <StatCard label={t("admin.stats.monthlyBookingAmount")} value={formatCurrency(stats.monthlyRevenue ?? 0)} icon={TrendingUp} />
+                            <StatCard label={t("admin.stats.maintenanceExpenses")} value="—" icon={TrendingUp} />
                         </div>
                     )}
                 </div>
@@ -171,5 +181,3 @@ export const AdminAccountPage = () => {
         </div>
     );
 };
-
-

@@ -1,6 +1,7 @@
 import { PersonalDataConsentDocument } from '@/features/auth/api/auth.api';
 import { useId } from 'react';
 import { Link } from 'react-router-dom';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 type PersonalDataConsentCheckboxProps = {
   checked: boolean;
@@ -15,6 +16,7 @@ export default function PersonalDataConsentCheckbox({
   document,
   error,
 }: PersonalDataConsentCheckboxProps) {
+  const { t } = useI18n();
   const id = useId();
   const errorId = `${id}-error`;
 
@@ -40,14 +42,14 @@ export default function PersonalDataConsentCheckbox({
         />
 
         <span>
-          Я даю согласие на обработку персональных данных и подтверждаю, что ознакомился(-ась) с{' '}
+          {t("consent.checkbox.prefix")}{' '}
           <Link
             to="/privacy"
             target="_blank"
             rel="noopener noreferrer"
             className="underline underline-offset-4 hover:text-slate-950 dark:hover:text-white"
           >
-            Политикой обработки персональных данных
+            {t("consent.policyLink")}
           </Link>.
         </span>
       </label>
@@ -55,7 +57,7 @@ export default function PersonalDataConsentCheckbox({
       {document && (
         <details className="rounded-xl border border-gray-200 dark:border-gray-700">
           <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-primary-700 dark:text-primary-400">
-            Прочитать текст согласия
+            {t("consent.readText")}
           </summary>
 
           <div className="max-h-64 overflow-y-auto border-t border-gray-200 px-4 py-3 dark:border-gray-700">
@@ -68,7 +70,7 @@ export default function PersonalDataConsentCheckbox({
 
       {!document && !error && (
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          Загружаем текст согласия…
+          {t("consent.loading")}
         </p>
       )}
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useI18n } from '@/app/providers/I18nProvider';
 import { CustomerDetailsDto, CustomerType, UpdateCustomerRequest, type CreateCustomerRequest } from '@/entities/customer/customer.type';
 import { Briefcase, Car, Landmark, Save, SquareUser, User } from 'lucide-react';
 import { FormSection } from './FormSection';
@@ -23,6 +24,7 @@ export const EntrepreneurForm = ({
     onCreate,
     onUpdate 
 }: EntrepreneurFormProps) => {
+        const { t } = useI18n();
         const isEditMode = !!customer;
 
         const [showPersonalInfo, setShowPersonalInfo] = useState(true);
@@ -148,44 +150,44 @@ export const EntrepreneurForm = ({
             <div className="space-y-4">
 
                 <FormSection
-                    title="Личные данные"
+                    title={t("customer.form.personalData")}
                     icon={User}
                     open={showPersonalInfo}
                     onToggle={() => setShowPersonalInfo(prev => !prev)}
                 >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                        <CustomerFormField label="Фамилия">
+                        <CustomerFormField label={t("customer.form.lastName")}>
                             <input
                                 className={customerInputClass}
-                                placeholder="Фамилия"
+                                placeholder={t("customer.form.lastName")}
                                 value={lastName}
                                 readOnly={readOnly}
                                 onChange={e => setLastName(e.target.value)}
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="Имя">
+                        <CustomerFormField label={t("customer.form.firstName")}>
                             <input
                                 className={customerInputClass}
-                                placeholder="Имя"
+                                placeholder={t("customer.form.firstName")}
                                 value={firstName}
                                 readOnly={readOnly}
                                 onChange={e => setFirstName(e.target.value)}
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="Отчество">
+                        <CustomerFormField label={t("customer.form.middleName")}>
                             <input
                                 className={customerInputClass}
-                                placeholder="Отчество"
+                                placeholder={t("customer.form.middleName")}
                                 value={middleName}
                                 readOnly={readOnly}
                                 onChange={e => setMiddleName(e.target.value)}
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="Телефон">
+                        <CustomerFormField label={t("common.phone")}>
                             <PhoneInput
                                 className={customerInputClass}
                                 placeholder="+7 (___) ___-__-__"
@@ -209,14 +211,14 @@ export const EntrepreneurForm = ({
 
 
                 <FormSection
-                    title="Паспорт"
+                    title={t("customer.form.passport")}
                     icon={SquareUser}
                     open={showPassport}
                     onToggle={() => setShowPassport(prev => !prev)}
                 >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                        <CustomerFormField label="Серия">
+                        <CustomerFormField label={t("customer.form.series")}>
                         <DigitsInput
                             className={customerInputClass}
                             placeholder="0000"
@@ -228,7 +230,7 @@ export const EntrepreneurForm = ({
                         />
                     </CustomerFormField>
 
-                    <CustomerFormField label="Номер">
+                    <CustomerFormField label={t("customer.form.number")}>
                         <DigitsInput
                             className={customerInputClass}
                             placeholder="000000"
@@ -241,19 +243,19 @@ export const EntrepreneurForm = ({
                     </CustomerFormField>
 
                         <CustomerFormField
-                            label="Кем выдан"
+                            label={t("customer.form.issuedBy")}
                             className="md:col-span-2"
                         >
                             <input
                                 className={customerInputClass}
-                                placeholder="Наименование подразделения"
+                                placeholder={t("customer.form.issuingAuthorityPlaceholder")}
                                 value={passportIssuedBy}
                                 readOnly={readOnly}
                                 onChange={e => setPassportIssuedBy(e.target.value)}
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="Дата выдачи">
+                        <CustomerFormField label={t("customer.form.issueDate")}>
                             <input
                                 type="date"
                                 className={customerInputClass}
@@ -264,13 +266,13 @@ export const EntrepreneurForm = ({
                         </CustomerFormField>
 
                         <CustomerFormField
-                            label="Адрес регистрации"
+                            label={t("customer.form.registrationAddress")}
                             className="md:col-span-2"
                         >
                             <textarea
                                 className={`${customerInputClass} resize-none`}
                                 rows={3}
-                                placeholder="Адрес регистрации"
+                                placeholder={t("customer.form.registrationAddress")}
                                 value={registrationAddress}
                                 readOnly={readOnly}
                                 onChange={e => setRegistrationAddress(e.target.value)}
@@ -281,14 +283,14 @@ export const EntrepreneurForm = ({
 
 
                 <FormSection
-                    title="Водительское удостоверение"
+                    title={t("customer.form.driverLicense")}
                     icon={Car}
                     open={showDriverLicense}
                     onToggle={() => setShowDriverLicense(prev => !prev)}
                 >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                        <CustomerFormField label="Номер ВУ">
+                        <CustomerFormField label={t("customer.form.driverLicenseNumber")}>
                             <DriverLicenseInput
                                 className={customerInputClass}
                                 placeholder="00 00 000000"
@@ -299,7 +301,7 @@ export const EntrepreneurForm = ({
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="Категории">
+                        <CustomerFormField label={t("customer.form.categories")}>
                             <DriverLicenseCategoriesInput
                                 className={customerInputClass}
                                 placeholder="B, BE"
@@ -309,7 +311,7 @@ export const EntrepreneurForm = ({
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="Дата выдачи">
+                        <CustomerFormField label={t("customer.form.issueDate")}>
                             <input
                                 type="date"
                                 className={customerInputClass}
@@ -319,7 +321,7 @@ export const EntrepreneurForm = ({
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="Действительно до">
+                        <CustomerFormField label={t("customer.form.validUntil")}>
                             <input
                                 type="date"
                                 className={customerInputClass}
@@ -329,7 +331,7 @@ export const EntrepreneurForm = ({
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="Стаж с">
+                        <CustomerFormField label={t("customer.form.experienceFrom")}>
                             <DigitsInput
                                 value={driverLicenseExperienceFrom}
                                 onChange={(value) => {
@@ -349,17 +351,17 @@ export const EntrepreneurForm = ({
 
 
                 <FormSection
-                    title="Данные ИП"
+                    title={t("customer.form.entrepreneurData")}
                     icon={Briefcase}
                     open={showEntrepreneurInfo}
                     onToggle={() => setShowEntrepreneurInfo(prev => !prev)}
                 >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                        <CustomerFormField label="ИНН">
+                        <CustomerFormField label={t("customer.form.inn")}>
                             <DigitsInput
                                 className={customerInputClass}
-                                placeholder="12 цифр"
+                                placeholder={t("customer.form.twelveDigits")}
                                 value={inn}
                                 readOnly={readOnly}
                                 maxLength={12}
@@ -368,10 +370,10 @@ export const EntrepreneurForm = ({
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="ОГРНИП">
+                        <CustomerFormField label={t("customer.form.ogrnip")}>
                             <DigitsInput
                                 className={customerInputClass}
-                                placeholder="15 цифр"
+                                placeholder={t("customer.form.fifteenDigits")}
                                 value={ogrnip}
                                 readOnly={readOnly}
                                 maxLength={15}
@@ -381,13 +383,13 @@ export const EntrepreneurForm = ({
                         </CustomerFormField>
 
                         <CustomerFormField
-                            label="Юридический адрес"
+                            label={t("customer.form.legalAddress")}
                             className="md:col-span-2"
                         >
                             <textarea
                                 className={`${customerInputClass} resize-none`}
                                 rows={2}
-                                placeholder="Введите адрес"
+                                placeholder={t("customer.form.enterAddress")}
                                 value={organizationAddress}
                                 readOnly={readOnly}
                                 onChange={e => setOrganizationAddress(e.target.value)}
@@ -395,13 +397,13 @@ export const EntrepreneurForm = ({
                         </CustomerFormField>
 
                         <CustomerFormField
-                            label="Фактический адрес"
+                            label={t("customer.form.actualAddress")}
                             className="md:col-span-2"
                         >
                             <textarea
                                 className={`${customerInputClass} resize-none`}
                                 rows={2}
-                                placeholder="Введите адрес"
+                                placeholder={t("customer.form.enterAddress")}
                                 value={factAddress}
                                 readOnly={readOnly}
                                 onChange={e => setFactAddress(e.target.value)}
@@ -413,14 +415,14 @@ export const EntrepreneurForm = ({
 
 
                 <FormSection
-                    title="Банковские реквизиты"
+                    title={t("customer.form.bankDetails")}
                     icon={Landmark}
                     open={showBankInfo}
                     onToggle={() => setShowBankInfo(prev => !prev)}
                 >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                        <CustomerFormField label="Расчетный счет">
+                        <CustomerFormField label={t("customer.form.bankAccount")}>
                             <input
                                 className={customerInputClass}
                                 value={currentAccount}
@@ -429,7 +431,7 @@ export const EntrepreneurForm = ({
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="Корреспондентский счет">
+                        <CustomerFormField label={t("customer.form.correspondentAccount")}>
                             <input
                                 className={customerInputClass}
                                 value={correspondentAccount}
@@ -438,7 +440,7 @@ export const EntrepreneurForm = ({
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="БИК">
+                        <CustomerFormField label={t("customer.form.bik")}>
                             <input
                                 className={customerInputClass}
                                 value={bik}
@@ -447,10 +449,10 @@ export const EntrepreneurForm = ({
                             />
                         </CustomerFormField>
 
-                        <CustomerFormField label="Банк">
+                        <CustomerFormField label={t("customer.form.bank")}>
                             <input
                                 className={customerInputClass}
-                                placeholder="Наименование банка"
+                                placeholder={t("customer.form.bankNamePlaceholder")}
                                 value={bankName}
                                 readOnly={readOnly}
                                 onChange={e => setBankName(e.target.value)}
@@ -470,8 +472,8 @@ export const EntrepreneurForm = ({
                         >
                             <Save className="w-4 h-4" />
                             {isEditMode
-                                ? 'Сохранить изменения'
-                                : 'Создать клиента'}
+                                ? t('common.saveChanges')
+                                : t('customer.create.submit')}
                         </button>
                     </div>
                 )}

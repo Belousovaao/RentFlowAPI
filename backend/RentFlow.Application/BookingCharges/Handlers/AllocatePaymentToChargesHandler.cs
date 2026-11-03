@@ -19,10 +19,10 @@ public sealed class AllocatePaymentToChargesHandler : IRequestHandler<AllocatePa
         {
             await _uow.LockBookingPaymentsAsync(bookingId, ct);
             var payment = await _payments.GetByIdAsync(request.PaymentId, ct) ?? throw new KeyNotFoundException("Payment not found.");
-            if (payment.Type is not (PaymentType.Prepayment or PaymentType.AdditionalPayment) || payment.Status != PaymentStatus.Completed) throw new InvalidOperationException("Only completed incoming payments can be allocated.");
+            if (payment.Type is not (PaymentType.Prepayment or PaymentType.AdditionalPayment)) throw new InvalidOperationException("Only incoming payments can be allocated.");
             var current = await _allocations.GetByPaymentIdAsync(payment.Id, ct);
             var allPayments = await _payments.GetByBookingIdAsync(bookingId, ct);
-            var refunds = allPayments.Where(p => p.Type == PaymentType.Refund && p.OriginalPaymentId == payment.Id && p.Status is PaymentStatus.Pending or PaymentStatus.Completed).Sum(p => p.Amount);
+            var refunds = allPayments.Where(p => p.Type == PaymentType.Refund && p.OriginalPaymentId == payment.Id).Sum(p => p.Amount);
             var requested = request.Allocations.Sum(x => x.Amount);
             var available = payment.Amount - current.Sum(x => x.Amount) - refunds;
             if (requested > available) throw new InvalidOperationException($"Allocation exceeds unallocated payment balance. Available: {Math.Max(0m, available):F2} RUB.");
@@ -33,7 +33,7 @@ public sealed class AllocatePaymentToChargesHandler : IRequestHandler<AllocatePa
             foreach (var item in request.Allocations)
             {
                 var charge = charges.Single(x => x.Id == item.BookingChargeId);
-                if (charge.Status != BookingChargeStatus.Confirmed) throw new InvalidOperationException("Payments can be allocated only to confirmed charges.");
+                if (charge.Status != BookingChargeStatus.Accrued) throw new InvalidOperationException("Payments can be allocated only to confirmed charges.");
                 var paid = prior.Where(a => a.BookingChargeId == charge.Id).Sum(a => a.Amount);
                 if (paid + item.Amount > charge.Amount) throw new InvalidOperationException($"Allocation exceeds the remaining balance for charge '{charge.Title}'.");
             }

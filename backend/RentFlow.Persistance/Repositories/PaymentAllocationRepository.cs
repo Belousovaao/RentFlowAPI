@@ -13,4 +13,12 @@ public sealed class PaymentAllocationRepository : IPaymentAllocationRepository
         => await (from allocation in _db.PaymentAllocations.AsNoTracking()
                   join charge in _db.BookingCharges.AsNoTracking() on allocation.BookingChargeId equals charge.Id
                   where charge.BookingId == bookingId select allocation).ToListAsync(ct);
+
+    public async Task DeleteByBookingChargeIdAsync(Guid bookingChargeId, CancellationToken ct = default)
+    {
+        var allocations = await _db.PaymentAllocations
+            .Where(x => x.BookingChargeId == bookingChargeId)
+            .ToListAsync(ct);
+        _db.PaymentAllocations.RemoveRange(allocations);
+    }
 }

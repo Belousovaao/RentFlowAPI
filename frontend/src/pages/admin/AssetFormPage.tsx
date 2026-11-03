@@ -8,6 +8,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable, } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { getPhotoUrl } from '@/shared/utils/photoUrl';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 const SortablePhotoItem = ({ photo, index, onDelete, type, getFullImageUrl }: { 
     photo: { id: string; url: string }; 
@@ -72,6 +73,7 @@ const SortablePhotoItem = ({ photo, index, onDelete, type, getFullImageUrl }: {
 };
 
 export const AssetFormPage = () => {
+    const { t } = useI18n();
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const isEditMode = !!id && id !== 'new';
@@ -157,7 +159,7 @@ export const AssetFormPage = () => {
             console.log('Interior photos:', interior);
         } catch (err) {
             console.error(err);
-            alert('Ошибка загрузки данных автомобиля');
+            alert(t("admin.assetForm.loadError"));
             navigate('/admin/assets');
         } finally {
             setLoading(false);
@@ -175,7 +177,6 @@ export const AssetFormPage = () => {
         "fuelType",
         "transmission",
         "driveType",
-        "category",
         "type"
     ]);
 
@@ -240,10 +241,10 @@ export const AssetFormPage = () => {
         try {
             const urls = await uploadPhotos(id, e.target.files, 'exterior');
             setExteriorPhotos(prev => [...prev, ...urls]);
-            alert(`Загружено ${urls.length} фото экстерьера`);
+            alert(`${t("admin.assetForm.exteriorUploaded")} ${urls.length}`);
         } catch (err) {
             console.error(err);
-            alert('Ошибка загрузки фото экстерьера');
+            alert(t("admin.assetForm.exteriorUploadError"));
         } finally {
             setUploadingExterior(false);
             e.target.value = '';
@@ -256,10 +257,10 @@ export const AssetFormPage = () => {
         try {
             const urls = await uploadPhotos(id, e.target.files, 'interior');
             setInteriorPhotos(prev => [...prev, ...urls]);
-            alert(`Загружено ${urls.length} фото интерьера`);
+            alert(`${t("admin.assetForm.interiorUploaded")} ${urls.length}`);
         } catch (err) {
             console.error(err);
-            alert('Ошибка загрузки фото интерьера');
+            alert(t("admin.assetForm.interiorUploadError"));
         } finally {
             setUploadingInterior(false);
             e.target.value = '';
@@ -269,28 +270,28 @@ export const AssetFormPage = () => {
     // Удаление фото экстерьера
     const deleteExteriorPhoto = async (photoId: string) => {
         console.log('🔥 deleteExteriorPhoto ВЫЗВАНА! photoId:', photoId);
-        if (!confirm('Удалить это фото?')) return;
+        if (!confirm(t("admin.assetForm.deletePhotoConfirm"))) return;
         try {
             await adminAssetsApi.deletePhoto(id!, photoId);
             setExteriorPhotos(prev => prev.filter(p => p.id !== photoId));
-            alert('Фото удалено');
+            alert(t("admin.assetForm.photoDeleted"));
         } catch (err) {
             console.error(err);
-            alert('Ошибка удаления фото');
+            alert(t("admin.assetForm.deletePhotoError"));
         }
     };
 
     // Удаление фото интерьера
     const deleteInteriorPhoto = async (photoId: string) => {
-        if (!confirm('Удалить это фото?')) return;
+        if (!confirm(t("admin.assetForm.deletePhotoConfirm"))) return;
         try {
             await adminAssetsApi.deletePhoto(id!, photoId);
             setInteriorPhotos(prev => prev.filter(p => p.id !== photoId));
-            alert('Фото удалено');
+            alert(t("admin.assetForm.photoDeleted"));
         } 
         catch (err) {
             console.error(err);
-            alert('Ошибка удаления фото');
+            alert(t("admin.assetForm.deletePhotoError"));
     }
 };
 
@@ -345,14 +346,14 @@ export const AssetFormPage = () => {
             if (isEditMode && id) {
                 console.log('Updating asset:', id);
                 await adminAssetsApi.update(id, formData);
-                alert('Автомобиль обновлен');
+                alert(t("admin.assetForm.updated"));
             } 
             else {
                 console.log('Creating new asset with data:', formData);
                 const res = await adminAssetsApi.create(formData);
                 console.log('Created asset ID:', res.data.id);
                 console.log('Created asset:', res.data);
-                alert('Автомобиль создан');
+                alert(t("admin.assetForm.created"));
                 // Перенаправляем на редактирование нового авто, чтобы можно было добавить фото
                 navigate(`/admin/assets/${res.data.id}/edit`);
                 return;
@@ -365,7 +366,7 @@ export const AssetFormPage = () => {
             console.error('Error response:', err.response);
             console.error('Error data:', err.response?.data);
             console.error('Error status:', err.response?.status);
-            alert(isEditMode ? 'Ошибка обновления' : 'Ошибка создания');
+            alert(isEditMode ? t("admin.assetForm.updateError") : t("admin.assetForm.createError"));
         } 
         finally 
         {
@@ -396,7 +397,7 @@ export const AssetFormPage = () => {
                         <ArrowLeft className="w-5 h-5" />
                     </button>
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {isEditMode ? 'Редактирование автомобиля' : 'Новый автомобиль'}
+                        {isEditMode ? t('admin.assetForm.editTitle') : t('admin.assetForm.newTitle')}
                     </h1>
                 </div>
 
@@ -404,12 +405,12 @@ export const AssetFormPage = () => {
                 {/* Основная информация */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                    Основная информация
+                    {t("admin.assetForm.general")}
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Марка*
+                                {t("admin.assetForm.brandRequired")}
                             </label>
                             <input
                                 type="text"
@@ -422,7 +423,7 @@ export const AssetFormPage = () => {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Модель*
+                                {t("admin.assetForm.modelRequired")}
                             </label>
                             <input
                                 type="text"
@@ -435,7 +436,7 @@ export const AssetFormPage = () => {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Год выпуска*
+                                {t("admin.assetForm.yearRequired")}
                             </label>
                             <input
                                 type="number"
@@ -450,7 +451,7 @@ export const AssetFormPage = () => {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Цена за день (₽)*
+                                {t("admin.assetForm.dailyPriceRequired")}
                             </label>
                             <input
                                 type="number"
@@ -465,7 +466,7 @@ export const AssetFormPage = () => {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Залог (₽)
+                                {t("admin.assetForm.deposit")}
                             </label>
                             <input 
                                 type="number" 
@@ -476,7 +477,7 @@ export const AssetFormPage = () => {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Цвет*
+                                {t("admin.assetForm.colorRequired")}
                             </label>
                             <input 
                                 type="text" 
@@ -490,32 +491,32 @@ export const AssetFormPage = () => {
                 {/* Тип и категория */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                        Тип и категория
+                        {t("admin.assetForm.typeAndCategory")}
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Тип ТС
+                                {t("admin.assetForm.vehicleType")}
                             </label>
                             <select
                                 value={formData.type || AssetType.Auto} 
                                 onChange={handleChange} 
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                                {Object.entries(AssetTypeLabels).map(([value, label]) => (
-                                    <option key={value} value={Number(value)}>{label}</option>
+                                {Object.entries(AssetTypeLabels).map(([value]) => (
+                                    <option key={value} value={Number(value)}>{t(`asset.type.${value}`)}</option>
                                 ))}
                             </select>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Категория
+                                {t("asset.category")}
                             </label>
                             <select
                                 value={formData.category || AssetCategory.Crossover} 
                                 onChange={handleChange} 
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                                {Object.entries(AssetCategoryLabels).map(([value, label]) => (
-                                    <option key={value} value={Number(value)}>{label}</option>
+                                {Object.entries(AssetCategoryLabels).map(([value]) => (
+                                    <option key={value} value={value}>{t(`asset.category.${value}`)}</option>
                                 ))}
                             </select>
                         </div>
@@ -524,54 +525,54 @@ export const AssetFormPage = () => {
                 {/* Технические характеристики */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                        Технические характеристики
+                        {t("asset.characteristics")}
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Топливо
+                                {t("asset.fuel")}
                             </label>
                             <select 
                                 name="fuelType" 
                                 value={formData.fuelType || FuelType.Petrol} 
                                 onChange={handleChange} 
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                                {Object.entries(FuelTypeLabels).map(([value, label]) => (
-                                    <option key={value} value={Number(value)}>{label}</option>
+                                {Object.entries(FuelTypeLabels).map(([value]) => (
+                                    <option key={value} value={Number(value)}>{t(`asset.fuelType.${value}`)}</option>
                                 ))}
                             </select>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                КПП
+                                {t("asset.transmission")}
                             </label>
                             <select 
                                 name="transmission" 
                                 value={formData.transmission || TransmissionType.Automatic} 
                                 onChange={handleChange} 
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                                {Object.entries(TransmissionTypeLabels).map(([value, label]) => (
-                                    <option key={value} value={Number(value)}>{label}</option>
+                                {Object.entries(TransmissionTypeLabels).map(([value]) => (
+                                    <option key={value} value={Number(value)}>{t(`asset.transmissionType.${value}`)}</option>
                                 ))}
                             </select>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Привод
+                                {t("asset.driveType")}
                             </label>
                             <select 
                                 name="driveType" 
                                 value={formData.driveType || DriveType.FrontWheelDrive} 
                                 onChange={handleChange} 
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
-                                {Object.entries(DriveTypeLabels).map(([value, label]) => (
-                                    <option key={value} value={Number(value)}>{label}</option>
+                                {Object.entries(DriveTypeLabels).map(([value]) => (
+                                    <option key={value} value={Number(value)}>{t(`asset.driveTypeOption.${value}`)}</option>
                                 ))}
                             </select>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Мощность (л.с.)
+                                {t("admin.assetForm.horsepower")}
                             </label>
                             <input 
                                 type="number" 
@@ -582,7 +583,7 @@ export const AssetFormPage = () => {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Кол-во мест
+                                {t("asset.seats")}
                             </label>
                             <input 
                                 type="number" 
@@ -593,7 +594,7 @@ export const AssetFormPage = () => {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Кол-во дверей
+                                {t("asset.doors")}
                             </label>
                             <input 
                                 type="number" 
@@ -604,7 +605,7 @@ export const AssetFormPage = () => {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Двигатель
+                                {t("asset.engine")}
                             </label>
                             <input 
                                 type="text" 
@@ -615,7 +616,7 @@ export const AssetFormPage = () => {
                         </div>
                         <div> 
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Разгон (сек)
+                                {t("asset.acceleration")}
                             </label>
                             <input 
                                 type="text" 
@@ -626,7 +627,7 @@ export const AssetFormPage = () => {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Макс. скорость (км/ч)
+                                {t("asset.topSpeed")}
                             </label>
                             <input 
                                 type="number" 
@@ -640,12 +641,12 @@ export const AssetFormPage = () => {
                 {/* Описания */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                        Описания
+                        {t("admin.assetForm.descriptions")}
                     </h2>
                     <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Краткое описание
+                                {t("admin.assetForm.shortDescription")}
                             </label>
                             <textarea 
                                 name="shortDescription" 
@@ -656,7 +657,7 @@ export const AssetFormPage = () => {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Полное описание
+                                {t("admin.assetForm.fullDescription")}
                             </label>
                             <textarea 
                                 name="fullDescription" 
@@ -670,14 +671,14 @@ export const AssetFormPage = () => {
                 {/* Особенности */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                     <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                        Особенности
+                        {t("admin.assetForm.features")}
                     </h2>
                     <div className="flex gap-2 mb-4">
                         <input 
                             type="text" 
                             value={newFeature} 
                             onChange={(e) => setNewFeature(e.target.value)} 
-                            placeholder="Добавить особенность" 
+                            placeholder={t("admin.assetForm.addFeature")} 
                             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"/>
                         <button 
                             type="button" 
@@ -703,14 +704,14 @@ export const AssetFormPage = () => {
                     <>
                         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                             <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                                📸 Экстерьер (360° обзор) - {exteriorPhotos.length}/36 фото
+                                📸 {t("asset.exterior")} (360°) — {exteriorPhotos.length}/36 {t("admin.assetForm.photosCount")}
                             </h2>
                             <div className="mb-4">
                                 <label className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-primary-500 transition-colors">
                                     <div className="text-center">
                                         <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                                         <span className="text-sm text-gray-500">
-                                            {uploadingExterior ? 'Загрузка...' : 'Загрузить фото экстерьера (до 36 шт)'}
+                                            {uploadingExterior ? t('common.uploading') : t('admin.assetForm.uploadExterior')}
                                         </span>
                                     </div>
                                     <input
@@ -723,7 +724,7 @@ export const AssetFormPage = () => {
                                     />
                                 </label>
                                 <p className="text-xs text-gray-500 mt-2">
-                                    Рекомендуется: 36 фото, 1920x1080, JPG/PNG. Фото будут автоматически упорядочены по имени.
+                                    {t("admin.assetForm.photoRecommendation")}
                                 </p>
                             </div>
                             <DndContext
@@ -742,7 +743,7 @@ export const AssetFormPage = () => {
                                                 photo={photo}
                                                 index={idx}
                                                 onDelete={deleteExteriorPhoto}
-                                                type='Экстерьер'
+                                                type={t('asset.exterior')}
                                                 getFullImageUrl={getPhotoUrl}
                                             />
                                         ))}
@@ -754,14 +755,14 @@ export const AssetFormPage = () => {
                         {/* Фото интерьера для 360-обзора */}
                         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6">
                             <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-                                🪑 Интерьер (360° обзор) - {interiorPhotos.length}/36 фото
+                                🪑 {t("asset.interior")} (360°) — {interiorPhotos.length}/36 {t("admin.assetForm.photosCount")}
                             </h2>
                             <div className="mb-4">
                                 <label className="flex items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-primary-500 transition-colors">
                                     <div className="text-center">
                                         <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                                         <span className="text-sm text-gray-500">
-                                            {uploadingInterior ? 'Загрузка...' : 'Загрузить фото интерьера (до 36 шт)'}
+                                            {uploadingInterior ? t('common.uploading') : t('admin.assetForm.uploadInterior')}
                                         </span>
                                     </div>
                                     <input
@@ -790,7 +791,7 @@ export const AssetFormPage = () => {
                                                 photo={photo}
                                                 index={idx}
                                                 onDelete={deleteInteriorPhoto}
-                                                type="Интерьер"
+                                                type={t("asset.interior")}
                                                 getFullImageUrl={getPhotoUrl}
                                             />
                                         ))}
@@ -811,7 +812,7 @@ export const AssetFormPage = () => {
                             flex items-center justify-center gap-2"
                     >
                     <Save className="w-4 h-4" />
-                    {saving ? 'Сохранение...' : (isEditMode ? 'Сохранить изменения' : 'Создать автомобиль')}
+                    {saving ? t('common.saving') : (isEditMode ? t('common.saveChanges') : t('admin.assetForm.createAsset'))}
                     </button>
                     <button
                     type="button"
@@ -820,7 +821,7 @@ export const AssetFormPage = () => {
                             text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700
                             transition-colors"
                     >
-                    Отмена
+                    {t("common.cancel")}
                     </button>
                 </div>
                 </form>

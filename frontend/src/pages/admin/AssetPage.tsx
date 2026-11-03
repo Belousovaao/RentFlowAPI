@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminAssetsApi } from '@/features/admin/api/adminAsset.api';
-import { Asset, AssetStatus, AssetStatusColors, AssetStatusLabels } from '@/entities/asset/asset.types';
+import { Asset, AssetStatus, AssetStatusColors } from '@/entities/asset/asset.types';
 import { Pencil, Plus, Image, ArrowLeft, } from 'lucide-react';
 import { getPhotoUrl } from '@/shared/utils/photoUrl';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 export const AdminAssetsListPage = () => {
+  const { t, language } = useI18n();
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -27,7 +29,7 @@ export const AdminAssetsListPage = () => {
       setTotal(res.data.totalCount);
     } catch (err) {
       console.error(err);
-      alert('Ошибка загрузки автомобилей');
+      alert(t('admin.assets.loadError'));
     } finally {
       setLoading(false);
     }
@@ -49,10 +51,10 @@ export const AdminAssetsListPage = () => {
   const handleStatusChange = async (assetId: string, newStatus: AssetStatus) => {
     try {
       await adminAssetsApi.updateStatus(assetId, newStatus);
-      alert(`Статус изменен на ${AssetStatusLabels[newStatus]}`);
+      alert(`${t("admin.assets.statusChanged")} ${t(`asset.status.${newStatus}`)}`);
       fetchAssets(); // Обновляем список
     } catch (err) {
-      alert('Ошибка при изменении статуса');
+      alert(t('admin.assets.statusError'));
     }
   };
 
@@ -71,14 +73,14 @@ export const AdminAssetsListPage = () => {
                 <ArrowLeft className="w-5 h-5" />
             </button>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Управление автомобилями
+              {t("admin.assets.title")}
             </h1>
           </div>
           <Link 
             to="/admin/assets/new" 
             className="bg-primary-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-primary-700 transition-colors"
           >
-            <Plus className="w-4 h-4" /> Добавить автомобиль
+            <Plus className="w-4 h-4" /> {t("admin.assets.add")}
           </Link>
         </div>
 
@@ -88,7 +90,7 @@ export const AdminAssetsListPage = () => {
             <div className="flex-1">
               <input
                 type="text"
-                placeholder="Поиск по марке, модели или году..."
+                placeholder={t("admin.assets.searchPlaceholder")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
@@ -104,7 +106,7 @@ export const AdminAssetsListPage = () => {
                 className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
               />
               <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-                Показывать отключенные
+                {t("admin.assets.showDisabled")}
               </span>
             </label>
           </div>
@@ -117,9 +119,9 @@ export const AdminAssetsListPage = () => {
           </div>
         ) : !assets || assets.length === 0 ? (
           <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl">
-            <p className="text-gray-500">Автомобили не найдены</p>
+            <p className="text-gray-500">{t("admin.assets.empty")}</p>
             <Link to="/admin/assets/new" className="text-primary-600 hover:underline mt-2 inline-block">
-              Добавить первый автомобиль
+              {t("admin.assets.addFirst")}
             </Link>
           </div>
         ) : (
@@ -128,22 +130,22 @@ export const AdminAssetsListPage = () => {
               <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
                   <th className="px-4 py-2 text-sm font-medium text-gray-500 tracking-wider">
-                    Фото
+                    {t("common.photo")}
                   </th>
                   <th className="px-4 py-2 text-sm font-medium text-gray-500 tracking-wider">
-                    Автомобиль
+                    {t("common.vehicle")}
                   </th>
                   <th className="px-4 py-2 text-sm font-medium text-gray-500 tracking-wider">
-                    Год
+                    {t("common.year")}
                   </th>
                   <th className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-500 tracking-wider">
-                    Цена/день
+                    {t("common.dailyPrice")}
                   </th>
                   <th className="px-4 py-2 text-sm font-medium text-gray-500 tracking-wider">
-                    Статус
+                    {t("common.status")}
                   </th>
                   <th className="px-4 py-2 text-sm font-medium text-gray-500 tracking-wider">
-                    Действия
+                    {t("common.actions")}
                   </th>
                 </tr>
               </thead>
@@ -177,7 +179,7 @@ export const AdminAssetsListPage = () => {
                       </div>
                       {asset.status == AssetStatus.Disabled && (
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 mt-1">
-                          Отключен
+                          {t("asset.status.Disabled")}
                         </span>
                       )}
                     </td>
@@ -187,7 +189,7 @@ export const AdminAssetsListPage = () => {
                     </td>
                     {/* Цена */}
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                      {asset.dailyPrice.toLocaleString()} ₽
+                      {asset.dailyPrice.toLocaleString(language === "zh" ? "zh-CN" : language === "en" ? "en-GB" : "ru-RU")} ₽
                     </td>
                     {/* Статус */}
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -198,7 +200,7 @@ export const AdminAssetsListPage = () => {
                       >
                         {Object.entries(AssetStatusLabels).map(([status, label]) => (
                           <option key={status} value={status} className="text-gray-900">
-                            {label}
+                            {t(`asset.status.${status}`)}
                           </option>
                         ))}
                       </select>
@@ -209,7 +211,7 @@ export const AdminAssetsListPage = () => {
                         <Link 
                           to={`/admin/assets/${asset.id}/edit`} 
                           className="text-blue-600 hover:text-blue-800 dark:text-blue-400"
-                          title="Редактировать"
+                          title={t("common.edit")}
                         >
                           <Pencil className="w-4 h-4" />
                         </Link>
@@ -233,10 +235,10 @@ export const AdminAssetsListPage = () => {
                        hover:bg-gray-100 dark:hover:bg-gray-700
                        text-gray-700 dark:text-gray-300"
             >
-              ← Назад
+              {t("common.previous")}
             </button>
             <span className="px-4 py-2 text-gray-600 dark:text-gray-400">
-              Страница {page} из {totalPages}
+              {t("common.pageOf").replace("{page}", String(page)).replace("{totalPages}", String(totalPages))}
             </span>
             <button
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
@@ -245,7 +247,7 @@ export const AdminAssetsListPage = () => {
                        hover:bg-gray-100 dark:hover:bg-gray-700
                        text-gray-700 dark:text-gray-300"
             >
-              Вперед →
+              {t("common.next")}
             </button>
           </div>
         )}

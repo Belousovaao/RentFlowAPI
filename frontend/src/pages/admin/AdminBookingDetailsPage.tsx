@@ -12,8 +12,11 @@ import { ServiceModal } from "@/features/booking/components/ServiceModal";
 import { formatDate, formatDateTime, formatPrice, } from "@/shared/utils/formatters";
 import { travelZones } from "@/entities/destination/destination.constants";
 import { RouteReviewStatus } from "@/entities/destination/destination.type";
+import { BookingFinancesSection } from "@/features/admin/components/BookingFinancesSection";
+import { useI18n } from "@/app/providers/I18nProvider";
 
 export const AdminBookingDetailsPage = () => {
+    const { t, language } = useI18n();
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
@@ -26,10 +29,10 @@ export const AdminBookingDetailsPage = () => {
     const [serviceModalOpen, setServiceModalOpen] = useState(false);
 
     const customerStatusLabels: Record<VerificationStatus, string> = {
-        NotSubmitted: "Не установлен",
-        Pending: "На проверке",
-        Approved: "Одобрен",
-        Rejected: "Отказ",
+        NotSubmitted: "verification.status.notSubmitted",
+        Pending: "verification.status.pending",
+        Approved: "verification.status.approved",
+        Rejected: "verification.status.rejected",
     };
 
     const requiresApprovedCustomer = (status: BookingStatus) =>
@@ -46,7 +49,7 @@ export const AdminBookingDetailsPage = () => {
             setBooking(response);
         } catch (error) {
             console.error("Failed to load booking details:", error);
-            toast.error("Не удалось загрузить бронирование.");
+            toast.error(t("admin.bookingDetails.loadError"));
         } finally {
             setLoading(false);
         }
@@ -55,7 +58,7 @@ export const AdminBookingDetailsPage = () => {
     const handleCancelBooking = async () => {
         if (!id || cancelLoading) return;
 
-        const confirmed = window.confirm("Вы действительно хотите отменить бронирование?");
+        const confirmed = window.confirm(t("admin.bookingDetails.cancelConfirm"));
 
         if (!confirmed) return;
 
@@ -64,12 +67,12 @@ export const AdminBookingDetailsPage = () => {
 
             await bookingApi.cancel(id);
 
-            toast.success("Бронирование отменено.");
+            toast.success(t("admin.bookingDetails.cancelled"));
 
             await loadBooking();
         } catch (error) {
             console.error("Failed to cancel booking:", error);
-            toast.error("Не удалось отменить бронирование.");
+            toast.error(t("admin.bookingDetails.cancelError"));
         } finally {
             setCancelLoading(false);
         }
@@ -86,7 +89,7 @@ export const AdminBookingDetailsPage = () => {
             booking.customer.verificationStatus !== VerificationStatus.Approved
         ) {
             toast.error(
-                "Клиент не одобрен. Подтвердить или активировать бронирование можно только после одобрения клиента."
+                t("admin.bookingDetails.customerNotApproved")
             );
 
             return;
@@ -107,12 +110,12 @@ export const AdminBookingDetailsPage = () => {
             );
 
             toast.success(
-                `Статус изменён на «${statusLabels[status]}»`
+                `${t("admin.bookingDetails.statusChangedPrefix")} «${t(statusLabels[status])}»`
             );
         } catch (error) {
             console.error("Failed to change booking status:", error);
 
-            toast.error("Не удалось изменить статус бронирования.");
+            toast.error(t("admin.bookingDetails.statusError"));
         } finally {
             setChangingStatus(false);
         }
@@ -132,7 +135,7 @@ export const AdminBookingDetailsPage = () => {
                 <div className="container mx-auto max-w-5xl px-4">
                     <div className="rounded-2xl bg-white p-8 text-center shadow-sm dark:bg-gray-800">
                         <p className="text-gray-600 dark:text-gray-300">
-                            Бронирование не найдено.
+                            {t("admin.bookingDetails.notFound")}
                         </p>
 
                         <button
@@ -140,7 +143,7 @@ export const AdminBookingDetailsPage = () => {
                             onClick={() => navigate("/admin/bookings")}
                             className="mt-4 text-sm font-medium text-blue-600 hover:text-blue-700"
                         >
-                            Вернуться к списку
+                            {t("admin.bookingDetails.backToList")}
                         </button>
                     </div>
                 </div>
@@ -154,10 +157,10 @@ export const AdminBookingDetailsPage = () => {
         booking.status === "Active";
     const destinationZone = travelZones.find((zone) => zone.type === booking.destination.type);
     const routeReviewStatusLabels: Record<RouteReviewStatus, string> = {
-        NotRequired: "Проверка не требуется",
-        Pending: "На проверке",
-        Approved: "Одобрен",
-        Rejected: "Отклонён",
+        NotRequired: "route.status.notRequired",
+        Pending: "route.status.pending",
+        Approved: "route.status.approved",
+        Rejected: "route.status.rejected",
     };
     const rentalSegments = booking.price.rentalPrice.segments ?? [];
 
@@ -191,19 +194,6 @@ export const AdminBookingDetailsPage = () => {
         };
     });
 
-    const rentalPrice =
-        booking.price.rentalPrice.rentalPriceWithDiscount;
-
-    const servicesPrice = booking.price.servicesPrice;
-    const routeSurcharge = booking.price.routeSurcharge;
-
-    const penaltiesPrice = booking.price.penaltiesPrice;
-
-    const deposit = booking.price.deposit;
-
-    const total = booking.price.total;
-    const totalToPay = booking.price.totalToPay;
-
     return (
         <div className="min-h-screen bg-gray-50 pt-24 pb-16 dark:bg-gray-900">
             <div className="container mx-auto max-w-5xl px-4">
@@ -215,7 +205,7 @@ export const AdminBookingDetailsPage = () => {
                         className="flex w-fit items-center gap-2 text-sm font-medium text-gray-600 transition hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
                     >
                         <ArrowLeft className="h-4 w-4" />
-                        Список всех бронирований
+                        {t("admin.bookings.title")}
                     </button>
 
                     <div className="flex flex-wrap items-center gap-3">
@@ -232,7 +222,7 @@ export const AdminBookingDetailsPage = () => {
                                     <XCircle className="h-4 w-4" />
                                 )}
 
-                                Отменить бронирование
+                                {t("admin.bookingDetails.cancel")}
                             </button>
                         )}
                         <button
@@ -247,7 +237,7 @@ export const AdminBookingDetailsPage = () => {
                                 <RefreshCw className="h-4 w-4" />
                             )}
 
-                            Изменить статус
+                            {t("booking.statusModal.title")}
                         </button>
 
                         <button
@@ -257,7 +247,7 @@ export const AdminBookingDetailsPage = () => {
                             className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             <CalendarDays className="h-4 w-4" />
-                            Изменить срок
+                            {t("admin.bookingDetails.changePeriod")}
                         </button>
                     </div>
                 </div>
@@ -277,7 +267,7 @@ export const AdminBookingDetailsPage = () => {
                                 <div className="flex items-start justify-between">
                                     <div>
                                         <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                            Автомобиль
+                                            {t("common.vehicle")}
                                         </h2>
 
                                         <p className="mt-2 text-xl font-semibold text-gray-900 dark:text-white">
@@ -309,12 +299,12 @@ export const AdminBookingDetailsPage = () => {
                                 <div className="flex items-start justify-between">
                                     <div className="min-w-0">
                                         <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                            Клиент
+                                            {t("common.customer")}
                                         </h2>
 
                                         <p className="mt-2 text-xl font-semibold text-gray-900 dark:text-white">
                                             {booking.customer.displayName ??
-                                                "Без имени"}
+                                                t("common.unnamed")}
                                         </p>
 
                                         <div className="mt-2 space-y-1 text-sm text-gray-500 dark:text-gray-400">
@@ -330,7 +320,7 @@ export const AdminBookingDetailsPage = () => {
                                             )}
 
                                             <p>
-                                                Статус:{" "}
+                                                {t("common.status")}:{" "}
                                                 <span className="font-medium text-gray-700 dark:text-gray-200">
                                                     {
                                                         customerStatusLabels[
@@ -348,134 +338,200 @@ export const AdminBookingDetailsPage = () => {
                             </section>
                         </button>
                     </div>
-
-                    {/* Период аренды */}
-                    <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
-                        <div className="mb-6">
-                            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                Период аренды
-                            </h2>
-                        </div>
-
-                        <div className="relative">
-                            {/* Линия таймлайна */}
-                            <div className="absolute left-[7px] top-2 bottom-2 w-px bg-gray-200 dark:bg-gray-700" />
-
-                            {/* Начало */}
-                            <div className="relative flex gap-4">
-                                <div className="relative z-10 mt-1 h-4 w-4 shrink-0 rounded-full border-4 border-white bg-blue-600 dark:border-gray-800" />
-
-                                <div className="pb-5">
-                                    <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                                        Начало аренды
-                                    </p>
-
-                                    <p className="mt-1 font-medium text-gray-900 dark:text-white">
-                                        {formatDateTime(rentalStart)}
-                                    </p>
-                                </div>
+                    {/* Период аренды + Маршрут */}
+                    <div className="grid gap-6 lg:grid-cols-2">
+                        {/* Период аренды */}
+                        <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
+                            <div className="mb-6">
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                    {t("admin.bookingDetails.rentalPeriod")}
+                                </h2>
                             </div>
 
-                            {/* Сегменты */}
-                            <div className="space-y-4">
-                                {segmentTimeline.map((segment, index) => (
-                                    <div
-                                        key={`${segment.start.toISOString()}-${index}`}
-                                        className="relative flex gap-4"
-                                    >
-                                        <div className="relative z-10 mt-5 h-4 w-4 shrink-0 rounded-full border-4 border-white bg-gray-300 dark:border-gray-800 dark:bg-gray-600" />
+                            <div className="relative">
+                                {/* Линия таймлайна */}
+                                <div className="absolute left-[7px] top-2 bottom-2 w-px bg-gray-200 dark:bg-gray-700" />
 
-                                        <div className="min-w-0 flex-1 rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-700/50">
-                                            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                                                <div>
-                                                    <div className="flex flex-wrap items-center gap-2">
-                                                        <span className="font-semibold text-gray-900 dark:text-white">
-                                                            {segment.days}{" "}
-                                                            {segment.days ===
-                                                            1
-                                                                ? "день"
-                                                                : segment.days <
-                                                                    5
-                                                                  ? "дня"
-                                                                  : "дней"}
-                                                        </span>
+                                {/* Начало */}
+                                <div className="relative flex gap-4">
+                                    <div className="relative z-10 mt-1 h-4 w-4 shrink-0 rounded-full border-4 border-white bg-blue-600 dark:border-gray-800" />
 
-                                                        {segment.durationDiscountPercent >
-                                                            0 && (
-                                                            <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                                                −
-                                                                {
-                                                                    segment.durationDiscountPercent
-                                                                }
-                                                                %
+                                    <div className="pb-5">
+                                        <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                                            {t("admin.bookingDetails.rentalStart")}
+                                        </p>
+
+                                        <p className="mt-1 font-medium text-gray-900 dark:text-white">
+                                            {formatDateTime(rentalStart)}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Сегменты */}
+                                <div className="space-y-4">
+                                    {segmentTimeline.map((segment, index) => (
+                                        <div
+                                            key={`${segment.start.toISOString()}-${index}`}
+                                            className="relative flex gap-4"
+                                        >
+                                            <div className="relative z-10 mt-5 h-4 w-4 shrink-0 rounded-full border-4 border-white bg-gray-300 dark:border-gray-800 dark:bg-gray-600" />
+
+                                            <div className="min-w-0 flex-1 rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-700/50">
+                                                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                                    <div>
+                                                        <div className="flex flex-wrap items-center gap-2">
+                                                            <span className="font-semibold text-gray-900 dark:text-white">
+                                                                {segment.days}{" "}
+                                                                {segment.days ===
+                                                                1
+                                                                    ? t("common.day")
+                                                                    : segment.days <
+                                                                        5
+                                                                    ? t("common.daysFew")
+                                                                    : t("common.days")}
                                                             </span>
-                                                        )}
+
+                                                            {segment.durationDiscountPercent >
+                                                                0 && (
+                                                                <span className="rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                                                                    −
+                                                                    {
+                                                                        segment.durationDiscountPercent
+                                                                    }
+                                                                    %
+                                                                </span>
+                                                            )}
+                                                        </div>
+
+                                                        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                                            {formatDate(
+                                                                segment.start
+                                                            )}{" "}
+                                                            —{" "}
+                                                            {formatDate(
+                                                                segment.end
+                                                            )}
+                                                        </p>
                                                     </div>
 
-                                                    <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                                        {formatDate(
-                                                            segment.start
-                                                        )}{" "}
-                                                        —{" "}
-                                                        {formatDate(
-                                                            segment.end
-                                                        )}
-                                                    </p>
-                                                </div>
+                                                    <div className="text-left sm:text-right">
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                            {formatPrice(
+                                                                segment.discountedDailyPrice
+                                                            )}{" "}
+                                                            / {t("common.day")}
+                                                        </p>
 
-                                                <div className="text-left sm:text-right">
-                                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                        {formatPrice(
-                                                            segment.discountedDailyPrice
-                                                        )}{" "}
-                                                        / день
-                                                    </p>
-
-                                                    <p className="mt-1 font-semibold text-gray-900 dark:text-white">
-                                                        {formatPrice(
-                                                            segment.total
-                                                        )}
-                                                    </p>
+                                                        <p className="mt-1 font-semibold text-gray-900 dark:text-white">
+                                                            {formatPrice(
+                                                                segment.total
+                                                            )}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
 
-                            {/* Конец */}
-                            <div className="relative mt-4 flex gap-4">
-                                <div className="relative z-10 mt-1 h-4 w-4 shrink-0 rounded-full border-4 border-white bg-blue-600 dark:border-gray-800" />
+                                {/* Конец */}
+                                <div className="relative mt-4 flex gap-4">
+                                    <div className="relative z-10 mt-1 h-4 w-4 shrink-0 rounded-full border-4 border-white bg-blue-600 dark:border-gray-800" />
+
+                                    <div>
+                                        <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                                            {t("admin.bookingDetails.rentalEnd")}
+                                        </p>
+
+                                        <p className="mt-1 font-medium text-gray-900 dark:text-white">
+                                            {formatDateTime(rentalEnd)}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        {/* Маршрут */}
+                        <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
+                            <div className="mb-5 flex items-center gap-3">
+                                {destinationZone && (
+                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                                        <destinationZone.icon className="h-5 w-5" />
+                                    </div>
+                                )}
 
                                 <div>
-                                    <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                                        Конец аренды
-                                    </p>
+                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                        {t("admin.bookingDetails.route")}
+                                    </h2>
 
-                                    <p className="mt-1 font-medium text-gray-900 dark:text-white">
-                                        {formatDateTime(rentalEnd)}
+                                    <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
+                                        {destinationZone?.title ?? booking.destination.type}
                                     </p>
                                 </div>
                             </div>
-                        </div>
-                    </section>
 
+                            {booking.destination.destinationNameSnapshot && (
+                                <div className="mb-4">
+                                    <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                                        {t("admin.bookingDetails.destination")}
+                                    </p>
+                                    <p className="mt-1 font-medium text-gray-900 dark:text-white">
+                                        {booking.destination.destinationNameSnapshot}
+                                    </p>
+                                </div>
+                            )}
+
+                            {booking.destinationDetails && (
+                                <div className="mb-4">
+                                    <p className="font-medium text-gray-900 dark:text-white">
+                                        {booking.destinationDetails.region}
+                                    </p>
+                                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                        {t("admin.bookingDetails.distance")}: {booking.destinationDetails.distanceKm} {t("common.km")}
+                                    </p>
+                                </div>
+                            )}
+
+                            {booking.destination.customRouteDescription && (
+                                <div className="mb-4">
+                                    <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                                        {t("admin.bookingDetails.routeDescription")}
+                                    </p>
+                                    <p className="mt-1 whitespace-pre-wrap break-words text-sm text-gray-700 dark:text-gray-300">
+                                        {booking.destination.customRouteDescription}
+                                    </p>
+                                </div>
+                            )}
+
+                            <div className="border-t border-gray-100 pt-4 dark:border-gray-700">
+                                <div className="flex items-center justify-between gap-3">
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        {t("admin.bookingDetails.verificationStatus")}
+                                    </span>
+                                    <span className="text-right text-sm font-medium text-gray-900 dark:text-white">
+                                        {routeReviewStatusLabels[booking.destination.reviewStatus]}
+                                    </span>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    
                     {/* Дополнительные услуги */}
                     <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
                         <div className="mb-5 flex items-center justify-between gap-4">
                             <div>
                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    Дополнительные услуги
+                                    {t("checkout.additionalServices")}
                                 </h2>
 
                                 {booking.services.length > 0 && (
                                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                         {booking.services.length}{" "}
                                         {booking.services.length === 1
-                                            ? "услуга"
+                                            ? t("common.service")
                                             : booking.services.length < 5
-                                              ? "услуги"
-                                              : "услуг"}
+                                                ? t("common.servicesFew")
+                                                : t("common.services")}
                                     </p>
                                 )}
                             </div>
@@ -487,14 +543,14 @@ export const AdminBookingDetailsPage = () => {
                                 className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-750"
                             >
                                 <Plus className="h-4 w-4" />
-                                Добавить
+                                {t("common.add")}
                             </button>
                         </div>
 
                         {booking.services.length === 0 ? (
                             <div className="rounded-xl border border-dashed border-gray-200 px-4 py-8 text-center dark:border-gray-700">
                                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                                    Дополнительные услуги не выбраны.
+                                    {t("admin.bookingDetails.noServices")}
                                 </p>
                             </div>
                         ) : (
@@ -524,158 +580,8 @@ export const AdminBookingDetailsPage = () => {
                             </div>
                         )}
                     </section>
-
-                    {/* Маршрут + Стоимость */}
-                    <div className="grid gap-6 lg:grid-cols-2">
-                        {/* Маршрут */}
-                        <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
-                            <div className="mb-5 flex items-center gap-3">
-                                {destinationZone && (
-                                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
-                                        <destinationZone.icon className="h-5 w-5" />
-                                    </div>
-                                )}
-
-                                <div>
-                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                        Маршрут
-                                    </h2>
-
-                                    <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
-                                        {destinationZone?.title ?? booking.destination.type}
-                                    </p>
-                                </div>
-                            </div>
-
-                            {booking.destination.destinationNameSnapshot && (
-                                <div className="mb-4">
-                                    <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                                        Направление
-                                    </p>
-                                    <p className="mt-1 font-medium text-gray-900 dark:text-white">
-                                        {booking.destination.destinationNameSnapshot}
-                                    </p>
-                                </div>
-                            )}
-
-                            {booking.destinationDetails && (
-                                <div className="mb-4">
-                                    <p className="font-medium text-gray-900 dark:text-white">
-                                        {booking.destinationDetails.region}
-                                    </p>
-                                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                        Расстояние: {booking.destinationDetails.distanceKm} км
-                                    </p>
-                                </div>
-                            )}
-
-                            {booking.destination.customRouteDescription && (
-                                <div className="mb-4">
-                                    <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                                        Описание маршрута
-                                    </p>
-                                    <p className="mt-1 whitespace-pre-wrap break-words text-sm text-gray-700 dark:text-gray-300">
-                                        {booking.destination.customRouteDescription}
-                                    </p>
-                                </div>
-                            )}
-
-                            <div className="border-t border-gray-100 pt-4 dark:border-gray-700">
-                                <div className="flex items-center justify-between gap-3">
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                                        Статус проверки
-                                    </span>
-                                    <span className="text-right text-sm font-medium text-gray-900 dark:text-white">
-                                        {routeReviewStatusLabels[booking.destination.reviewStatus]}
-                                    </span>
-                                </div>
-                            </div>
-                        </section>
-                        {/* Стоимость */}
-                        <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
-                            <div className="mb-6">
-                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    Стоимость
-                                </h2>
-                            </div>
-                            <div className="space-y-3">
-                                {/* Аренда */}
-                                <div className="flex items-center justify-between gap-4">
-                                    <span className="text-gray-600 dark:text-gray-300">
-                                        Аренда
-                                    </span>
-                                    <span className="shrink-0 font-medium text-gray-900 dark:text-white">
-                                        {formatPrice(rentalPrice)}
-                                    </span>
-                                </div>
-                                {/* Услуги */}
-                                {servicesPrice > 0 && (
-                                    <div className="flex items-center justify-between gap-4">
-                                        <span className="text-gray-600 dark:text-gray-300">
-                                            Дополнительные услуги
-                                        </span>
-                                        <span className="shrink-0 font-medium text-gray-900 dark:text-white">
-                                            {formatPrice(servicesPrice)}
-                                        </span>
-                                    </div>
-                                )}
-                                {/* Маршрут */}
-                                {routeSurcharge > 0 && (
-                                    <div className="flex items-center justify-between gap-4">
-                                        <span className="text-gray-600 dark:text-gray-300">
-                                            Доплата за маршрут
-                                        </span>
-                                        <span className="shrink-0 font-medium text-gray-900 dark:text-white">
-                                            {formatPrice(routeSurcharge)}
-                                        </span>
-                                    </div>
-                                )}
-                                {/* Штрафы */}
-                                {penaltiesPrice > 0 && (
-                                    <div className="flex items-center justify-between gap-4">
-                                        <div className="min-w-0">
-                                            <p className="text-gray-600 dark:text-gray-300">
-                                                Штрафы
-                                            </p>
-                                            {booking.price.penalties.length > 0 && (
-                                                <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
-                                                    {booking.price.penalties.length}{" "}
-                                                    {booking.price.penalties.length === 1
-                                                        ? "начисление"
-                                                        : "начисления"}
-                                                </p>
-                                            )}
-                                        </div>
-                                        <span className="shrink-0 font-medium text-red-600 dark:text-red-400">
-                                            {formatPrice(penaltiesPrice)}
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-                            {/* Итог аренды без депозита */}
-                            <div className="my-5 border-t border-gray-200 pt-5 dark:border-gray-700">
-                                <div className="flex items-center justify-between gap-4">
-                                    <span className="font-semibold text-gray-900 dark:text-white">
-                                        Итого за аренду
-                                    </span>
-                                    <span className="shrink-0 text-lg font-semibold text-gray-900 dark:text-white">
-                                        {formatPrice(total)}
-                                    </span>
-                                </div>
-                            </div>
-                            {/* Депозит */}
-                            <div className="flex items-center justify-between gap-4">
-                                <div>
-                                    <p className="text-gray-600 dark:text-gray-300">
-                                        Депозит
-                                    </p>
-                                </div>
-                                <span className="shrink-0 font-medium text-gray-900 dark:text-white">
-                                    {formatPrice(deposit)}
-                                </span>
-                            </div>
-                        </section>
-                    </div>
+                    {/* Единая финансовая история */}
+                    <BookingFinancesSection bookingId={booking.id} price={booking.price} services={booking.services} bookingStatus={booking.status} />
                 </div>
 
                 {/* Модальные окна */}

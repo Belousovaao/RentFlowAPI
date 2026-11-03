@@ -22,7 +22,7 @@ export const UserMenu = () => {
 
     if (!user) return null;
 
-    const display = user.firstName?.trim() || 'Мой профиль';
+    const display = user.firstName?.trim() || t('account.profile.myProfile');
     const isAdmin = user.role === 'admin';
     const accountPath = isAdmin ? '/admin' : '/account';
 

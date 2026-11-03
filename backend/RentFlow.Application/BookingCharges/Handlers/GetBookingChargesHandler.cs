@@ -19,9 +19,9 @@ public sealed class GetBookingChargesHandler : IRequestHandler<GetBookingCharges
         var charges = await _charges.GetByBookingIdAsync(request.BookingId, ct);
         var allocations = await _allocations.GetByBookingIdAsync(request.BookingId, ct);
         var payments = await _payments.GetByBookingIdAsync(request.BookingId, ct);
-        var completedIds = payments.Where(p => p.Status == PaymentStatus.Completed && p.Type is PaymentType.Prepayment or PaymentType.AdditionalPayment).Select(p => p.Id).ToHashSet();
+        var incomingIds = payments.Where(p => p.Type is PaymentType.Prepayment or PaymentType.AdditionalPayment).Select(p => p.Id).ToHashSet();
         return charges.Select(c => {
-            var paid = c.Status == BookingChargeStatus.Confirmed ? allocations.Where(a => a.BookingChargeId == c.Id && completedIds.Contains(a.PaymentId)).Sum(a => a.Amount) : 0m;
+            var paid = c.Status == BookingChargeStatus.Accrued ? allocations.Where(a => a.BookingChargeId == c.Id && incomingIds.Contains(a.PaymentId)).Sum(a => a.Amount) : 0m;
             return new BookingChargeDto(c.Id,c.BookingId,c.Type,c.Status,c.Title,c.Description,c.ReferenceNumber,c.Quantity,c.Unit,c.UnitPrice,c.Amount,c.Currency,paid,Math.Max(0m,c.Amount-paid),c.CreatedAt,c.ReviewedAt);
         }).ToList();
     }
