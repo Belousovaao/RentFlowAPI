@@ -5,9 +5,11 @@ import { adminCustomersApi } from "@/features/admin/api/adminCustomers.api";
 import { BarChart3, Calendar, Car, TrendingUp, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useI18n } from "@/app/providers/I18nProvider";
 
 /* ЛК Админа */
 export const AdminAccountPage = () => {
+    const { t } = useI18n();
     const StatCard = ({ label, value, icon: Icon }: { label: string; value: string; icon: any }) => (
         <div className="flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
             <div className="rounded-lg bg-primary-100 p-2 text-primary-600 dark:bg-primary-900/30">
@@ -22,37 +24,37 @@ export const AdminAccountPage = () => {
 
     const adminModules = [
         {
-            title: 'Автомобили',
+            title: t('admin.module.assets'),
             icon: Car,
-            description: 'Добавление, редактирование, удаление, загрузка фото',
+            description: t('admin.module.assetsDescription'),
             link: '/admin/assets',
             color: 'bg-blue-500',
         },
         {
-            title: 'Бронирования',
+            title: t('admin.module.bookings'),
             icon: Calendar,
-            description: 'Просмотр всех бронирований, изменение статусов, отмена',
+            description: t('admin.module.bookingsDescription'),
             link: '/admin/bookings',
             color: 'bg-green-500',
         },
         {
-            title: 'Пользователи',
+            title: t('admin.module.users'),
             icon: Users,
-            description: 'Управление пользователями, роли, блокировки',
+            description: t('admin.module.usersDescription'),
             link: '/admin/users',
             color: 'bg-purple-500',
         },
         {
-            title: 'Статистика',
+            title: t('admin.module.statistics'),
             icon: BarChart3,
-            description: 'Аналитика: загрузка автомобилей, выручка, популярные модели',
+            description: t('admin.module.statisticsDescription'),
             link: '/admin/statistics',
             color: 'bg-orange-500',
         },
         {
-            title: 'Календарь занятости',
+            title: t('admin.module.calendar'),
             icon: TrendingUp,
-            description: 'Просмотр свободных и занятых автомобилей на даты',
+            description: t('admin.module.calendarDescription'),
             link: '/admin/availability',
             color: 'bg-teal-500',
         },
@@ -145,7 +147,7 @@ export const AdminAccountPage = () => {
                                         </p>
                                     </div>
                                 </div>
-                                {module.title === "Бронирования" && pendingBookings > 0 && (
+                                {module.title === t('admin.module.bookings') && pendingBookings > 0 && (
                                     <span className="absolute right-4 top-4 flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-bold text-white shadow-sm">
                                         {pendingBookings}
                                     </span>
@@ -166,12 +168,12 @@ export const AdminAccountPage = () => {
                         </div>
                     ) : (
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                            <StatCard label="Активных бронирований" value={(stats.activeBookings ?? 0).toString()} icon={Calendar} />
-                            <StatCard label="Доступно автомобилей" value={(stats.availableAssets ?? 0).toString()} icon={Car} />
-                            <StatCard label="Всего клиентов" value={(stats.totalCustomers ?? 0).toString()} icon={Users} />
-                            <StatCard label="Количество уникальных клиентов" value={(stats.uniqueCustomers ?? 0).toString()} icon={Users} />
-                            <StatCard label="Сумма бронирований за месяц" value={formatCurrency(stats.monthlyRevenue ?? 0)} icon={TrendingUp} />
-                            <StatCard label="Расходы на содержание и обслуживание" value="—" icon={TrendingUp} />
+                            <StatCard label={t("admin.stats.activeBookings")} value={(stats.activeBookings ?? 0).toString()} icon={Calendar} />
+                            <StatCard label={t("admin.stats.availableAssets")} value={(stats.availableAssets ?? 0).toString()} icon={Car} />
+                            <StatCard label={t("admin.stats.totalCustomers")} value={(stats.totalCustomers ?? 0).toString()} icon={Users} />
+                            <StatCard label={t("admin.stats.uniqueCustomers")} value={(stats.uniqueCustomers ?? 0).toString()} icon={Users} />
+                            <StatCard label={t("admin.stats.monthlyBookingAmount")} value={formatCurrency(stats.monthlyRevenue ?? 0)} icon={TrendingUp} />
+                            <StatCard label={t("admin.stats.maintenanceExpenses")} value="—" icon={TrendingUp} />
                         </div>
                     )}
                 </div>
