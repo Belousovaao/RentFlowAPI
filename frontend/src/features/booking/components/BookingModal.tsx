@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { Asset } from '../../../entities/asset/asset.types';
 import { BookingWidget } from './BookingWidget';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 interface BookingModalProps {
     isOpen: boolean;
@@ -11,6 +12,7 @@ interface BookingModalProps {
 }
 
 export const BookingModal = ({ isOpen, asset, onClose }: BookingModalProps) => {
+    const { t } = useI18n();
     
     // Блокировка прокрутки при открытии модалки
     useEffect(() => {
@@ -64,7 +66,7 @@ export const BookingModal = ({ isOpen, asset, onClose }: BookingModalProps) => {
                                     className="p-2 rounded-full bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-100 
                                              shadow-md border border-gray-200 dark:border-gray-600
                                              hover:bg-white dark:hover:bg-gray-800 transition-colors"
-                                    aria-label="Закрыть"
+                                    aria-label={t("common.close")}
                                 >
                                     <X className="w-5 h-5" />
                                 </button>
