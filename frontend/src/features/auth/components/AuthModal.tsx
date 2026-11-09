@@ -308,7 +308,7 @@ export const AuthModal = () => {
         };
 
         if (!data.phone) {
-            setError('Введите номер телефона.');
+            setError(t('auth.enterPhone'));
             return;
         }
 
