@@ -20,7 +20,7 @@ public class AssetRepository : IAssetRepository
         var query = _context.Assets
             .Include(a => a.Photos)
             .Include(a => a.Bookings) // Включаем бронирования для проверки доступности
-            .AsQueryable().Where(a => a.Status != AssetStatus.Disabled);
+            .AsQueryable().Where(a => a.Status != AssetStatus.Disabled && a.Status != AssetStatus.Service);
 
         // Поиск по тексту
         if (!string.IsNullOrWhiteSpace(filter.Search))
