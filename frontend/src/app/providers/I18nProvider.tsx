@@ -1781,6 +1781,21 @@ const translations: Record<Language, Translations> = {
         'contact.ctaTitle': 'Ready to choose a vehicle?',
         'contact.ctaDescription': 'Browse the available vehicles and compare rental prices and terms before sending a booking request.',
 
+        'rentalTerms.title': 'Vehicle rental terms',
+        'rentalTerms.intro': 'Key information about booking, documents, deposits, mileage and cancellations — all in one place.',
+        'rentalTerms.chooseVehicle': 'Choose a vehicle',
+        'rentalTerms.cancellationRules': 'Cancellation policy',
+        'rentalTerms.summary': 'Key rental conditions',
+        'rentalTerms.age': 'Driver age',
+        'rentalTerms.experience': 'Driving experience',
+        'rentalTerms.includedMileage': 'Included mileage',
+        'rentalTerms.overLimit': 'Excess mileage',
+        'rentalTerms.details': 'Detailed rental terms',
+        'rentalTerms.ctaTitle': 'Ready to choose a vehicle?',
+        'rentalTerms.ctaDescription': 'Compare available vehicles, rental prices and the terms of each offer.',
+        'rentalTerms.goToVehicles': 'Browse vehicles',
+        'rentalTerms.disclaimer': 'This page provides an overview of the main rules. The individual terms for the selected vehicle and booking are set out in the relevant documents.',
+
         },
     ru: {
         ...financeTranslations.ru,
@@ -2249,6 +2264,21 @@ const translations: Record<Language, Translations> = {
         'contact.ctaTitle': '准备好选择车辆了吗？',
         'contact.ctaDescription': '浏览可租车辆，比较租金和租赁条件，然后提交预订申请。',
         'footer.rentalTerms': '租赁条款',
+
+        'rentalTerms.title': '车辆租赁条款',
+        'rentalTerms.intro': '在这里了解预订、所需文件、押金、里程限制和取消预订等主要信息。',
+        'rentalTerms.chooseVehicle': '选择车辆',
+        'rentalTerms.cancellationRules': '取消预订规则',
+        'rentalTerms.summary': '主要租赁条件',
+        'rentalTerms.age': '驾驶员年龄',
+        'rentalTerms.experience': '驾龄',
+        'rentalTerms.includedMileage': '包含里程',
+        'rentalTerms.overLimit': '超出里程',
+        'rentalTerms.details': '详细租赁条款',
+        'rentalTerms.ctaTitle': '准备好选择车辆了吗？',
+        'rentalTerms.ctaDescription': '比较可租车辆、租赁价格以及各项服务的具体条件。',
+        'rentalTerms.goToVehicles': '浏览车辆',
+        'rentalTerms.disclaimer': '本页面用于介绍主要规则。所选车辆及预订的具体条件以相关文件中的约定为准。',
 
     },
 };
