@@ -156,6 +156,7 @@ const faqCategories: FAQCategory[] = [
 const localizedFaqCategories: Record<'en' | 'zh', FAQCategory[]> = {
     "en": [
         {
+            "id": "booking",
             "title": "Booking",
             "description": "Creating, changing and cancelling a reservation.",
             "items": [{
@@ -174,6 +175,7 @@ const localizedFaqCategories: Record<'en' | 'zh', FAQCategory[]> = {
             ]
         },
         {
+            "id": "requirements",
             "title": "Documents and requirements",
             "description": "Driver requirements and documents needed to arrange a rental.",
             "items": [{
@@ -198,6 +200,7 @@ const localizedFaqCategories: Record<'en' | 'zh', FAQCategory[]> = {
             ]
         },
         {
+            "id": "payment",
             "title": "Price, payment and deposit",
             "description": "What makes up the rental price.",
             "items": [{
@@ -216,6 +219,7 @@ const localizedFaqCategories: Record<'en' | 'zh', FAQCategory[]> = {
             ]
         },
         {
+            "id": "rental",
             "title": "Vehicle pickup, use and return",
             "description": "What you should know during the rental period.",
             "items": [{
@@ -245,6 +249,7 @@ const localizedFaqCategories: Record<'en' | 'zh', FAQCategory[]> = {
     ],
     "zh": [
         {
+            "id": "booking",
             "title": "预订",
             "description": "如何提交、修改和取消预订。",
             "items": [{
@@ -263,6 +268,7 @@ const localizedFaqCategories: Record<'en' | 'zh', FAQCategory[]> = {
             ]
         },
         {
+            "id": "requirements",
             "title": "文件与要求",
             "description": "驾驶员要求及办理租赁所需的文件。",
             "items": [{
@@ -287,6 +293,7 @@ const localizedFaqCategories: Record<'en' | 'zh', FAQCategory[]> = {
             ]
         },
         {
+            "id": "payment",
             "title": "费用、付款与押金",
             "description": "租赁费用由哪些部分构成。",
             "items": [{
@@ -305,6 +312,7 @@ const localizedFaqCategories: Record<'en' | 'zh', FAQCategory[]> = {
             ]
         },
         {
+            "id": "rental",
             "title": "取车、使用与还车",
             "description": "租赁期间需要了解的重要事项。",
             "items": [{
