@@ -59,7 +59,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
         
         Asset asset = await _assets.GetByIdAsync(cmd.AssetId, ct) ?? throw new AssetNotFoundException();
 
-        if (asset.Status == AssetStatus.Disabled)
+        if (asset.Status is AssetStatus.Disabled or AssetStatus.Service)
             throw new BusinessRuleViolationException("This vehicle is disabled and cannot be booked.");
 
         Customer customer = await _customers.GetByIdAsync(cmd.CustomerId, ct) ?? throw new CustomerNotFoundException();
