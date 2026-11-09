@@ -406,7 +406,7 @@ export const AssetFilters = ({
                                     className="px-3 py-2 text-sm bg-primary-600 text-white rounded-lg 
                                                hover:bg-primary-700 transition-colors"
                                 >
-                                    {t('common.save')}
+                                    {t('asset.filters.apply')}
                                 </button>
                             </div>
                         </div>
