@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
-import { FuelType, TransmissionType, DriveType, AssetStatus, type AssetFilters as AssetFiltersType } from '../../../entities/asset/asset.types';
-import { useFuelTypeLabel, useTransmissionLabel, useDriveTypeLabel, useStatusLabel } from '@/entities/asset/asset.hooks';
+import { FuelType, TransmissionType, DriveType, type AssetFilters as AssetFiltersType } from '../../../entities/asset/asset.types';
+import { useFuelTypeLabel, useTransmissionLabel, useDriveTypeLabel } from '@/entities/asset/asset.hooks';
 import { useI18n } from '@/app/providers/I18nProvider';
 
 interface AssetFiltersProps {
@@ -35,7 +35,6 @@ export const AssetFilters = ({
     const getFuelTypeLabel = useFuelTypeLabel();
     const getTransmissionLabel = useTransmissionLabel();
     const getDriveTypeLabel = useDriveTypeLabel();
-    const getStatusLabel = useStatusLabel();
 
     const { t } = useI18n();
 
@@ -91,11 +90,6 @@ export const AssetFilters = ({
         { value: DriveType.AllWheelDrive, label: getDriveTypeLabel(DriveType.AllWheelDrive) },
     ];
 
-    const statusOptions = [
-        { value: AssetStatus.Available, label: getStatusLabel(AssetStatus.Available) },
-        { value: AssetStatus.Reserved, label: getStatusLabel(AssetStatus.Reserved) },
-        { value: AssetStatus.InRent, label: getStatusLabel(AssetStatus.InRent) },
-    ];
 
     const activeCount = Object.entries(localFilters).filter(([key, value]) => {
         if (
