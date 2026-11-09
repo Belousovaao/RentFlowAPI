@@ -150,7 +150,7 @@ export const AuthModal = () => {
                 }
             } catch {
                 if (!cancelled) {
-                    setError('Не удалось загрузить текст согласия. Попробуйте позже.');
+                    setError(t('auth.consentLoadError'));
                 }
             } finally {
                 if (!cancelled) {
@@ -229,8 +229,8 @@ export const AuthModal = () => {
 
         if (!value) {
             setError( channel === 'phone'
-                ? 'Введите номер телефона.'
-                : 'Введите email.'
+                ? t('auth.enterPhone')
+                : t('auth.enterEmail')
             );
 
             return;
@@ -250,7 +250,7 @@ export const AuthModal = () => {
         setError(null);
         const code = otpCode.trim();
         if (!/^\d{6}$/.test(code)) {
-            setError('Введите 6-значный код.');
+            setError(t('auth.enterSixDigitCode'));
             return;
         }
 
@@ -290,7 +290,7 @@ export const AuthModal = () => {
         }
 
         if (!consentDocument || consentDocumentLoading) {
-            setError('Текст согласия ещё не загружен. Попробуйте позже.');
+            setError(t('auth.consentNotLoaded'));
             return;
         }
 
@@ -314,12 +314,12 @@ export const AuthModal = () => {
 
         if (data.customerType === CustomerType.Individual || data.customerType === CustomerType.IndividualEntrepreneur) {
             if (!data.firstName) {
-                setError('Введите имя.');
+                setError(t('auth.enterFirstName'));
                 return;
             }
 
             if (!data.lastName) {
-                setError('Введите фамилию.');
+                setError(t('auth.enterLastName'));
                 return;
             }
         }
@@ -328,12 +328,12 @@ export const AuthModal = () => {
             const expectedInnLength = data.customerType === CustomerType.Organization ? 10 : 12;
 
             if (!data.inn) {
-                setError('Введите ИНН.');
+                setError(t('auth.enterInn'));
                 return;
             }
 
             if (data.inn.length !== expectedInnLength) {
-                setError(`ИНН должен содержать ${expectedInnLength} цифр.`);
+                setError(t('auth.innLength').replace('{count}', String(expectedInnLength)));
                 return;
             }
         }
@@ -374,10 +374,10 @@ export const AuthModal = () => {
     };
 
     const title = step === 'contact'
-        ? 'Вход / регистрация'
+        ? t('auth.title')
         : step === 'otp'
-            ? 'Подтверждение контакта'
-            : 'Создание аккаунта';
+            ? t('auth.verifyContact')
+            : t('auth.createAccount');
     return (
         <div
             className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
@@ -415,7 +415,7 @@ export const AuthModal = () => {
                             onClick={close}
                             disabled={isLoading}
                             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50 dark:hover:bg-gray-800 dark:hover:text-gray-200"
-                            aria-label="Закрыть"
+                            aria-label={t('auth.close')}
                         >
                             <X className="h-5 w-5" />
                         </button>
@@ -443,7 +443,7 @@ export const AuthModal = () => {
                                         }`}
                                     >
                                         <Phone className="h-4 w-4" />
-                                        Телефон
+                                        {t('auth.phone')}
                                     </button>
 
                                     <button
@@ -469,7 +469,7 @@ export const AuthModal = () => {
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200">
                                     {channel === 'phone'
-                                        ? 'Номер телефона'
+                                        ? t('auth.phoneNumber')
                                         : 'Email'}
                                 </label>
 
@@ -512,8 +512,8 @@ export const AuthModal = () => {
                                     }
                                 >
                                     {isLoading
-                                        ? 'Отправка...'
-                                        : 'Получить код'}
+                                        ? t('auth.sending')
+                                        : t('auth.getCode')}
                                 </Button>
                             </div>
                         </section>
@@ -527,11 +527,11 @@ export const AuthModal = () => {
 
                                     <div>
                                         <p className="text-sm font-medium text-gray-800">
-                                            Код подтверждения
+                                            {t('auth.codeConfirmation')}
                                         </p>
 
                                         <p className="mt-1 text-xs leading-5 text-gray-600">
-                                            Мы отправили код на{' '}
+                                            {t('auth.codeSentTo')}{' '}
                                             <span className="font-medium text-gray-700">
                                                 {destination}
                                             </span>
@@ -542,7 +542,7 @@ export const AuthModal = () => {
 
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200">
-                                    Одноразовый код
+                                    {t('auth.oneTimeCode')}
                                 </label>
 
                                 <input
@@ -570,8 +570,8 @@ export const AuthModal = () => {
                             <div className="flex items-center justify-between text-xs">
                                 <span className="text-gray-500 dark:text-gray-400">
                                     {otpExpired
-                                        ? 'Срок действия кода истёк.'
-                                        : `Код действует ещё ${formatSeconds(expiresIn)}`}
+                                        ? t('auth.codeExpired')
+                                        : t('auth.codeExpiresIn').replace('{time}', formatSeconds(expiresIn, t))}
                                 </span>
 
                                 <button
@@ -584,8 +584,8 @@ export const AuthModal = () => {
                                     className="font-medium text-primary-600 transition hover:text-primary-700 disabled:cursor-not-allowed disabled:text-gray-400"
                                 >
                                     {resendAvailable
-                                        ? 'Отправить повторно'
-                                        : `Повторно через ${retryAfter} с`}
+                                        ? t('auth.resend')
+                                        : t('auth.resendIn').replace('{seconds}', String(retryAfter))}
                                 </button>
                             </div>
 
@@ -601,7 +601,7 @@ export const AuthModal = () => {
                                     className="flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-200"
                                 >
                                     <ArrowLeft className="h-4 w-4" />
-                                    Изменить контакт
+                                    {t('auth.changeContact')}
                                 </button>
 
                                 <Button
@@ -613,8 +613,8 @@ export const AuthModal = () => {
                                     }
                                 >
                                     {isLoading
-                                        ? 'Проверка...'
-                                        : 'Продолжить'}
+                                        ? t('auth.checking')
+                                        : t('auth.continue')}
                                 </Button>
                             </div>
                         </section>
@@ -628,11 +628,11 @@ export const AuthModal = () => {
 
                                     <div>
                                         <p className="text-sm font-medium text-gray-800 dark:text-gray-700">
-                                            Завершение регистрации
+                                            {t('auth.registrationComplete')}
                                         </p>
 
                                         <p className="mt-1 text-xs leading-5 text-gray-500 dark:text-gray-600">
-                                            Контакт уже подтверждён. Осталось заполнить данные аккаунта.
+                                            {t('auth.contactVerified')}
                                         </p>
                                     </div>
                                 </div>
@@ -640,7 +640,7 @@ export const AuthModal = () => {
 
                             <div>
                                 <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200">
-                                    Тип клиента
+                                    {t('auth.customerType')}
                                 </label>
 
                                 <select
@@ -662,7 +662,7 @@ export const AuthModal = () => {
                                             CustomerType.Individual
                                         }
                                     >
-                                        Физическое лицо
+                                        {t('auth.individual')}
                                     </option>
 
                                     <option
@@ -670,7 +670,7 @@ export const AuthModal = () => {
                                             CustomerType.IndividualEntrepreneur
                                         }
                                     >
-                                        Индивидуальный предприниматель
+                                        {t('auth.soleProprietor')}
                                     </option>
 
                                     <option
@@ -678,7 +678,7 @@ export const AuthModal = () => {
                                             CustomerType.Organization
                                         }
                                     >
-                                        Организация
+                                        {t('auth.organization')}
                                     </option>
                                 </select>
                             </div>
@@ -686,7 +686,7 @@ export const AuthModal = () => {
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div>
                                     <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200">
-                                        Телефон
+                                        {t('auth.phone')}
                                         <span className="ml-1 text-red-500">*</span>
                                     </label>
 
@@ -720,7 +720,7 @@ export const AuthModal = () => {
                             ) && (
                                 <div className="grid gap-4 sm:grid-cols-2">
                                     <Field
-                                        label="Имя"
+                                        label={t('auth.firstName')}
                                         type="text"
                                         value={
                                             registerData.firstName ??
@@ -738,7 +738,7 @@ export const AuthModal = () => {
                                     />
 
                                     <Field
-                                        label="Фамилия"
+                                        label={t('auth.lastName')}
                                         type="text"
                                         value={registerData.lastName ?? ''}
                                         onChange={(value) => updateRegisterField( 'lastName', value)}
@@ -754,7 +754,7 @@ export const AuthModal = () => {
                                 registerData.customerType === CustomerType.Organization
                             ) && (
                                 <Field
-                                    label="ИНН"
+                                    label={t('auth.inn')}
                                     required
                                     type="text"
                                     value={registerData.inn ?? ''}
@@ -762,7 +762,7 @@ export const AuthModal = () => {
                                     disabled={isLoading}
                                     inputMode="numeric"
                                     maxLength={registerData.customerType === CustomerType.Organization ? 10 : 12}
-                                    placeholder={registerData.customerType === CustomerType.Organization ? '10 цифр' : '12 цифр'}
+                                    placeholder={registerData.customerType === CustomerType.Organization ? t('auth.tenDigits') : t('auth.twelveDigits')}
                                     autoComplete="off"
                                 />
                             )}
@@ -779,7 +779,7 @@ export const AuthModal = () => {
                                 }}
                                 error={
                                     consentError
-                                        ? 'Для регистрации необходимо дать согласие на обработку персональных данных.'
+                                        ? t('auth.consentRequired')
                                         : undefined
                                 }
                             />
@@ -796,7 +796,7 @@ export const AuthModal = () => {
                                     className="flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-gray-800 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-200"
                                 >
                                     <ArrowLeft className="h-4 w-4" />
-                                    Назад
+                                    {t('auth.back')}
                                 </button>
 
                                 <Button
@@ -804,8 +804,8 @@ export const AuthModal = () => {
                                     disabled={isLoading || !isRegistrationValid}
                                 >
                                     {isLoading
-                                        ? 'Создание аккаунта...'
-                                        : 'Зарегистрироваться'}
+                                        ? t('auth.creatingAccount')
+                                        : t('auth.register')}
                                 </Button>
                             </div>
                         </section>
@@ -877,12 +877,12 @@ const ErrorMessage = ({
     );
 };
 
-function formatSeconds(seconds: number): string {
+function formatSeconds(seconds: number, t: (key: string) => string): string {
     const minutes = Math.floor(seconds / 60);
     const remainder = seconds % 60;
 
     if (minutes === 0) {
-        return `${remainder} сек.`;
+        return `${remainder} ${t('auth.secondsShort')}`;
     }
 
     return `${minutes}:${remainder
@@ -919,5 +919,5 @@ function getErrorMessage(error: unknown, t: (key: string) => string): string {
         return error.message;
     }
 
-    return 'Произошла ошибка. Попробуйте ещё раз.';
+    return t('auth.genericError');
 }
