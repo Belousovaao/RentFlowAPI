@@ -1801,6 +1801,8 @@ const translations: Record<Language, Translations> = {
         },
         'booking.day1': 'day',
 
+        'booking.priceDependsOnTime': 'Up to 6 hours: hourly rate; over 6 hours: daily rate.',
+
     ru: {
         ...financeTranslations.ru,
         'nav.home': 'Главная',
@@ -2051,6 +2053,8 @@ const translations: Record<Language, Translations> = {
         'rentalTerms.ctaDescription': 'Сравните доступные автомобили, стоимость аренды и условия конкретного предложения.',
         'rentalTerms.goToVehicles': 'Перейти к автомобилям',
         'rentalTerms.disclaimer': 'Информация на этой странице помогает ознакомиться с основными правилами. Индивидуальные условия выбранного автомобиля и бронирования фиксируются в соответствующих документах.',
+        'auth.methodEmail': 'Email и пароль',
+
     },
     zh: {
         ...financeTranslations.zh,
@@ -2292,6 +2296,19 @@ const translations: Record<Language, Translations> = {
         'checkout.period': '租赁期限',
         'checkout.renter': '承租人',
         'checkout.confirm': '确认预订',
+
+        'asset.filters.title': '筛选条件',
+        'asset.filters.basic': '基本信息',
+        'asset.filters.searchPlaceholder': '按品牌或型号搜索……',
+        'asset.filters.from': '最低',
+        'asset.filters.to': '最高',
+        'asset.filters.year': '出厂年份',
+        'asset.filters.fuelType': '燃油类型',
+        'asset.filters.driveType': '驱动形式',
+        'asset.filters.power': '发动机功率',
+        'asset.filters.fromHp': '最低，马力',
+        'asset.filters.toHp': '最高，马力',
+        'booking.day1': '天',
 
     },
 };
