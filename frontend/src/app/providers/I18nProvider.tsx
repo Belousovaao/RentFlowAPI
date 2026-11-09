@@ -1847,6 +1847,8 @@ const translations: Record<Language, Translations> = {
         'footer.rightsReserved': 'All rights reserved.',
         'footer.cookies': 'Cookies',
 
+        'asset.filters.apply': 'Apply filters',
+
         },
     ru: {
         ...financeTranslations.ru,
@@ -2102,6 +2104,8 @@ const translations: Record<Language, Translations> = {
 
         'footer.rightsReserved': 'Все права защищены.',
         'footer.cookies': 'Файлы cookie',
+
+        'asset.filters.apply': 'Применить фильтры',
 
     },
     zh: {
@@ -2360,6 +2364,8 @@ const translations: Record<Language, Translations> = {
 
         'footer.rightsReserved': '版权所有。',
         'footer.cookies': 'Cookie',
+
+        'asset.filters.apply': '应用筛选',
 
     },
 };
