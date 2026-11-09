@@ -1657,7 +1657,7 @@ const translations: Record<Language, Translations> = {
         'footer.faq': 'FAQ',
         'footer.privacy': 'Privacy Policy',
         'footer.supportCenter': 'Support Center',
-        'address': 'Krasnoyarsk, 40/1 Krasnodarskaya st.',
+        'address': 'Krasnoyarsk, 40/6 Krasnodarskaya St.',
         'footer.quickLinks': 'Site Map',
         'footer.support': 'Support',
         'footer.contact': 'Contact us',
@@ -1799,6 +1799,9 @@ const translations: Record<Language, Translations> = {
 
 
         'booking.day1': 'day',
+        'footer.rightsReserved': 'All rights reserved.',
+        'footer.cookies': 'Cookies',
+
         },
     ru: {
         ...financeTranslations.ru,
@@ -1933,7 +1936,7 @@ const translations: Record<Language, Translations> = {
         'footer.faq': 'Часто задаваемые вопросы',
         'footer.privacy': 'Политика конфиденциальности',
         'footer.supportCenter': 'Служба поддержки',
-        'address': 'г. Красноярск, ул. Краснодарская 40/1',
+        'address': 'г. Красноярск, ул. Краснодарская, 40/6',
         'footer.quickLinks': 'Карта сайта',
         'footer.support': 'Поддержка',
         'footer.contact': 'Связаться с нами',
@@ -2051,6 +2054,9 @@ const translations: Record<Language, Translations> = {
         'rentalTerms.goToVehicles': 'Перейти к автомобилям',
         'rentalTerms.disclaimer': 'Информация на этой странице помогает ознакомиться с основными правилами. Индивидуальные условия выбранного автомобиля и бронирования фиксируются в соответствующих документах.',
         'auth.methodEmail': 'Email и пароль',
+
+        'footer.rightsReserved': 'Все права защищены.',
+        'footer.cookies': 'Файлы cookie',
 
     },
     zh: {
@@ -2223,7 +2229,7 @@ const translations: Record<Language, Translations> = {
         'footer.faq': '常见问题',
         'footer.privacy': '隐私政策',
         'footer.supportCenter': '客户支持中心',
-        'address': '俄罗斯克拉斯诺亚尔斯克市，克拉斯诺达尔街40/1号',
+        'address': '俄罗斯克拉斯诺亚尔斯克市，克拉斯诺达尔街40/6号',
         'common.name': 'Volnami Drive',
         'footer.quickLinks': '快速链接',
         'footer.support': '客户支持',
@@ -2306,6 +2312,9 @@ const translations: Record<Language, Translations> = {
         'asset.filters.fromHp': '最低，马力',
         'asset.filters.toHp': '最高，马力',
         'booking.day1': '天',
+
+        'footer.rightsReserved': '版权所有。',
+        'footer.cookies': 'Cookie',
 
     },
 };
