@@ -400,14 +400,26 @@ export const RentalTermsPage = () => {
                                             </ul>
                                         )}
 
-                                        {section.subSections?.map((subSection) => (
-                                            <div key={subSection.title} className="space-y-2">
-                                                <h3 className="font-semibold text-gray-800 dark:text-white">{language === 'ru' ? subSection.title : localizedSections[language][section.id].subSections?.find((item) => item.title === subSection.title)?.title}</h3>
-                                                <ul className="list-disc space-y-2 pl-5 leading-7 text-gray-600 dark:text-gray-300">
-                                                    {subSection.bullets.map((bullet, index) => <li key={bullet}>{language === 'ru' ? bullet : localizedSections[language][section.id].subSections?.find((item) => item.title === subSection.title)?.bullets[index]}</li>)}
-                                                </ul>
-                                            </div>
-                                        ))}
+                                        {section.subSections?.map((subSection, subSectionIndex) => {
+                                            const localizedSubSection = language === 'ru'
+                                                ? undefined
+                                                : localizedSections[language][section.id].subSections?.[subSectionIndex];
+
+                                            return (
+                                                <div key={subSection.title} className="space-y-2">
+                                                    <h3 className="font-semibold text-gray-800 dark:text-white">
+                                                        {language === 'ru' ? subSection.title : localizedSubSection?.title}
+                                                    </h3>
+                                                    <ul className="list-disc space-y-2 pl-5 leading-7 text-gray-600 dark:text-gray-300">
+                                                        {subSection.bullets.map((bullet, index) => (
+                                                            <li key={bullet}>
+                                                                {language === 'ru' ? bullet : localizedSubSection?.bullets[index]}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </article>
