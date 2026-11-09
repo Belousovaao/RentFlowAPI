@@ -92,6 +92,52 @@ namespace RentFlow.Api.Controllers.Admin
             return Ok();
         }
 
+        [HttpGet("{assetId:guid}/maintenance")]
+        public async Task<IActionResult> GetMaintenancePeriods(Guid assetId, CancellationToken ct)
+        {
+            var asset = await _assetRepository.GetByIdAsync(assetId, ct);
+            if (asset is null) return NotFound();
+            var periods = await _assetRepository.GetMaintenancePeriodsAsync(assetId, ct);
+            return Ok(periods.Select(x => new MaintenancePeriodResponse(x.Id, x.StartDate, x.EndDate, x.Reason)));
+        }
+
+        [HttpPost("{assetId:guid}/maintenance")]
+        public async Task<IActionResult> CreateMaintenancePeriod(
+            Guid assetId,
+            [FromBody] CreateMaintenancePeriodRequest request,
+            CancellationToken ct)
+        {
+            var asset = await _assetRepository.GetByIdAsync(assetId, ct);
+            if (asset is null) return NotFound();
+
+            if (request.EndDate <= request.StartDate)
+                return BadRequest("EndDate must be later than StartDate.");
+
+            var startUtc = DateTime.SpecifyKind(request.StartDate, DateTimeKind.Utc);
+            var endUtc = DateTime.SpecifyKind(request.EndDate, DateTimeKind.Utc);
+
+            if (await _assetRepository.HasMaintenanceOverlapAsync(assetId, startUtc, endUtc, ct))
+                return Conflict("Maintenance period overlaps an existing maintenance period.");
+
+            var period = new AssetMaintenancePeriod(assetId, startUtc, endUtc, request.Reason);
+            await _assetRepository.AddMaintenancePeriodAsync(period, ct);
+            await _unitOfWork.SaveChangesAsync(ct);
+            return CreatedAtAction(nameof(GetMaintenancePeriods), new { assetId }, 
+                new MaintenancePeriodResponse(period.Id, period.StartDate, period.EndDate, period.Reason));
+        }
+
+        [HttpDelete("{assetId:guid}/maintenance/{periodId:guid}")]
+        public async Task<IActionResult> DeleteMaintenancePeriod(Guid assetId, Guid periodId, CancellationToken ct)
+        {
+            var deleted = await _assetRepository.DeleteMaintenancePeriodAsync(assetId, periodId, ct);
+            if (!deleted) return NotFound();
+            await _unitOfWork.SaveChangesAsync(ct);
+            return NoContent();
+        }
+
+        public sealed record CreateMaintenancePeriodRequest(DateTime StartDate, DateTime EndDate, string? Reason);
+        public sealed record MaintenancePeriodResponse(Guid Id, DateTime StartDate, DateTime EndDate, string? Reason);
+
         [HttpPost("{assetId:guid}/photos/exterior/batch")]
         public async Task<IActionResult> UploadExteriorPhotos(Guid assetId, IFormFileCollection files, CancellationToken ct)
         {
