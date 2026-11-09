@@ -351,10 +351,10 @@ export const RentalTermsPage = () => {
                 </section>
 
                 <section className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label={t('rentalTerms.summary')}>
-                    <FactCard label={t('rentalTerms.age')} value="от 25 лет" icon={BadgeCheck} />
-                    <FactCard label={t('rentalTerms.experience')} value="от 5 лет" icon={CarFront} />
-                    <FactCard label={t('rentalTerms.includedMileage')} value="250 км/сутки" icon={Gauge} />
-                    <FactCard label={t('rentalTerms.overLimit')} value="15 ₽/км" icon={Wallet} />
+                    <FactCard label={t('rentalTerms.age')} value={language === 'ru' ? 'от 25 лет' : language === 'en' ? '25+' : '25岁及以上'} icon={BadgeCheck} />
+                    <FactCard label={t('rentalTerms.experience')} value={language === 'ru' ? 'от 5 лет' : language === 'en' ? '5+ years' : '驾龄5年以上'} icon={CarFront} />
+                    <FactCard label={t('rentalTerms.includedMileage')} value={language === 'ru' ? '250 км/сутки' : language === 'en' ? '250 km/day' : '250公里/天'} icon={Gauge} />
+                    <FactCard label={t('rentalTerms.overLimit')} value={language === 'ru' ? '15 ₽/км' : language === 'en' ? '₽15/km' : '15卢布/公里'} icon={Wallet} />
                 </section>
 
                 <section className="space-y-3" aria-label={t('rentalTerms.details')}>
