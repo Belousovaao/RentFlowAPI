@@ -210,7 +210,10 @@ export const AuthModal = () => {
         )
     ) &&
     (
-        registerData.customerType === CustomerType.Individual || !!registerData.inn?.trim()
+        registerData.customerType === CustomerType.Individual ||
+        (registerData.customerType === CustomerType.Organization
+            ? (registerData.inn?.length ?? 0) === 10
+            : (registerData.inn?.length ?? 0) === 12)
     );
 
     if (!isOpen) {
@@ -320,8 +323,15 @@ export const AuthModal = () => {
         }
 
         if (data.customerType === CustomerType.IndividualEntrepreneur || data.customerType === CustomerType.Organization) {
+            const expectedInnLength = data.customerType === CustomerType.Organization ? 10 : 12;
+
             if (!data.inn) {
                 setError('Введите ИНН.');
+                return;
+            }
+
+            if (data.inn.length !== expectedInnLength) {
+                setError(`ИНН должен содержать ${expectedInnLength} цифр.`);
                 return;
             }
         }
@@ -746,9 +756,11 @@ export const AuthModal = () => {
                                     required
                                     type="text"
                                     value={registerData.inn ?? ''}
-                                    onChange={(value) => updateRegisterField( 'inn', value.replace(/\D/g, ''))}
+                                    onChange={(value) => updateRegisterField('inn', value.replace(/\D/g, '').slice(0, registerData.customerType === CustomerType.Organization ? 10 : 12))}
                                     disabled={isLoading}
                                     inputMode="numeric"
+                                    maxLength={registerData.customerType === CustomerType.Organization ? 10 : 12}
+                                    placeholder={registerData.customerType === CustomerType.Organization ? '10 цифр' : '12 цифр'}
                                     autoComplete="off"
                                 />
                             )}
@@ -811,6 +823,7 @@ interface FieldProps {
     required?: boolean;
     autoComplete?: string;
     inputMode?: InputHTMLAttributes<HTMLInputElement>['inputMode'];
+    maxLength?: number;
 }
 
 const Field = ({
@@ -822,6 +835,7 @@ const Field = ({
     required = false,
     autoComplete,
     inputMode,
+    maxLength,
 }: FieldProps) => {
     return (
         <div>
@@ -842,6 +856,7 @@ const Field = ({
                 required={required}
                 autoComplete={autoComplete}
                 inputMode={inputMode}
+                maxLength={maxLength}
                 className="w-full rounded-xl border border-gray-200 bg-white px-3 py-3 text-sm text-gray-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:focus:border-primary-500 dark:disabled:bg-gray-800/60"
             />
         </div>
