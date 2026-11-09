@@ -230,6 +230,16 @@ public class AssetRepository : IAssetRepository
             x.AssetId == assetId && x.StartDate < endDate && x.EndDate > startDate, ct);
     }
 
+    public Task<bool> HasBookingOverlapAsync(Guid assetId, DateTime startDate, DateTime endDate, CancellationToken ct = default)
+    {
+        return _context.Bookings.AnyAsync(b =>
+            b.AssetId == assetId &&
+            b.Status != RentFlow.Domain.Bookings.BookingStatus.Cancelled &&
+            b.Status != RentFlow.Domain.Bookings.BookingStatus.Completed &&
+            b.RentalPeriod.StartDate < endDate &&
+            b.RentalPeriod.EndDate > startDate, ct);
+    }
+
     public async Task<bool> DeleteMaintenancePeriodAsync(Guid assetId, Guid periodId, CancellationToken ct = default)
     {
         var period = await _context.AssetMaintenancePeriods
