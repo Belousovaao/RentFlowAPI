@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminAssetsApi } from '@/features/admin/api/adminAsset.api';
 import { Asset, AssetStatus, AssetStatusColors, AssetStatusLabels } from '@/entities/asset/asset.types';
-import { Pencil, Plus, Image, ArrowLeft, CalendarClock } from 'lucide-react';
+import { Pencil, Plus, Image, ArrowLeft, Wrench } from 'lucide-react';
 import { getPhotoUrl } from '@/shared/utils/photoUrl';
 import { useI18n } from '@/app/providers/I18nProvider';
 import { DateInput } from '@/features/ui/components/DateInput';
@@ -278,7 +278,7 @@ export const AdminAssetsListPage = () => {
                           title={t('admin.assets.maintenance')}
                           aria-label={t('admin.assets.maintenance')}
                         >
-                          <CalendarClock className="h-4 w-4" />
+                          <Wrench className="h-4 w-4" />
                         </button>
                       </div>
                     </td>
