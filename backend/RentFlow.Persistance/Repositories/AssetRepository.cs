@@ -210,6 +210,35 @@ public class AssetRepository : IAssetRepository
         return  _context.Assets.Include(a => a.Photos).AsNoTracking().ToList();
     }
 
+    public async Task<IReadOnlyList<AssetMaintenancePeriod>> GetMaintenancePeriodsAsync(Guid assetId, CancellationToken ct = default)
+    {
+        return await _context.AssetMaintenancePeriods
+            .AsNoTracking()
+            .Where(x => x.AssetId == assetId)
+            .OrderBy(x => x.StartDate)
+            .ToListAsync(ct);
+    }
+
+    public async Task AddMaintenancePeriodAsync(AssetMaintenancePeriod period, CancellationToken ct = default)
+    {
+        await _context.AssetMaintenancePeriods.AddAsync(period, ct);
+    }
+
+    public Task<bool> HasMaintenanceOverlapAsync(Guid assetId, DateTime startDate, DateTime endDate, CancellationToken ct = default)
+    {
+        return _context.AssetMaintenancePeriods.AnyAsync(x =>
+            x.AssetId == assetId && x.StartDate < endDate && x.EndDate > startDate, ct);
+    }
+
+    public async Task<bool> DeleteMaintenancePeriodAsync(Guid assetId, Guid periodId, CancellationToken ct = default)
+    {
+        var period = await _context.AssetMaintenancePeriods
+            .FirstOrDefaultAsync(x => x.Id == periodId && x.AssetId == assetId, ct);
+        if (period is null) return false;
+        _context.AssetMaintenancePeriods.Remove(period);
+        return true;
+    }
+
     public async Task AddAsync(Asset asset, CancellationToken ct)
     {
         await _context.Assets.AddAsync(asset, ct);
