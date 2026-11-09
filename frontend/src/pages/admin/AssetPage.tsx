@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminAssetsApi } from '@/features/admin/api/adminAsset.api';
-import { Asset, AssetStatus, AssetStatusColors } from '@/entities/asset/asset.types';
+import { Asset, AssetStatus, AssetStatusColors, AssetStatusLabels } from '@/entities/asset/asset.types';
 import { Pencil, Plus, Image, ArrowLeft, } from 'lucide-react';
 import { getPhotoUrl } from '@/shared/utils/photoUrl';
 import { useI18n } from '@/app/providers/I18nProvider';
