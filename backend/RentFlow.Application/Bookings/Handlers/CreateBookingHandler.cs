@@ -59,6 +59,9 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
         
         Asset asset = await _assets.GetByIdAsync(cmd.AssetId, ct) ?? throw new AssetNotFoundException();
 
+        if (asset.Status == AssetStatus.Disabled)
+            throw new BusinessRuleViolationException("This vehicle is disabled and cannot be booked.");
+
         Customer customer = await _customers.GetByIdAsync(cmd.CustomerId, ct) ?? throw new CustomerNotFoundException();
 
         var resolvedDestination = await _destinationResolver.ResolveAsync(
@@ -88,7 +91,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
         {
             List<Booking> overlapping = await _bookings.GetOverlappingAsync(cmd.AssetId, period, ct);
 
-            if (overlapping.Any())
+            if (overlapping.Any() || await _assets.HasMaintenanceOverlapAsync(cmd.AssetId, startUtc, endUtc, ct))
                 throw new BookingConflictException();
 
             Driver? driver = null;
