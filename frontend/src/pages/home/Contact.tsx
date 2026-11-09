@@ -156,7 +156,7 @@ export const ContactPage = () => {
                                 <div>
                                     <h2 className="font-semibold text-black dark:text-white">{t("contact.location")}</h2>
                                     <p className="mt-1 leading-7 text-gray-600 dark:text-gray-300">
-                                        {contactDetails.city}
+                                        {t('address')}
                                     </p>
                                 </div>
                             </div>
