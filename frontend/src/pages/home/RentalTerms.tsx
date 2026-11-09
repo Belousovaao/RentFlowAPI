@@ -351,7 +351,7 @@ export const RentalTermsPage = () => {
                 </section>
 
                 <section className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label={t('rentalTerms.summary')}>
-                    <FactCard label={t('rentalTerms.age)} value="от 25 лет" icon={BadgeCheck} />
+                    <FactCard label={t('rentalTerms.age')} value="от 25 лет" icon={BadgeCheck} />
                     <FactCard label={t('rentalTerms.experience')} value="от 5 лет" icon={CarFront} />
                     <FactCard label={t('rentalTerms.includedMileage')} value="250 км/сутки" icon={Gauge} />
                     <FactCard label={t('rentalTerms.overLimit')} value="15 ₽/км" icon={Wallet} />
