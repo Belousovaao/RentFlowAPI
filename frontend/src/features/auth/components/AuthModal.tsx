@@ -5,6 +5,7 @@ import { useAuthModalStore } from '../stores/authModalStore';
 import { authApi, type OtpChannel, type PersonalDataConsentDocument } from '../api/auth.api';
 import type { RegisterFormData } from '../types';
 import { CustomerType } from '@/entities/customer/customer.type';
+import { useI18n } from '@/app/providers/I18nProvider';
 import { Button } from '@/features/ui/components/Button';
 import { PhoneInput } from '@/features/ui/components/PhoneInput';
 import { EmailInput } from '@/features/ui/components/EmailInput';
@@ -16,6 +17,7 @@ type Step =
     | 'registration';
 
 export const AuthModal = () => {
+    const { t } = useI18n();
     const {
         isOpen,
         completeAuth,
@@ -240,7 +242,7 @@ export const AuthModal = () => {
             setOtpCode('');
             setStep('otp');
         } catch (err) {
-            setError(getErrorMessage(err));
+            setError(getErrorMessage(err, t));
         }
     };
 
@@ -260,7 +262,7 @@ export const AuthModal = () => {
             }
             setStep('registration');
         } catch (err) {
-            setError(getErrorMessage(err));
+            setError(getErrorMessage(err, t));
         }
     };
 
@@ -275,7 +277,7 @@ export const AuthModal = () => {
             await sendOtp(channel, destination);
             setOtpCode('');
         } catch (err) {
-            setError(getErrorMessage(err));
+            setError(getErrorMessage(err, t));
         }
     };
 
@@ -340,7 +342,7 @@ export const AuthModal = () => {
             await register(data);
             completeAuth();
         } catch (err) {
-            setError(getErrorMessage(err));
+            setError(getErrorMessage(err, t));
         }
     };
 
@@ -888,7 +890,7 @@ function formatSeconds(seconds: number): string {
         .padStart(2, '0')}`;
 }
 
-function getErrorMessage(error: unknown): string {
+function getErrorMessage(error: unknown, t: (key: string) => string): string {
     if (
         typeof error === 'object' &&
         error !== null &&
@@ -903,6 +905,10 @@ function getErrorMessage(error: unknown): string {
                 };
             }
         ).response;
+
+        if (response?.data?.message === 'Invalid or expired registration ticket.') {
+            return t('auth.registrationTicketExpired');
+        }
 
         if (response?.data?.message) {
             return response.data.message;
