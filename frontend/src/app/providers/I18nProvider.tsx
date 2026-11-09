@@ -1563,7 +1563,7 @@ const translations: Record<Language, Translations> = {
         'booking.days' : 'days',
         'booking.total': 'Total',
         'booking.deposit': 'Deposit',
-        'booking.priceDependsOnTime' : 'До 6 часов включительно - почасовая оплата, свыше - суточный тариф',
+        'booking.priceDependsOnTime': 'Up to 6 hours: hourly rate; over 6 hours: daily rate.',
         'asset.available': 'Available Now',
         'asset.comingSoon': 'Coming Soon',
         'asset.details': 'Details',
@@ -1798,11 +1798,8 @@ const translations: Record<Language, Translations> = {
 
 
 
-        },
         'booking.day1': 'day',
-
-        'booking.priceDependsOnTime': 'Up to 6 hours: hourly rate; over 6 hours: daily rate.',
-
+        },
     ru: {
         ...financeTranslations.ru,
         'nav.home': 'Главная',
