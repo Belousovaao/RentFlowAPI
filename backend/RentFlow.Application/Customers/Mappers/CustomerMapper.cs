@@ -98,7 +98,7 @@ public static class CustomerMapper
                 null,
                 o.ShortName,
                 o.FullName,
-                o.LegalForm.ShortName.ToString(),
+                o.LegalForm?.ShortName,
                 o.Email,
                 o.Phone,
                 null,

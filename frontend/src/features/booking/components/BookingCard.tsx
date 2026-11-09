@@ -4,6 +4,7 @@ import type { BookingListItemDto } from '@/entities/booking/booking.types';
 import { BookingStatusBadge } from '@/features/booking/components/BookingStatusBage';
 import { getPhotoUrl } from '@/shared/utils/photoUrl';
 import { formatPrice } from '@/shared/utils/formatters';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 interface Props {
     booking: BookingListItemDto;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export const BookingCard = ({ booking, compact = false }: Props) => {
+    const { t, language } = useI18n();
     const { asset, rentalPeriod, price, services, status } = booking;
 
     if (compact) {
@@ -46,9 +48,9 @@ export const BookingCard = ({ booking, compact = false }: Props) => {
                         <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
                             <span className="flex items-center gap-1.5">
                                 <Calendar className="h-4 w-4" />
-                                {formatDate(rentalPeriod.startDate)}
+                                {formatDate(rentalPeriod.startDate, language)}
                                 {' — '}
-                                {formatDate(rentalPeriod.endDate)}
+                                {formatDate(rentalPeriod.endDate, language)}
                             </span>
 
                             <span className="font-medium text-gray-700 dark:text-gray-200">
@@ -102,16 +104,16 @@ export const BookingCard = ({ booking, compact = false }: Props) => {
                         <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
                             <Calendar className="h-4 w-4" />
                             <span>
-                                {formatDate(rentalPeriod.startDate)}
+                                {formatDate(rentalPeriod.startDate, language)}
                                 {' — '}
-                                {formatDate(rentalPeriod.endDate)}
+                                {formatDate(rentalPeriod.endDate, language)}
                             </span>
                         </div>
 
                         <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
                             <CreditCard className="h-4 w-4" />
                             <span>
-                                Итого: {formatPrice(price.totalToPay)}
+                                {t("booking.total")}: {formatPrice(price.totalToPay)}
                             </span>
                         </div>
                     </div>
@@ -119,7 +121,7 @@ export const BookingCard = ({ booking, compact = false }: Props) => {
                     {services.length > 0 && (
                         <div className="mt-4">
                             <p className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                                Дополнительные услуги
+                                {t("booking.additionalServices")}
                             </p>
 
                             <ul className="space-y-1 text-sm text-gray-500">
@@ -138,4 +140,4 @@ export const BookingCard = ({ booking, compact = false }: Props) => {
         </Link>
     );
 };
-const formatDate = (value: string) => new Intl.DateTimeFormat('ru-RU').format(new Date(value));
+const formatDate = (value: string, language: string) => new Intl.DateTimeFormat(language === 'zh' ? 'zh-CN' : language === 'en' ? 'en-GB' : 'ru-RU').format(new Date(value));

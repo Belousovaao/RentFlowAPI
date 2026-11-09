@@ -117,7 +117,7 @@ export const AssetCard = ({ asset, index, onBookClick }: AssetCardProps) => {
                 
                 {/* Цена */}
                 <div className="absolute top-2 right-2 bg-primary-600 text-white px-3 py-1 rounded-lg text-sm font-bold">
-                    от {formatPrice(calculateMaxDiscountDailyPrice(asset.dailyPrice))} ₽/{t('asset.perDay')}
+                    {t('asset.filters.from')} {formatPrice(calculateMaxDiscountDailyPrice(asset.dailyPrice))} {t('asset.perDay')}
                 </div>
             </div>
             {/* Информация */}

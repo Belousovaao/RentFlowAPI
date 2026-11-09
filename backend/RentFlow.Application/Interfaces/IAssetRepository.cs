@@ -14,6 +14,11 @@ public interface IAssetRepository
     Task<IEnumerable<Asset>> GetAllAsync();
     Task AddAsync(Asset asset, CancellationToken ct);
     Task UpdateAsync(Asset asset, CancellationToken ct);
+    Task<IReadOnlyList<AssetMaintenancePeriod>> GetMaintenancePeriodsAsync(Guid assetId, CancellationToken ct = default);
+    Task AddMaintenancePeriodAsync(AssetMaintenancePeriod period, CancellationToken ct = default);
+    Task<bool> HasMaintenanceOverlapAsync(Guid assetId, DateTime startDate, DateTime endDate, CancellationToken ct = default);
+    Task<bool> HasBookingOverlapAsync(Guid assetId, DateTime startDate, DateTime endDate, CancellationToken ct = default);
+    Task<bool> DeleteMaintenancePeriodAsync(Guid assetId, Guid periodId, CancellationToken ct = default);
     void Attach(Asset asset);
     
 }

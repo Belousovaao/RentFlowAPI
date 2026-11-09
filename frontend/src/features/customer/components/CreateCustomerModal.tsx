@@ -8,6 +8,7 @@ import { OrganizationForm } from './forms/OrganizationForm';
 import { createPortal } from 'react-dom';
 import { adminCustomersApi } from '@/features/admin/api/adminCustomers.api';
 import axios from '@/shared/api/axios';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 interface CreateCustomerModalProps {
     open: boolean;
@@ -18,20 +19,20 @@ interface CreateCustomerModalProps {
 const customerTypes = [
     {
         type: CustomerType.Individual,
-        title: 'Физическое лицо',
-        description: 'Частный клиент',
+        titleKey: 'customer.type.individual',
+        descriptionKey: 'customer.type.individualDescription',
         icon: UserRound,
     },
     {
         type: CustomerType.IndividualEntrepreneur,
-        title: 'ИП',
-        description: 'Индивидуальный предприниматель',
+        titleKey: 'customer.type.entrepreneur',
+        descriptionKey: 'customer.type.entrepreneurDescription',
         icon: Briefcase,
     },
     {
         type: CustomerType.Organization,
-        title: 'Организация',
-        description: 'Юридическое лицо',
+        titleKey: 'customer.type.organization',
+        descriptionKey: 'customer.type.organizationDescription',
         icon: Building2,
     },
 ];
@@ -41,6 +42,7 @@ export const CreateCustomerModal = ({
     onClose,
     onCreated,
 }: CreateCustomerModalProps) => {
+    const { t } = useI18n();
 
     const [type, setType] = useState<CustomerType>(CustomerType.Individual);
 
@@ -79,7 +81,7 @@ export const CreateCustomerModal = ({
 
                         <div>
                             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                                Новый клиент
+                                {t("customer.create.title")}
                             </h2>
                         </div>
 
@@ -102,7 +104,7 @@ export const CreateCustomerModal = ({
 
                         <div className="mb-4">
                             <h3 className="font-semibold text-gray-900 dark:text-white">
-                                Тип клиента
+                                {t("customer.create.type")}
                             </h3>
                         </div>
 
@@ -137,10 +139,10 @@ export const CreateCustomerModal = ({
                                             <Icon className="w-5 h-5" />
                                         </div>
                                         <div className="font-semibold text-gray-900 dark:text-white">
-                                            {item.title}
+                                            {t(item.titleKey)}
                                         </div>
                                         <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                            {item.description}
+                                            {t(item.descriptionKey)}
                                         </div>
                                     </button>
                                 );

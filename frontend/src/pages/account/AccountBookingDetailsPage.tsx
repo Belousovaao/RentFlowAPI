@@ -10,8 +10,10 @@ import { formatDate, formatDateTime, formatPrice, } from "@/shared/utils/formatt
 import { getPhotoUrl } from "@/shared/utils/photoUrl";
 import { RouteReviewStatus } from "@/entities/destination/destination.type";
 import { travelZones } from "@/entities/destination/destination.constants";
+import { useI18n } from "@/app/providers/I18nProvider";
 
 export const AccountBookingDetailsPage = () => {
+    const { t, language } = useI18n();
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
@@ -30,7 +32,7 @@ export const AccountBookingDetailsPage = () => {
             setBooking(response);
         } catch (error) {
             console.error("Failed to load booking details:", error);
-            toast.error("Не удалось загрузить бронирование.");
+            toast.error(t("account.bookingDetails.loadError"));
         } finally {
             setLoading(false);
         }
@@ -40,7 +42,7 @@ export const AccountBookingDetailsPage = () => {
         if (!id || cancelLoading) return;
 
         const confirmed = window.confirm(
-            "Вы действительно хотите отменить бронирование?"
+            t("account.bookingDetails.cancelConfirm")
         );
 
         if (!confirmed) return;
@@ -50,12 +52,12 @@ export const AccountBookingDetailsPage = () => {
 
             await bookingApi.cancel(id);
 
-            toast.success("Бронирование отменено.");
+            toast.success(t("account.bookingDetails.cancelled"));
 
             await loadBooking();
         } catch (error) {
             console.error("Failed to cancel booking:", error);
-            toast.error("Не удалось отменить бронирование.");
+            toast.error(t("account.bookingDetails.cancelError"));
         } finally {
             setCancelLoading(false);
         }
@@ -79,7 +81,7 @@ export const AccountBookingDetailsPage = () => {
                 <div className="container mx-auto max-w-5xl px-4">
                     <div className="rounded-2xl bg-white p-8 text-center shadow-sm dark:bg-gray-800">
                         <p className="text-gray-600 dark:text-gray-300">
-                            Бронирование не найдено.
+                            {t("account.bookingDetails.notFound")}
                         </p>
 
                         <button
@@ -87,7 +89,7 @@ export const AccountBookingDetailsPage = () => {
                             onClick={() => navigate("/account/bookings")}
                             className="mt-4 text-sm font-medium text-blue-600 hover:text-blue-700"
                         >
-                            Вернуться к списку
+                            {t("common.backToList")}
                         </button>
                     </div>
                 </div>
@@ -102,10 +104,10 @@ export const AccountBookingDetailsPage = () => {
 
     const destinationZone = travelZones.find((zone) => zone.type === booking.destination.type);
     const routeReviewStatusLabels: Record<RouteReviewStatus, string> = {
-        NotRequired: "Проверка не требуется",
-        Pending: "На проверке",
-        Approved: "Одобрен",
-        Rejected: "Отклонён",
+        NotRequired: "route.status.notRequired",
+        Pending: "route.status.pending",
+        Approved: "route.status.approved",
+        Rejected: "route.status.rejected",
     };
 
     const rentalSegments = booking.price.rentalPrice.segments ?? [];
@@ -149,7 +151,7 @@ export const AccountBookingDetailsPage = () => {
                         className="flex w-fit items-center gap-2 text-sm font-medium text-gray-600 transition hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
                     >
                         <ArrowLeft className="h-4 w-4" />
-                        Список всех бронирований
+                        {t("admin.bookings.title")}
                     </button>
 
                     <div className="flex flex-wrap items-center gap-3">
@@ -166,7 +168,7 @@ export const AccountBookingDetailsPage = () => {
                                 ) : (
                                     <XCircle className="h-4 w-4" />
                                 )}
-                                Отменить бронирование
+                                {t("account.bookingDetails.cancel")}
                             </button>
                         )}
 
@@ -177,7 +179,7 @@ export const AccountBookingDetailsPage = () => {
                             className="inline-flex w-fit items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             <CalendarDays className="h-4 w-4" />
-                            Изменить срок
+                            {t("admin.bookingDetails.changePeriod")}
                         </button>
                     </div>
                 </div>
@@ -233,17 +235,14 @@ export const AccountBookingDetailsPage = () => {
                             <div className="mb-5 flex items-center justify-between gap-4">
                                 <div>
                                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                        Дополнительные услуги
+                                        {t("checkout.additionalServices")}
                                     </h2>
 
                                     {booking.services.length > 0 && (
                                         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                             {booking.services.length}{" "}
                                             {booking.services.length === 1
-                                                ? "услуга"
-                                                : booking.services.length < 5
-                                                  ? "услуги"
-                                                  : "услуг"}
+                                                ? t("common.service") : booking.services.length < 5 ? t("common.servicesFew") : t("common.services")}
                                         </p>
                                     )}
                                 </div>
@@ -255,14 +254,14 @@ export const AccountBookingDetailsPage = () => {
                                     className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-750"
                                 >
                                     <Plus className="h-4 w-4" />
-                                    Добавить
+                                    {t("common.add")}
                                 </button>
                             </div>
 
                             {booking.services.length === 0 ? (
                                 <div className="rounded-xl border border-dashed border-gray-200 px-4 py-8 text-center dark:border-gray-700">
                                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        Дополнительные услуги не выбраны.
+                                        {t("admin.bookingDetails.noServices")}
                                     </p>
                                 </div>
                             ) : (
@@ -300,7 +299,7 @@ export const AccountBookingDetailsPage = () => {
                     <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
                         <div className="mb-6">
                             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                Период аренды
+                                {t("admin.bookingDetails.rentalPeriod")}
                             </h2>
                         </div>
 
@@ -314,7 +313,7 @@ export const AccountBookingDetailsPage = () => {
 
                                 <div className="pb-5">
                                     <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                                        Начало аренды
+                                        {t("admin.bookingDetails.rentalStart")}
                                     </p>
 
                                     <p className="mt-1 font-medium text-gray-900 dark:text-white">
@@ -343,11 +342,7 @@ export const AccountBookingDetailsPage = () => {
                                                                 }{" "}
                                                                 {segment.days ===
                                                                 1
-                                                                    ? "день"
-                                                                    : segment.days <
-                                                                        5
-                                                                      ? "дня"
-                                                                      : "дней"}
+                                                                    ? t("common.day") : segment.days < 5 ? t("common.daysFew") : t("common.days")}
                                                             </span>
 
                                                             {segment.durationDiscountPercent >
@@ -378,7 +373,7 @@ export const AccountBookingDetailsPage = () => {
                                                             {formatPrice(
                                                                 segment.discountedDailyPrice,
                                                             )}{" "}
-                                                            / день
+                                                            / {t("common.day")}
                                                         </span>
 
                                                         <span className="font-semibold text-gray-900 dark:text-white">
@@ -400,7 +395,7 @@ export const AccountBookingDetailsPage = () => {
 
                                 <div>
                                     <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                                        Конец аренды
+                                        {t("admin.bookingDetails.rentalEnd")}
                                     </p>
 
                                     <p className="mt-1 font-medium text-gray-900 dark:text-white">
@@ -417,7 +412,7 @@ export const AccountBookingDetailsPage = () => {
                     {/* Маршрут — слева */}
                     <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
                         <h2 className="mb-5 text-lg font-semibold text-gray-900 dark:text-white">
-                            Маршрут
+                            {t("admin.bookingDetails.route")}
                         </h2>
                         <div className="flex items-start gap-3">
                             {destinationZone?.icon && (
@@ -445,18 +440,18 @@ export const AccountBookingDetailsPage = () => {
 
                         <div className="mt-5 border-t border-gray-100 pt-4 dark:border-gray-700">
                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Статус проверки маршрута
+                                {t("admin.bookingDetails.verificationStatus")}
                             </p>
 
                             <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">
-                                {routeReviewStatusLabels[booking.destination.reviewStatus]}
+                                {t(routeReviewStatusLabels[booking.destination.reviewStatus])}
                             </p>
                         </div>
 
                         {routeSurcharge > 0 && (
                             <div className="mt-4 flex items-center justify-between gap-4 border-t border-gray-100 pt-4 dark:border-gray-700">
                                 <span className="text-sm text-gray-600 dark:text-gray-300">
-                                    Доплата за маршрут
+                                    {t("checkout.routeSurcharge")}
                                 </span>
 
                                 <span className="shrink-0 font-medium text-gray-900 dark:text-white">
@@ -470,7 +465,7 @@ export const AccountBookingDetailsPage = () => {
                     <section className="rounded-2xl bg-white p-6 shadow-sm dark:bg-gray-800">
                         <div className="mb-6">
                             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                                Стоимость
+                                {t("common.amount")}
                             </h2>
                         </div>
 
@@ -478,7 +473,7 @@ export const AccountBookingDetailsPage = () => {
                             {/* Аренда */}
                             <div className="flex items-center justify-between gap-4">
                                 <span className="text-gray-600 dark:text-gray-300">
-                                    Аренда
+                                    {t("finance.charge.rental")}
                                 </span>
 
                                 <span className="shrink-0 font-medium text-gray-900 dark:text-white">
@@ -490,7 +485,7 @@ export const AccountBookingDetailsPage = () => {
                             {servicesPrice > 0 && (
                                 <div className="flex items-center justify-between gap-4">
                                     <span className="text-gray-600 dark:text-gray-300">
-                                        Дополнительные услуги
+                                        {t("checkout.additionalServices")}
                                     </span>
 
                                     <span className="shrink-0 font-medium text-gray-900 dark:text-white">
@@ -503,7 +498,7 @@ export const AccountBookingDetailsPage = () => {
                             {routeSurcharge > 0 && (
                                 <div className="flex items-center justify-between gap-4">
                                     <span className="text-gray-600 dark:text-gray-300">
-                                        Доплата за маршрут
+                                        {t("checkout.routeSurcharge")}
                                     </span>
 
                                     <span className="shrink-0 font-medium text-gray-900 dark:text-white">
@@ -517,7 +512,7 @@ export const AccountBookingDetailsPage = () => {
                                 <div className="flex items-center justify-between gap-4">
                                     <div className="min-w-0">
                                         <p className="text-gray-600 dark:text-gray-300">
-                                            Штрафы
+                                            {t("account.bookingDetails.penalties")}
                                         </p>
 
                                         {booking.price.penalties.length >
@@ -529,8 +524,7 @@ export const AccountBookingDetailsPage = () => {
                                                 }{" "}
                                                 {booking.price.penalties
                                                     .length === 1
-                                                    ? "начисление"
-                                                    : "начисления"}
+                                                    ? t("finance.chargeOne") : t("finance.chargeMany")}
                                             </p>
                                         )}
                                     </div>
@@ -546,7 +540,7 @@ export const AccountBookingDetailsPage = () => {
                         <div className="my-5 border-t border-gray-200 pt-5 dark:border-gray-700">
                             <div className="flex items-center justify-between gap-4">
                                 <span className="font-semibold text-gray-900 dark:text-white">
-                                    Итого за аренду
+                                    {t("account.bookingDetails.totalRental")}
                                 </span>
 
                                 <span className="shrink-0 text-lg font-semibold text-gray-900 dark:text-white">
@@ -558,7 +552,7 @@ export const AccountBookingDetailsPage = () => {
                         {/* Депозит */}
                         <div className="flex items-center justify-between gap-4">
                             <span className="text-gray-600 dark:text-gray-300">
-                                Депозит
+                                {t("checkout.deposit")}
                             </span>
 
                             <span className="shrink-0 font-medium text-gray-900 dark:text-white">
@@ -570,7 +564,7 @@ export const AccountBookingDetailsPage = () => {
                         <div className="mt-5 border-t border-gray-200 pt-5 dark:border-gray-700">
                             <div className="flex items-center justify-between gap-4">
                                 <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                                    Итого к оплате
+                                    {t("checkout.totalToPay")}
                                 </span>
 
                                 <span className="shrink-0 text-2xl font-bold text-blue-600 dark:text-blue-400">

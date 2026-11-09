@@ -80,7 +80,7 @@ export const CheckoutPage = () => {
 
                 if (!cancelled) {
                     setDestinations([]);
-                    setDestinationError('Не удалось загрузить направления. Попробуйте ещё раз.');
+                    setDestinationError(t("checkout.error.destinations"));
                 }
             } finally {
                 if (!cancelled) {
@@ -101,11 +101,11 @@ export const CheckoutPage = () => {
         return (
             <div className="mx-auto max-w-2xl px-4 py-16 text-center">
                 <h1 className="text-xl font-semibold">
-                    Данные бронирования не найдены
+                    {t("checkout.notFound")}
                 </h1>
 
                 <p className="mt-2 text-gray-600">
-                    Выберите автомобиль и период аренды, чтобы продолжить.
+                    {t("checkout.selectVehicleAndPeriod")}
                 </p>
 
                 <button
@@ -113,7 +113,7 @@ export const CheckoutPage = () => {
                     onClick={() => navigate('/')}
                     className="mt-6 rounded-lg bg-blue-600 px-5 py-3 text-white"
                 >
-                    Вернуться к автомобилям
+                    {t("checkout.backToAssets")}
                 </button>
             </div>
         );
@@ -186,27 +186,27 @@ export const CheckoutPage = () => {
             const customer = await loadCurrentCustomer();
 
             if (!customer) {
-                setError("Не удалось загрузить данные клиента.");
+                setError(t("checkout.error.customer"));
                 return;
             }
 
             if (customer.verificationStatus !== VerificationStatus.Pending) {
-                setError("Документы отправлены, но статус проверки не обновился.");
+                setError(t("checkout.error.verificationNotUpdated"));
                 return;
             }
 
             await onCreateBooking(customer.id);
         } catch (err: unknown) {
             console.error(err);
-            setError("Не удалось обновить статус клиента после отправки документов.");
+            setError(t("checkout.error.verificationUpdate"));
         }
     };
     const onCreateBooking = async (customerIdOverride?: string) => {
         if (!routeIsValid) {
             setError(
                 requiresCatalogDestination
-                    ? 'Выберите город назначения.'
-                    : 'Укажите описание маршрута.'
+                    ? t('checkout.error.destinationRequired')
+                    : t('checkout.error.routeDescriptionRequired')
             );
             return;
         }
@@ -218,7 +218,7 @@ export const CheckoutPage = () => {
             : customerIdOverride ?? currentCustomer?.id;
 
         if (!bookingCustomerId) {
-            setError("Не удалось определить профиль клиента");
+            setError(t("checkout.error.profile"));
             return;
         }
 
@@ -312,11 +312,11 @@ export const CheckoutPage = () => {
                     return;
 
                 default:
-                    setError("Неизвестный статус проверки клиента.");
+                    setError(t("checkout.error.verificationStatus"));
             }
         } catch (err: unknown) {
             console.error(err);
-            setError("Не удалось загрузить данные клиента.");
+            setError(t("checkout.error.customer"));
         }
     };
     const handleBookingClick = async () => {
@@ -340,7 +340,7 @@ export const CheckoutPage = () => {
         const customer = await loadCurrentCustomer();
 
         if (!customer) {
-            setError("Не удалось определить профиль клиента.");
+            setError(t("checkout.error.profile"));
             return;
         }
 
@@ -356,7 +356,7 @@ export const CheckoutPage = () => {
                 return;
 
             default:
-                setError("Неизвестный статус проверки клиента.");
+                setError(t("checkout.error.verificationStatus"));
         }
     };
     
@@ -420,7 +420,7 @@ export const CheckoutPage = () => {
                                                 setSelectedCustomer(null)
                                             }
                                         >
-                                            Сменить клиента
+                                            {t("checkout.changeCustomer")}
                                         </Button>
                                     </div>
                                 ) : (
@@ -487,7 +487,7 @@ export const CheckoutPage = () => {
                                         htmlFor="destination"
                                         className="block font-semibold text-gray-900 dark:text-white"
                                     >
-                                        Город назначения
+                                        {t("checkout.destinationCity")}
                                     </label>
 
                                     <div className="relative mt-1">
@@ -500,8 +500,8 @@ export const CheckoutPage = () => {
                                         >
                                             <option value="" disabled>
                                                 {destinationsLoading
-                                                    ? 'Загружаем направления...'
-                                                    : 'Выберите город'}
+                                                    ? t('checkout.loadingDestinations')
+                                                    : t('checkout.selectCity')}
                                             </option>
 
                                             {destinations.map(destination => (
@@ -530,7 +530,7 @@ export const CheckoutPage = () => {
                                     {selectedDestination && (
                                         <div className="text-sm text-gray-600 dark:text-gray-300">
                                             <p>
-                                                Доплата за маршрут:{' '}
+                                                {t('checkout.routeSurcharge')}{' '}
                                                 {formatPrice(selectedDestination.routeSurcharge)}
                                             </p>
                                         </div>
@@ -548,7 +548,7 @@ export const CheckoutPage = () => {
                                         htmlFor="customRoute"
                                         className="block text-sm font-medium text-gray-700 dark:text-gray-200"
                                     >
-                                        Описание маршрута
+                                        {t("checkout.routeDescription")}
                                     </label>
 
                                     <textarea
@@ -557,11 +557,11 @@ export const CheckoutPage = () => {
                                         onChange={e => setCustomRouteDescription(e.target.value)}
                                         maxLength={2000}
                                         rows={3}
-                                        placeholder="Например, Красноярск — Абакан"
+                                        placeholder={t("checkout.routePlaceholder")}
                                         className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-3 text-gray-900 dark:text-white"
                                     />
                                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        Окончательные условия аренды определяются после проверки маршрута менеджером.
+                                        {t("checkout.routeReviewHint")}
                                     </p>
                                 </div>
                             )}
@@ -599,7 +599,7 @@ export const CheckoutPage = () => {
                                         {/* Базовая аренда */}
                                         <div className="flex justify-between gap-4">
                                             <span className="text-gray-600 dark:text-gray-300">
-                                                Базовый тариф {formatPrice(currentSegment.baseDailyPrice)} × {currentSegment.days}
+                                                {t("checkout.baseRate")} {formatPrice(currentSegment.baseDailyPrice)} × {currentSegment.days}
                                             </span>
 
                                             <span className="font-medium text-gray-900 dark:text-white whitespace-nowrap">
@@ -612,7 +612,7 @@ export const CheckoutPage = () => {
                                             <>
                                                 <div className="flex justify-between gap-4">
                                                     <span className="text-gray-600 dark:text-gray-300">
-                                                        Скидка {currentSegment.durationDiscountPercent}%
+                                                        {t("checkout.discount")} {currentSegment.durationDiscountPercent}%
                                                     </span>
 
                                                     <span className="font-medium text-green-600 whitespace-nowrap">
@@ -623,7 +623,7 @@ export const CheckoutPage = () => {
                                                 {/* Аренда после скидки */}
                                                 <div className="flex justify-between gap-4">
                                                     <span className="text-gray-600 dark:text-gray-300">
-                                                        Тариф для Вас {formatPrice(currentSegment.discountedDailyPrice)} × {currentSegment.days}
+                                                        {t("checkout.yourRate")} {formatPrice(currentSegment.discountedDailyPrice)} × {currentSegment.days}
                                                     </span>
 
                                                     <span className="font-medium text-gray-900 dark:text-white whitespace-nowrap">
@@ -639,7 +639,7 @@ export const CheckoutPage = () => {
                                 {servicesPrice > 0 && (
                                     <div className="flex justify-between gap-4">
                                         <span className="text-gray-600 dark:text-gray-300">
-                                            Дополнительные услуги
+                                            {t("checkout.additionalServices")}
                                         </span>
 
                                         <span className="font-medium text-gray-900 dark:text-white whitespace-nowrap">
@@ -654,7 +654,7 @@ export const CheckoutPage = () => {
                                 {/* Стоимость аренды + услуг */}
                                 <div className="flex justify-between gap-4">
                                     <span className="font-medium text-gray-700 dark:text-gray-200">
-                                        Стоимость аренды и услуг
+                                        {t("checkout.rentalAndServices")}
                                     </span>
 
                                     <span className="font-semibold text-gray-900 dark:text-white whitespace-nowrap">
@@ -665,7 +665,7 @@ export const CheckoutPage = () => {
                                 {(price?.price.routeSurcharge ?? 0) > 0 && (
                                     <div className="flex justify-between gap-4">
                                         <span className="text-gray-600 dark:text-gray-300">
-                                            Доплата за маршрут
+                                            {t("checkout.routeSurcharge")}
                                         </span>
 
                                         <span className="font-medium text-gray-900 dark:text-white whitespace-nowrap">
@@ -679,10 +679,10 @@ export const CheckoutPage = () => {
                                     <div className="flex justify-between gap-4">
                                         <div>
                                             <span className="text-gray-600 dark:text-gray-300">
-                                                Депозит
+                                                {t("checkout.deposit")}
                                             </span>
                                             <p className="text-xs text-gray-400 mt-0.5">
-                                                Возвращается после завершения аренды
+                                                {t("checkout.depositReturnHint")}
                                             </p>
                                         </div>
 
@@ -696,7 +696,7 @@ export const CheckoutPage = () => {
                                 <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                                     <div className="flex justify-between items-center gap-4">
                                         <span className="text-lg font-bold text-gray-900 dark:text-white">
-                                            Итого к оплате
+                                            {t("checkout.totalToPay")}
                                         </span>
 
                                         <span className="text-xl font-bold text-primary-600 dark:text-primary-400 whitespace-nowrap">

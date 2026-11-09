@@ -79,7 +79,14 @@ public class BookingRepository : IBookingRepository
             .Distinct()
             .ToListAsync(ct);
 
-        return bookings;
+        var maintenanceAssetIds = await _db.AssetMaintenancePeriods
+            .Where(x => assetIds.Contains(x.AssetId))
+            .Where(x => x.StartDate < endDate && x.EndDate > startDate)
+            .Select(x => x.AssetId)
+            .Distinct()
+            .ToListAsync(ct);
+
+        return bookings.Concat(maintenanceAssetIds).Distinct().ToList();
     }
 
     public async Task<bool> IsAssetAvailableAsync(
@@ -97,7 +104,10 @@ public class BookingRepository : IBookingRepository
                 b.RentalPeriod.EndDate > startDate,
                 ct);
 
-        return !hasConflictingBooking;
+        var hasConflictingMaintenance = await _db.AssetMaintenancePeriods.AnyAsync(x =>
+            x.AssetId == assetId && x.StartDate < endDate && x.EndDate > startDate, ct);
+
+        return !hasConflictingBooking && !hasConflictingMaintenance;
     }
 
     public async Task<IReadOnlyList<Booking>> GetBookingsForAssetAsync(
@@ -115,7 +125,7 @@ public class BookingRepository : IBookingRepository
 
     public async Task<List<BusyPeriodDto>> GetBusyPeriodsAsync(Guid assetId, Guid? excludeBookingId, CancellationToken ct)
     {
-        return await _db.Bookings
+        var bookingPeriods = await _db.Bookings
             .Where(x =>
                 x.AssetId == assetId &&
                 x.Status != BookingStatus.Cancelled &&
@@ -126,6 +136,15 @@ public class BookingRepository : IBookingRepository
                 x.RentalPeriod.StartDate,
                 x.RentalPeriod.EndDate))
             .ToListAsync(ct);
+
+        var maintenancePeriods = await _db.AssetMaintenancePeriods
+            .Where(x => x.AssetId == assetId)
+            .Select(x => new BusyPeriodDto(x.StartDate, x.EndDate))
+            .ToListAsync(ct);
+
+        return bookingPeriods.Concat(maintenancePeriods)
+            .OrderBy(x => x.StartDate)
+            .ToList();
     }
 
     public async Task SaveChangesAsync(CancellationToken ct = default)

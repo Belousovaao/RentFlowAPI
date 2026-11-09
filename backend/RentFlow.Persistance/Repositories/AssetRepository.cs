@@ -20,7 +20,7 @@ public class AssetRepository : IAssetRepository
         var query = _context.Assets
             .Include(a => a.Photos)
             .Include(a => a.Bookings) // Включаем бронирования для проверки доступности
-            .AsQueryable().Where(a => a.Status != AssetStatus.Disabled);
+            .AsQueryable().Where(a => a.Status != AssetStatus.Disabled && a.Status != AssetStatus.Service);
 
         // Поиск по тексту
         if (!string.IsNullOrWhiteSpace(filter.Search))
@@ -174,6 +174,7 @@ public class AssetRepository : IAssetRepository
     {
         // Здесь можно реализовать логику популярности на основе количества бронирований
         return await _context.Assets
+            .Where(a => a.Status != AssetStatus.Disabled && a.Status != AssetStatus.Service)
             .Include(a => a.Photos)
             .Include(a => a.Bookings)
             .OrderByDescending(a => a.Bookings.Count)
@@ -184,6 +185,7 @@ public class AssetRepository : IAssetRepository
     public async Task<IReadOnlyList<Asset>> GetNearbyAssetsAsync(double latitude, double longitude, double radiusKm, CancellationToken ct = default)
     {
         var assets = await _context.Assets
+            .Where(a => a.Status != AssetStatus.Disabled && a.Status != AssetStatus.Service)
             .Include(a => a.Photos)
             .Where(a => a.Latitude.HasValue && a.Longitude.HasValue)
             .ToListAsync(ct);
@@ -208,6 +210,45 @@ public class AssetRepository : IAssetRepository
     public async Task<IEnumerable<Asset>> GetAllAsync()
     {
         return  _context.Assets.Include(a => a.Photos).AsNoTracking().ToList();
+    }
+
+    public async Task<IReadOnlyList<AssetMaintenancePeriod>> GetMaintenancePeriodsAsync(Guid assetId, CancellationToken ct = default)
+    {
+        return await _context.AssetMaintenancePeriods
+            .AsNoTracking()
+            .Where(x => x.AssetId == assetId)
+            .OrderBy(x => x.StartDate)
+            .ToListAsync(ct);
+    }
+
+    public async Task AddMaintenancePeriodAsync(AssetMaintenancePeriod period, CancellationToken ct = default)
+    {
+        await _context.AssetMaintenancePeriods.AddAsync(period, ct);
+    }
+
+    public Task<bool> HasMaintenanceOverlapAsync(Guid assetId, DateTime startDate, DateTime endDate, CancellationToken ct = default)
+    {
+        return _context.AssetMaintenancePeriods.AnyAsync(x =>
+            x.AssetId == assetId && x.StartDate < endDate && x.EndDate > startDate, ct);
+    }
+
+    public Task<bool> HasBookingOverlapAsync(Guid assetId, DateTime startDate, DateTime endDate, CancellationToken ct = default)
+    {
+        return _context.Bookings.AnyAsync(b =>
+            b.AssetId == assetId &&
+            b.Status != RentFlow.Domain.Bookings.BookingStatus.Cancelled &&
+            b.Status != RentFlow.Domain.Bookings.BookingStatus.Completed &&
+            b.RentalPeriod.StartDate < endDate &&
+            b.RentalPeriod.EndDate > startDate, ct);
+    }
+
+    public async Task<bool> DeleteMaintenancePeriodAsync(Guid assetId, Guid periodId, CancellationToken ct = default)
+    {
+        var period = await _context.AssetMaintenancePeriods
+            .FirstOrDefaultAsync(x => x.Id == periodId && x.AssetId == assetId, ct);
+        if (period is null) return false;
+        _context.AssetMaintenancePeriods.Remove(period);
+        return true;
     }
 
     public async Task AddAsync(Asset asset, CancellationToken ct)

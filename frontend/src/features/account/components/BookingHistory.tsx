@@ -1,12 +1,14 @@
 import { CalendarDays, Car } from 'lucide-react';
 import type { BookingListItemDto } from '@/entities/booking/booking.types';
 import { getPhotoUrl } from '@/shared/utils/photoUrl';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 interface Props {
     bookings: BookingListItemDto[];
 }
 
 export const BookingHistory = ({ bookings }: Props) => {
+    const { t, language } = useI18n();
     const history = bookings
         .filter(
             booking =>
@@ -27,11 +29,11 @@ export const BookingHistory = ({ bookings }: Props) => {
         <section>
             <div className="mb-5">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Ваша история поездок
+                    {t("account.history.title")}
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                    Автомобили, на которых вы уже ездили
+                    {t("account.history.description")}
                 </p>
             </div>
 
@@ -96,13 +98,9 @@ const HistoryItem = ({
                         <CalendarDays className="h-4 w-4 shrink-0" />
 
                         <span>
-                            {formatDate(
-                                booking.rentalPeriod.startDate,
-                            )}
+                            {formatDate(booking.rentalPeriod.startDate, language)}
                             {' — '}
-                            {formatDate(
-                                booking.rentalPeriod.endDate,
-                            )}
+                            {formatDate(booking.rentalPeriod.endDate, language)}
                         </span>
                     </div>
                 </div>
@@ -111,8 +109,8 @@ const HistoryItem = ({
     );
 };
 
-const formatDate = (value: string): string =>
-    new Intl.DateTimeFormat('ru-RU', {
+const formatDate = (value: string, language: string): string =>
+    new Intl.DateTimeFormat(language === 'zh' ? 'zh-CN' : language === 'en' ? 'en-GB' : 'ru-RU', {
         day: 'numeric',
         month: 'short',
     }).format(new Date(value));

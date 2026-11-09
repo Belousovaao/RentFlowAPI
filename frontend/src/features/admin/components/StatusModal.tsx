@@ -1,5 +1,6 @@
 import { VerificationStatus } from "@/entities/customer/customer.type";
 import { CheckCircle, EyeIcon, FileQuestion, Info, XCircle } from "lucide-react";
+import { useI18n } from "@/app/providers/I18nProvider";
 
 interface StatusModalProps {
     open: boolean;
@@ -11,17 +12,17 @@ interface StatusModalProps {
 const statusTypes = [
     {
         type: VerificationStatus.Approved,
-        title: 'Одобрен',
+        titleKey: 'verification.status.approved',
         icon: CheckCircle,
     },
     {
         type: VerificationStatus.Pending,
-        title: 'На проверке',
+        titleKey: 'verification.status.pending',
         icon: EyeIcon,
     },
     {
         type: VerificationStatus.Rejected,
-        title: 'Отказ',
+        titleKey: 'verification.status.rejected',
         icon: XCircle
     }
 ];
@@ -32,6 +33,7 @@ export const StatusModal = ({
     onClose,
     onChange,
 }: StatusModalProps) => {
+    const { t } = useI18n();
     if (!open)
         return null;
 
@@ -53,10 +55,10 @@ export const StatusModal = ({
                 <div className="mb-6 flex items-center justify-between"> 
                     <div> 
                         <h2 className="text-xl font-bold text-gray-900 dark:text-white"> 
-                            Статус клиента 
+                            {t("verification.modal.title")} 
                         </h2> 
                         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400"> 
-                            Выберите новый статус верификации 
+                            {t("verification.modal.description")} 
                         </p> 
                     </div> 
                     <button 
@@ -91,12 +93,12 @@ export const StatusModal = ({
                                     /> 
                                     <div className="flex-1"> 
                                         <p className="font-semibold text-gray-900 dark:text-white"> 
-                                            {status.title} 
+                                            {t(status.titleKey)} 
                                         </p> 
                                     </div> 
                                     {isCurrent && ( 
                                         <span className="text-xs font-medium text-primary-600"> 
-                                            Текущий 
+                                            {t("common.current")} 
                                         </span> 
                                     )} 
                             </button> 
@@ -108,7 +110,7 @@ export const StatusModal = ({
                         type="button" 
                         onClick={onClose} 
                         className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700" > 
-                            Отмена 
+                            {t("common.cancel")} 
                     </button> 
                 </div> 
             </div> 

@@ -23,6 +23,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
     private readonly IBookingPricingService _pricingService;
     private readonly IAdditionalServiceRepository _additionalServiceRepository;
     private readonly IBookingDestinationResolver _destinationResolver;
+    private readonly IBookingChargeRepository _bookingCharges;
 
     public CreateBookingHandler(
         IUnitOfWork unitOfWork, 
@@ -33,7 +34,8 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
         IBookingPricingService pricingService,
         IAdditionalServiceRepository additionalServiceRepository,
         ILogger<CreateBookingHandler> logger,
-        IBookingDestinationResolver destinationResolver)
+        IBookingDestinationResolver destinationResolver,
+        IBookingChargeRepository bookingCharges)
     {
         _uow = unitOfWork;
         _bookings = bookings;
@@ -44,6 +46,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
         _additionalServiceRepository = additionalServiceRepository;
         _logger = logger;
         _destinationResolver = destinationResolver;
+        _bookingCharges = bookingCharges;
     }
 
     public async Task<Booking> Handle(CreateBookingCommand cmd, CancellationToken ct)
@@ -55,6 +58,9 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
         RentalPeriod period = new RentalPeriod(startUtc, endUtc);
         
         Asset asset = await _assets.GetByIdAsync(cmd.AssetId, ct) ?? throw new AssetNotFoundException();
+
+        if (asset.Status is AssetStatus.Disabled or AssetStatus.Service)
+            throw new BusinessRuleViolationException("This vehicle is disabled and cannot be booked.");
 
         Customer customer = await _customers.GetByIdAsync(cmd.CustomerId, ct) ?? throw new CustomerNotFoundException();
 
@@ -85,7 +91,7 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
         {
             List<Booking> overlapping = await _bookings.GetOverlappingAsync(cmd.AssetId, period, ct);
 
-            if (overlapping.Any())
+            if (overlapping.Any() || await _assets.HasMaintenanceOverlapAsync(cmd.AssetId, startUtc, endUtc, ct))
                 throw new BookingConflictException();
 
             Driver? driver = null;
@@ -121,6 +127,33 @@ public class CreateBookingHandler : IRequestHandler<CreateBookingCommand, Bookin
             }
 
             await _bookings.AddAsync(booking, ct);
+
+            // Persist the booking's initial price components as real, allocatable charges.
+            // They share the booking creation timestamp and retain the price snapshot.
+            var createdAt = _dateTimeProvider.UtcNow;
+            var initialCharges = new[]
+            {
+                (Type: BookingChargeType.Rental, Title: "Аренда", Amount: booking.Price.RentalPrice.RentalPriceWithDiscount, Unit: "услуга"),
+                (Type: BookingChargeType.AdditionalServices, Title: "Дополнительные услуги", Amount: booking.Price.ServicesPrice, Unit: "услуга"),
+                (Type: BookingChargeType.RouteSurcharge, Title: "Доплата за маршрут", Amount: booking.Price.RouteSurcharge, Unit: "услуга"),
+                (Type: BookingChargeType.Deposit, Title: "Депозит", Amount: booking.Price.Deposit, Unit: "услуга")
+            };
+
+            foreach (var item in initialCharges.Where(x => x.Amount > 0))
+            {
+                await _bookingCharges.AddAsync(BookingCharge.Create(
+                    booking.Id,
+                    item.Type,
+                    item.Title,
+                    null,
+                    null,
+                    1m,
+                    item.Unit,
+                    item.Amount,
+                    item.Amount,
+                    createdAt), ct);
+            }
+
             await _uow.SaveChangesAsync(ct);
             await _uow.CommitAsync(ct);
 

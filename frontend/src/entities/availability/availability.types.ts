@@ -6,3 +6,10 @@ export interface BusyPeriodDto {
 }
 
 export type AvailableAssetDto = Asset;
+
+export interface AssetMaintenancePeriod {
+    id: string;
+    startDate: string;
+    endDate: string;
+    reason?: string | null;
+}

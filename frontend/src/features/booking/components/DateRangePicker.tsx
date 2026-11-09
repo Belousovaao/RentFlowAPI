@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { DayPicker } from 'react-day-picker';
+import { enUS, ru, zhCN } from 'react-day-picker/locale';
 import { useI18n } from '@/app/providers/I18nProvider';
 import 'react-day-picker/dist/style.css';
-import './DateRangePicker.css'
+import './DateRangePicker.css';
 import { formatDate } from '@/shared/utils/formatters';
 import startOfDay from 'date-fns/esm/fp/startOfDay/index.js';
 import { BusyPeriodDto } from '@/entities/booking/booking.hooks';
@@ -20,9 +21,15 @@ export const DateRangePicker = ({
 }: DateRangePickerProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const pickerRef = useRef<HTMLDivElement>(null);
-    const { t } = useI18n();
-    const modifiersClassNames = 
-    {
+    const { t, language } = useI18n();
+
+    const calendarLocale = {
+        en: enUS,
+        ru,
+        zh: zhCN,
+    }[language];
+
+    const modifiersClassNames = {
         rangeStart: 'date-range-start',
         rangeEnd: 'date-range-end',
         rangeMiddle: 'date-range-middle',
@@ -31,8 +38,7 @@ export const DateRangePicker = ({
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) 
-            {
+            if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
             }
         };
@@ -43,7 +49,7 @@ export const DateRangePicker = ({
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
-    
+
     const modifiers = {
         rangeStart:
             value.start && value.end
@@ -69,10 +75,8 @@ export const DateRangePicker = ({
                 : undefined,
     };
 
-
     const handleDayClick = (day: Date) => {
-        // 1. Уже есть полный диапазон:
-        // любой новый клик начинает новый выбор.
+        // Уже есть полный диапазон: любой новый клик начинает новый выбор.
         if (value.start && value.end) {
             onChange({
                 start: day,
@@ -82,16 +86,13 @@ export const DateRangePicker = ({
             return;
         }
 
-        // 2. Начальная дата уже выбрана:
-        // текущий клик становится конечной датой.
+        // Начальная дата уже выбрана: текущий клик становится конечной датой.
         if (value.start) {
             if (day.getTime() === value.start.getTime()) {
                 return;
             }
 
-            // Если пользователь кликнул раньше начала,
-            // делаем эту дату новой начальной,
-            // а старую дату — конечной.
+            // Если пользователь кликнул раньше начала, меняем даты местами.
             if (day < value.start) {
                 onChange({
                     start: day,
@@ -111,8 +112,7 @@ export const DateRangePicker = ({
             return;
         }
 
-        // 3. Ничего не выбрано:
-        // первый клик становится начальной датой.
+        // Первый клик становится начальной датой.
         onChange({
             start: day,
             end: null,
@@ -141,9 +141,7 @@ export const DateRangePicker = ({
                     </span>
 
                     <svg
-                        className={`w-5 h-5 transition-transform ${
-                            isOpen ? 'rotate-180' : ''
-                        }`}
+                        className={`w-5 h-5 transition-transform ${isOpen ? 'rotate-180' : ''}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -162,6 +160,7 @@ export const DateRangePicker = ({
                 <div className="absolute z-50 top-full mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700">
                     <DayPicker
                         mode="single"
+                        locale={calendarLocale}
                         modifiers={modifiers}
                         modifiersClassNames={modifiersClassNames}
                         onDayClick={handleDayClick}

@@ -49,6 +49,44 @@ namespace RentFlow.Persistance.Migrations
                     b.ToTable("CustomerDocuments");
                 });
 
+            modelBuilder.Entity("RentFlow.Domain.Assets.AssetMaintenancePeriod", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssetId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId", "StartDate", "EndDate");
+
+                    b.ToTable("AssetMaintenancePeriods", t =>
+                        {
+                            t.HasCheckConstraint("CK_AssetMaintenancePeriods_DateRange", "\"EndDate\" > \"StartDate\"");
+                        });
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Assets.AssetMaintenancePeriod", b =>
+                {
+                    b.HasOne("RentFlow.Domain.Assets.Asset", null)
+                        .WithMany()
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RentFlow.Domain.Assets.Asset", b =>
                 {
                     b.Property<Guid>("Id")
@@ -730,6 +768,40 @@ namespace RentFlow.Persistance.Migrations
                         .IsUnique();
 
                     b.ToTable("PaymentAllocations", (string)null);
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Settings.RentalTariff", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTimeOffset>("UpdatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("RentalTariffs", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_RentalTariffs_Price_NonNegative", "\"Price\" >= 0");
+                        });
                 });
 
             modelBuilder.Entity("RentFlow.Domain.Customers.Individual", b =>

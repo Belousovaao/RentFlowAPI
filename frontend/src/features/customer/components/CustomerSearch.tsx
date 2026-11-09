@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { customerApi } from '../api/customerApi';
 import { CustomerType, type CustomerLookup } from '@/entities/customer/customer.type';
 import { CreateCustomerModal } from './CreateCustomerModal';
+import { useI18n } from '@/app/providers/I18nProvider';
 
 interface CustomerSearchProps {
     onSelect: (customer: CustomerLookup) => void;
@@ -10,6 +11,7 @@ interface CustomerSearchProps {
 export const CustomerSearch = ({ 
     onSelect, 
 }: CustomerSearchProps) => {
+    const { t } = useI18n();
     const [type, setType] = useState<CustomerType>(CustomerType.Individual);
     const [query, setQuery] = useState('');
     const [results, setResults] = useState<CustomerLookup[]>([]);
@@ -33,20 +35,20 @@ export const CustomerSearch = ({
                     className='border rounded-lg text-gray-800 dark:text-gray-200'
                 >
                     <option value={CustomerType.Individual}>
-                        ФЛ
+                        {t("customer.type.individualShort")}
                     </option>
                     <option value={CustomerType.IndividualEntrepreneur}>
-                        ИП
+                        {t("customer.type.entrepreneurShort")}
                     </option>
                     <option value={CustomerType.Organization}>
-                        ООО
+                        {t("customer.type.organizationShort")}
                     </option>
                 </select>
 
                 <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Поиск"
+                    placeholder={t("customer.search.placeholder")}
                     className='border rounded-lg text-gray-800 dark:text-gray-200'
                 />
             </div>
@@ -54,12 +56,12 @@ export const CustomerSearch = ({
                 <button 
                     onClick={search}
                     className="mt-2 px-3 py-1 bg-blue-600 text-white rounded">  
-                    Найти
+                    {t("customer.search.find")}
                 </button>
                 <button
                     onClick={() => setCreateModalOpen(true)}
                     className="mt-2 px-3 py-1 bg-blue-600 text-white rounded">
-                    Добавить
+                    {t("customer.search.add")}
                 </button>
             </div>
             <div>
@@ -78,13 +80,13 @@ export const CustomerSearch = ({
 
                     {customer.passport && (
                         <div className="text-sm text-gray-700 dark:text-gray-300">
-                            Паспорт: {customer.passport}
+                            {t("customer.search.passport")}: {customer.passport}
                         </div>
                     )}
 
                     {customer.inn && (
                         <div className="text-sm text-gray-500">
-                            ИНН: {customer.inn}
+                            {t("customer.search.inn")}: {customer.inn}
                         </div>
                     )}
 
@@ -95,7 +97,7 @@ export const CustomerSearch = ({
                             onSelect(customer);}}
                         className="mt-2 px-3 py-1 bg-blue-600 text-white rounded"
                     >
-                        Выбрать
+                        {t("common.select")}
                     </button>
                 </div>
                 ))}

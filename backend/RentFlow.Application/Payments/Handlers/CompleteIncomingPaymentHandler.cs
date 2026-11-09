@@ -6,8 +6,7 @@ using RentFlow.Domain.Payments;
 
 namespace RentFlow.Application.Payments.Handlers;
 
-public sealed class CompleteIncomingPaymentHandler
-    : IRequestHandler<CompleteIncomingPaymentCommand>
+public sealed class CompleteIncomingPaymentHandler : IRequestHandler<CompleteIncomingPaymentCommand>
 {
     private readonly IBookingRepository _bookings;
     private readonly IPaymentRepository _payments;
@@ -80,17 +79,15 @@ public sealed class CompleteIncomingPaymentHandler
         }
     }
 
-    private static void EnsurePaymentAllowed(
-        BookingStatus status,
-        PaymentType type)
+    private static void EnsurePaymentAllowed(BookingStatus status, PaymentType type)
     {
         var allowed = type switch
         {
-            PaymentType.Prepayment =>
-                status == BookingStatus.Confirmed,
+            PaymentType.Prepayment => status == BookingStatus.Confirmed,
 
-            PaymentType.AdditionalPayment =>
-                status is BookingStatus.Confirmed or BookingStatus.Active,
+            PaymentType.AdditionalPayment => status is BookingStatus.Confirmed
+                or BookingStatus.Active
+                or BookingStatus.Completed,
 
             _ => false
         };

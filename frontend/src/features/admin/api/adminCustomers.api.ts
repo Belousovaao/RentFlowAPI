@@ -4,7 +4,7 @@ import { CreateCustomerRequest, CustomerDetailsDto, CustomerShortDto, CustomerTy
 export const adminCustomersApi = {
   // Получить список всех клиентов (включая чс)
   getList: (params: { page: number; pageSize: number; showRejected?: boolean; search?: string; type?: CustomerType }) => 
-    api.get<{ data: CustomerShortDto[]; totalCount: number }>('/admin/customers', { params }),
+    api.get<{ data: CustomerShortDto[]; total: number }>('/admin/customers', { params }),
   
   // Получить клиента по ID
   getById: (id: string) => api.get<CustomerDetailsDto>(`/admin/customers/${id}`),
