@@ -32,7 +32,7 @@ public class GetAssetsForAdminQueryHandler : IRequestHandler<GetAssetsForAdminQu
         }
         
         // Фильтрация по статусу
-        if (filter.ShowDisabled == false)
+        if (filter.ShowDisabled != true)
         {
             // Если НЕ показывать отключенные - исключаем Disabled
             query = query.Where(a => a.Status != AssetStatus.Disabled);
