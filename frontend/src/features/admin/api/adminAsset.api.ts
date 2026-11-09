@@ -24,6 +24,15 @@ export const adminAssetsApi = {
   // Изменить статус
   updateStatus: (id: string, status: AssetStatus) => api.patch(`/admin/assets/${id}/status`, { status }),
 
+  getMaintenancePeriods: (assetId: string) =>
+    api.get<import('@/entities/availability/availability.types').AssetMaintenancePeriod[]>(`/admin/assets/${assetId}/maintenance`),
+
+  createMaintenancePeriod: (assetId: string, data: { startDate: string; endDate: string; reason?: string }) =>
+    api.post(`/admin/assets/${assetId}/maintenance`, data),
+
+  deleteMaintenancePeriod: (assetId: string, periodId: string) =>
+    api.delete(`/admin/assets/${assetId}/maintenance/${periodId}`),
+
   // Удалить фото
   deletePhoto: (assetId: string, photoId: string) => api.delete(`/admin/assets/${assetId}/photos/exterior/${photoId}`),
 };
