@@ -119,6 +119,9 @@ namespace RentFlow.Api.Controllers.Admin
             if (await _assetRepository.HasMaintenanceOverlapAsync(assetId, startUtc, endUtc, ct))
                 return Conflict("Maintenance period overlaps an existing maintenance period.");
 
+            if (await _assetRepository.HasBookingOverlapAsync(assetId, startUtc, endUtc, ct))
+                return Conflict("Maintenance period overlaps an existing booking.");
+
             var period = new AssetMaintenancePeriod(assetId, startUtc, endUtc, request.Reason);
             await _assetRepository.AddMaintenancePeriodAsync(period, ct);
             await _unitOfWork.SaveChangesAsync(ct);
