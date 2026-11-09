@@ -49,6 +49,43 @@ namespace RentFlow.Persistance.Migrations
                     b.ToTable("CustomerDocuments");
                 });
 
+            modelBuilder.Entity("RentFlow.Domain.Assets.AssetMaintenancePeriod", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssetId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId", "StartDate", "EndDate");
+
+                    b.ToTable("AssetMaintenancePeriods", t =>
+                        {
+                            t.HasCheckConstraint("CK_AssetMaintenancePeriods_DateRange", "\"EndDate\" > \"StartDate\"");
+                        });
+                });
+
+            modelBuilder.Entity("RentFlow.Domain.Assets.AssetMaintenancePeriod", b =>
+                {
+                    b.HasOne("RentFlow.Domain.Assets.Asset", null)
+                        .WithMany()
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RentFlow.Domain.Assets.Asset", b =>
                 {
                     b.Property<Guid>("Id")
