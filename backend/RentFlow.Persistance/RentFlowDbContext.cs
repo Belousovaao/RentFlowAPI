@@ -11,6 +11,7 @@ namespace RentFlow.Persistance;
 public class RentFlowDbContext : DbContext
 {
     public DbSet<Asset> Assets => Set<Asset>();
+    public DbSet<AssetMaintenancePeriod> AssetMaintenancePeriods => Set<AssetMaintenancePeriod>();
     public DbSet<Location> Locations => Set<Location>();
     public DbSet<AssetPhoto> AssetPhotos => Set<AssetPhoto>();
     public DbSet<Booking> Bookings => Set<Booking>();
