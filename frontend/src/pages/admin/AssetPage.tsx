@@ -206,8 +206,8 @@ export const AdminAssetsListPage = () => {
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                 {assets.map((asset) => (
+                  <Fragment key={asset.id}>
                   <tr 
-                    key={asset.id} 
                     className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors
                       ${asset.status == AssetStatus.Disabled ? 'bg-gray-50 dark:bg-gray-900/50' : ''}`}
                   >
