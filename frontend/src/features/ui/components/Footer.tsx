@@ -64,7 +64,7 @@ export const Footer = () => {
         ...(contactDetails.city.trim()
             ? [{
                 icon: MapPin,
-                text: contactDetails.city,
+                text: t('address'),
                 href: '#',
             }]
             : []),
