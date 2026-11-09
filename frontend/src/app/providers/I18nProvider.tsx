@@ -1584,6 +1584,8 @@ const financeTranslations: Record<Language, Translations> = {
         "common.status": "状态",
         "common.unnamed": "未命名",
 
+        'auth.registrationTicketExpired': '注册会话已过期或无效。请刷新页面后重试，并重新获取验证码。',
+
     }
 };
 
