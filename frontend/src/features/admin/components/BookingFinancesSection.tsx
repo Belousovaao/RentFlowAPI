@@ -352,7 +352,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                                         <div className="flex justify-end gap-1">
                                             <button
                                                 type="button"
-                                                title=t("finance.rejectCharge")
+                                                title={t("finance.rejectCharge")}
                                                 disabled={busyId === row.id}
                                                 onClick={() => {
                                                     const paidAmount = row.charge?.paidAmount ?? 0;
