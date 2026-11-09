@@ -253,7 +253,7 @@ export const AdminAssetsListPage = () => {
                         onChange={(e) => handleStatusChange(asset.id, e.target.value as AssetStatus)}
                         className={`px-2 py-1 rounded-full text-xs font-medium border-0 cursor-pointer ${AssetStatusColors[asset.status as AssetStatus]}`}
                       >
-                        {Object.entries(AssetStatusLabels).map(([status, label]) => (
+                        {Object.entries(AssetStatusLabels).filter(([status]) => status !== String(AssetStatus.Service)).map(([status, label]) => (
                           <option key={status} value={status} className="text-gray-900">
                             {t(`asset.status.${status}`)}
                           </option>
