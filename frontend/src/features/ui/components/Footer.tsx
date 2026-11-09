@@ -164,11 +164,11 @@ export const Footer = () => {
                 <div className="container mx-auto px-4 py-6">
                     <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                         <p className="text-gray-400 text-sm">
-                            © {currentYear} VolnamiDrive. All rights reserved.
+                            © {currentYear} VolnamiDrive. {t('footer.rightsReserved')}
                         </p>
                         <div className="flex space-x-6">
                             <Link to="/cookies" className="text-gray-400 hover:text-primary-400 text-sm">
-                                Cookies
+                                {t('footer.cookies')}
                             </Link>
                         </div>
                     </div>
