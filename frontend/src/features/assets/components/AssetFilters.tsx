@@ -35,7 +35,7 @@ export const AssetFilters = ({
     const getFuelTypeLabel = useFuelTypeLabel();
     const getTransmissionLabel = useTransmissionLabel();
     const getDriveTypeLabel = useDriveTypeLabel();
-    const getStatusLabel = useDriveTypeLabel();
+    const getStatusLabel = useStatusLabel();
 
     const { t } = useI18n();
 
@@ -183,7 +183,7 @@ export const AssetFilters = ({
                 <div className="flex items-center space-x-2">
                     <SlidersHorizontal className="w-5 h-5 text-primary-600" />
                     <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                        Фильтры
+                        {t('asset.filters.title')}
                     </h3>
                     {activeCount > 0 && (
                         <span className="px-2 py-0.5 text-xs bg-primary-100 dark:bg-primary-900 
@@ -219,13 +219,13 @@ export const AssetFilters = ({
                         <div className="p-3 space-y-3">
                             {/* Поиск по тексту */}
                             <div>
-                                <SectionHeader title="Основное" sectionKey="basic" />
+                                <SectionHeader title={t('asset.filters.basic')} sectionKey="basic" />
                                 {sections.basic && (
                                     <input
                                         type="text"
                                         value={localFilters.search || ''}
                                         onChange={(e) => updateFilter('search', e.target.value)}
-                                        placeholder="Поиск по марке, модели..."
+                                        placeholder={t('asset.filters.searchPlaceholder')}
                                         className="w-full px-3 py-2 text-sm border border-gray-700 dark:border-gray-300 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                                     />
                                 )}
@@ -240,14 +240,14 @@ export const AssetFilters = ({
                                             type="number"
                                             value={localFilters.priceFrom || ''}
                                             onChange={(e) => updateFilter('priceFrom', e.target.value ? Number(e.target.value) : undefined)}
-                                            placeholder="От"
+                                            placeholder={t('asset.filters.from')}
                                             className="w-full px-3 py-2 text-sm border border-gray-700 dark:border-gray-300 rounded-lg bg-white dark:bg-gray-700"
                                         />
                                         <input
                                             type="number"
                                             value={localFilters.priceTo || ''}
                                             onChange={(e) => updateFilter('priceTo', e.target.value ? Number(e.target.value) : undefined)}
-                                            placeholder="До"
+                                            placeholder={t('asset.filters.to')}
                                             className="w-full px-3 py-2 text-sm border border-gray-700 dark:border-gray-300 rounded-lg bg-white dark:bg-gray-700"
                                         />
                                     </div>
@@ -256,7 +256,7 @@ export const AssetFilters = ({
 
                             {/* Год выпуска */}
                             <div>
-                                <SectionHeader title="Год выпуска" sectionKey="year" />
+                                <SectionHeader title={t('asset.filters.year')} sectionKey="year" />
                                 {sections.year && (
                                     <div className="grid grid-cols-2 gap-2">
                                         <input
@@ -279,7 +279,7 @@ export const AssetFilters = ({
 
                             {/* Тип топлива */}
                             <div>
-                                <SectionHeader title="Тип топлива" sectionKey="fuel" />
+                                <SectionHeader title={t('asset.filters.fuelType')} sectionKey="fuel" />
                                 {sections.fuel && (
                                     <div className="grid grid-cols-2 gap-2">
                                         {fuelTypeOptions.map(option => {
@@ -331,7 +331,7 @@ export const AssetFilters = ({
 
                             {/* Тип привода */}
                             <div>
-                                <SectionHeader title="Привод" sectionKey="drive" />
+                                <SectionHeader title={t('asset.filters.driveType')} sectionKey="drive" />
                                 {sections.drive && (
                                     <div className="grid grid-cols-1 gap-2">
                                         {driveTypeOptions.map(option => {
@@ -377,21 +377,21 @@ export const AssetFilters = ({
 
                             {/* Мощность двигателя */}
                             <div>
-                                <SectionHeader title="Мощность" sectionKey="power" />
+                                <SectionHeader title={t('asset.filters.power')} sectionKey="power" />
                                 {sections.power && (
                                     <div className="grid grid-cols-2 gap-2">
                                         <input
                                             type="number"
                                             value={localFilters.minHorsepower || ''}
                                             onChange={(e) => updateFilter('minHorsepower', e.target.value ? Number(e.target.value) : undefined)}
-                                            placeholder="От л.с."
+                                            placeholder={t('asset.filters.fromHp')}
                                             className="w-full px-3 py-2 text-sm border border-gray-700 dark:border-gray-300 rounded-lg bg-white dark:bg-gray-700"
                                         />
                                         <input
                                             type="number"
                                             value={localFilters.maxHorsepower || ''}
                                             onChange={(e) => updateFilter('maxHorsepower', e.target.value ? Number(e.target.value) : undefined)}
-                                            placeholder="До л.с."
+                                            placeholder={t('asset.filters.toHp')}
                                             className="w-full px-3 py-2 text-sm border border-gray-700 dark:border-gray-300 rounded-lg bg-white dark:bg-gray-700"
                                         />
                                     </div>
