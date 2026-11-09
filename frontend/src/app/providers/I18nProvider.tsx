@@ -528,6 +528,7 @@ const financeTranslations: Record<Language, Translations> = {
         'admin.assets.saveMaintenance': 'Save period',
         'admin.assets.deleteMaintenance': 'Delete period',
         'admin.assets.maintenanceError': 'Failed to update maintenance period.',
+        'auth.registrationTicketExpired': 'Your registration session has expired or is no longer valid. Refresh the page and try again. You will need to request a new verification code.',
     },
     "ru": {
         "finance.charge.rental": "Аренда",
@@ -1055,6 +1056,7 @@ const financeTranslations: Record<Language, Translations> = {
         'admin.assets.saveMaintenance': 'Сохранить период',
         'admin.assets.deleteMaintenance': 'Удалить период',
         'admin.assets.maintenanceError': 'Не удалось изменить период обслуживания.',
+        'auth.registrationTicketExpired': 'Срок действия сессии регистрации истёк или она больше недействительна. Обновите страницу и попробуйте ещё раз. Потребуется запросить новый код подтверждения.',
     },
     "zh": {
         "finance.charge.rental": "租金",
@@ -1926,6 +1928,7 @@ const translations: Record<Language, Translations> = {
         'checkout.priceBreakdown': 'Расчет стоимости',
         'checkout.additionalServices': 'Дополнительные услуги',
         'checkout.whereToGo': 'Куда планируете поехать?',
+        'auth.registrationTicketExpired': '注册会话已过期或失效。请刷新页面后重试，并重新获取验证码。',
     },
     zh: {
         ...financeTranslations.zh,
