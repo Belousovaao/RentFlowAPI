@@ -1057,6 +1057,8 @@ const financeTranslations: Record<Language, Translations> = {
         'admin.assets.deleteMaintenance': 'Удалить период',
         'admin.assets.maintenanceError': 'Не удалось изменить период обслуживания.',
         'auth.registrationTicketExpired': 'Срок действия сессии регистрации истёк или она больше недействительна. Обновите страницу и попробуйте ещё раз. Потребуется запросить новый код подтверждения.',
+
+
         "finance.rejectCharge": "驳回费用",
         "finance.success.rejectCharge": "费用已驳回，已释放分配给该费用的款项。",
         "finance.refundMaxPrefix": "扣除未结费用后，最多可退款：",
