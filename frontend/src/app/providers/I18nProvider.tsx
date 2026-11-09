@@ -1916,7 +1916,7 @@ const translations: Record<Language, Translations> = {
         'checkout.confirm': 'Подтвердить бронь',
         'checkout.priceBreakdown': 'Расчет стоимости',
         'checkout.additionalServices': 'Дополнительные услуги',
-        'checkout.whereToGo': 'Куда планируете поехать?'
+        'checkout.whereToGo': 'Куда планируете поехать?',
         'admin.assets.maintenance': '维护时段',
         'admin.assets.addMaintenance': '添加维护时段',
         'admin.assets.startDate': '开始日期',
