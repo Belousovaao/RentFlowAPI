@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useI18n } from '@/app/providers/I18nProvider';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, BadgeCheck, CalendarClock, CarFront, ChevronDown, ClipboardCheck, CreditCard, FileText, Gauge, ShieldCheck, Wallet, } from 'lucide-react';
+import { BadgeCheck, CalendarClock, CarFront, ChevronDown, ClipboardCheck, CreditCard, FileText, Gauge, ShieldCheck, Wallet, } from 'lucide-react';
 
 type TermsSection = {
     id: string;
