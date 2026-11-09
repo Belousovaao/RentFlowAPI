@@ -158,109 +158,88 @@ const localizedFaqCategories: Record<'en' | 'zh', FAQCategory[]> = {
         {
             "title": "Booking",
             "description": "Creating, changing and cancelling a reservation.",
-            "items": [
-                [
-                    "How do I book a car?",
-                    "Choose a car, enter the rental dates and review the price calculation. Then provide the required details and submit your request. If additional information or documents are needed, we will let you know. Alternatively, call us using the number on the Contact page and we will arrange everything for you."
-                ],
-                [
-                    "When is a booking considered confirmed?",
-                    "A booking is confirmed after the prepayment has been made. Submitting a request alone does not mean that the car has been reserved. Wait for booking confirmation. You can check the request status in your account and should rely on that status and the notifications you receive."
-                ],
-                [
-                    "Can I change the rental dates?",
-                    "Yes. Contact us to request a change of dates. An extension or rescheduling depends on vehicle availability and the booking terms. Do not consider the change approved until you receive confirmation."
-                ],
-                [
-                    "How do I cancel a booking?",
-                    "Contact us or use the cancellation option available in your account. If you cancel at least 24 hours before the rental starts, the prepayment is refunded in full. For cancellations made less than 24 hours before the start, an amount equal to one day's rental price will be retained from the prepayment."
-                ]
+            "items": [{
+                    question: "How do I book a car?",
+                    answer: "Choose a car, enter the rental dates and review the price calculation. Then provide the required details and submit your request. If additional information or documents are needed, we will let you know. Alternatively, call us using the number on the Contact page and we will arrange everything for you.",
+                },{
+                    question: "When is a booking considered confirmed?",
+                    answer: "A booking is confirmed after the prepayment has been made. Submitting a request alone does not mean that the car has been reserved. Wait for booking confirmation. You can check the request status in your account and should rely on that status and the notifications you receive.",
+                },{
+                    question: "Can I change the rental dates?",
+                    answer: "Yes. Contact us to request a change of dates. An extension or rescheduling depends on vehicle availability and the booking terms. Do not consider the change approved until you receive confirmation.",
+                },{
+                    question: "How do I cancel a booking?",
+                    answer: "Contact us or use the cancellation option available in your account. If you cancel at least 24 hours before the rental starts, the prepayment is refunded in full. For cancellations made less than 24 hours before the start, an amount equal to one day's rental price will be retained from the prepayment.",
+                }
             ]
         },
         {
             "title": "Documents and requirements",
             "description": "Driver requirements and documents needed to arrange a rental.",
-            "items": [
-                [
-                    "What are the driver requirements?",
-                    "The driver must be at least 25 years old and have at least 5 years of driving experience. A valid driving licence of the appropriate category, valid in the Russian Federation, is required. Only drivers approved by the lessor and named in the agreement or application may drive the vehicle. The vehicle must not be handed over to another driver without approval."
-                ],
-                [
-                    "What documents does an individual need?",
-                    "To rent as an individual, you need a passport and a driving licence valid in the Russian Federation."
-                ],
-                [
-                    "What documents does an individual entrepreneur (IE) need?",
-                    "To rent as an individual entrepreneur, you need a passport, the driving licence of every authorised driver, and the entrepreneur's company details card."
-                ],
-                [
-                    "What documents does a legal entity (LLC) need?",
-                    "An LLC must provide its company details card, the driver's passport and a driving licence valid in the Russian Federation. If a representative signs the agreement, a power of attorney authorising them to sign the rental agreement is required. A separate power of attorney authorising the driver to operate the vehicle is also required."
-                ],
-                [
-                    "Can someone else drive the car?",
-                    "Only drivers approved by the lessor and named in the agreement or application may drive the vehicle. You may not allow another person to drive without prior approval."
-                ],
-                [
-                    "Can I rent a car with less than 5 years of driving experience?",
-                    "No. The minimum driving experience required is 5 years. The driver must also be at least 25 years old."
-                ]
+            "items": [{
+                    question: "What are the driver requirements?",
+                    answer: "The driver must be at least 25 years old and have at least 5 years of driving experience. A valid driving licence of the appropriate category, valid in the Russian Federation, is required. Only drivers approved by the lessor and named in the agreement or application may drive the vehicle. The vehicle must not be handed over to another driver without approval.",
+                },{
+                    question: "What documents does an individual need?",
+                    answer: "To rent as an individual, you need a passport and a driving licence valid in the Russian Federation.",
+                },{
+                    question: "What documents does an individual entrepreneur (IE) need?",
+                    answer: "To rent as an individual entrepreneur, you need a passport, the driving licence of every authorised driver, and the entrepreneur's company details card.",
+                },{
+                    question: "What documents does a legal entity (LLC) need?",
+                    answer: "An LLC must provide its company details card, the driver's passport and a driving licence valid in the Russian Federation. If a representative signs the agreement, a power of attorney authorising them to sign the rental agreement is required. A separate power of attorney authorising the driver to operate the vehicle is also required.",
+                },{
+                    question: "Can someone else drive the car?",
+                    answer: "Only drivers approved by the lessor and named in the agreement or application may drive the vehicle. You may not allow another person to drive without prior approval.",
+                },{
+                    question: "Can I rent a car with less than 5 years of driving experience?",
+                    answer: "No. The minimum driving experience required is 5 years. The driver must also be at least 25 years old.",
+                }
             ]
         },
         {
             "title": "Price, payment and deposit",
             "description": "What makes up the rental price.",
-            "items": [
-                [
-                    "How is the rental price calculated?",
-                    "The total price depends on the selected vehicle, rental duration, and applicable additional services and terms. Route restrictions and other charges agreed in advance may also apply. Review the final calculation before confirming your booking."
-                ],
-                [
-                    "Is a deposit required?",
-                    "Whether a deposit is required and its amount depend on the rental terms for the selected vehicle. Before booking, clarify the deposit amount, how it must be paid and the conditions for its return."
-                ],
-                [
-                    "Who pays traffic fines?",
-                    "The renter is responsible for traffic fines incurred while the vehicle is being used during the rental period."
-                ],
-                [
-                    "How are traffic fines received after the car has been returned handled?",
-                    "If a fine relates to a violation committed during the rental period, the renter remains responsible for paying it even if the notice arrives after the vehicle has been returned."
-                ]
+            "items": [{
+                    question: "How is the rental price calculated?",
+                    answer: "The total price depends on the selected vehicle, rental duration, and applicable additional services and terms. Route restrictions and other charges agreed in advance may also apply. Review the final calculation before confirming your booking.",
+                },{
+                    question: "Is a deposit required?",
+                    answer: "Whether a deposit is required and its amount depend on the rental terms for the selected vehicle. Before booking, clarify the deposit amount, how it must be paid and the conditions for its return.",
+                },{
+                    question: "Who pays traffic fines?",
+                    answer: "The renter is responsible for traffic fines incurred while the vehicle is being used during the rental period.",
+                },{
+                    question: "How are traffic fines received after the car has been returned handled?",
+                    answer: "If a fine relates to a violation committed during the rental period, the renter remains responsible for paying it even if the notice arrives after the vehicle has been returned.",
+                }
             ]
         },
         {
             "title": "Vehicle pickup, use and return",
             "description": "What you should know during the rental period.",
-            "items": [
-                [
-                    "How do I pick up the car?",
-                    "The pickup location, time and handover procedure are agreed when booking. At pickup, complete the required paperwork, inspect the vehicle and document any existing damage before driving."
-                ],
-                [
-                    "What should I check before driving?",
-                    "Inspect the bodywork, windows, wheels and interior. Photograph or video any visible damage and notify the lessor before departure. Also check the vehicle's equipment, fuel level, and required documents and accessories."
-                ],
-                [
-                    "How many kilometres per day are included in the rental price?",
-                    "The rental price includes 250 km per day."
-                ],
-                [
-                    "Where can I drive the rental car?",
-                    "You may drive along the route selected when booking. Travel outside the agreed route is not permitted."
-                ],
-                [
-                    "Can I change the route during the rental?",
-                    "You may not change the route selected at booking without the lessor's prior approval."
-                ],
-                [
-                    "What should I do in case of a breakdown or accident?",
-                    "In the event of an accident, first ensure everyone's safety and follow applicable legal requirements. Contact emergency services if necessary. Notify the lessor immediately and follow the agreed procedure. Do not arrange repairs or make decisions that could affect the incident claim without approval, unless immediate action is required for safety."
-                ],
-                [
-                    "How do I return the car?",
-                    "Return the vehicle at the agreed date, time and location. Before handover, remove all personal belongings and ensure the vehicle meets the rental conditions: it must be clean and have at least the same fuel level as at pickup. Alternatively, you may use the washing or refuelling services at the rates specified in the rental agreement. Inspect the vehicle together with the lessor and record its condition and the end of the rental. If the vehicle is returned dirty, the lessor may postpone the deposit refund until the vehicle has been washed and its condition checked."
-                ]
+            "items": [{
+                    question: "How do I pick up the car?",
+                    answer: "The pickup location, time and handover procedure are agreed when booking. At pickup, complete the required paperwork, inspect the vehicle and document any existing damage before driving.",
+                },{
+                    question: "What should I check before driving?",
+                    answer: "Inspect the bodywork, windows, wheels and interior. Photograph or video any visible damage and notify the lessor before departure. Also check the vehicle's equipment, fuel level, and required documents and accessories.",
+                },{
+                    question: "How many kilometres per day are included in the rental price?",
+                    answer: "The rental price includes 250 km per day.",
+                },{
+                    question: "Where can I drive the rental car?",
+                    answer: "You may drive along the route selected when booking. Travel outside the agreed route is not permitted.",
+                },{
+                    question: "Can I change the route during the rental?",
+                    answer: "You may not change the route selected at booking without the lessor's prior approval.",
+                },{
+                    question: "What should I do in case of a breakdown or accident?",
+                    answer: "In the event of an accident, first ensure everyone's safety and follow applicable legal requirements. Contact emergency services if necessary. Notify the lessor immediately and follow the agreed procedure. Do not arrange repairs or make decisions that could affect the incident claim without approval, unless immediate action is required for safety.",
+                },{
+                    question: "How do I return the car?",
+                    answer: "Return the vehicle at the agreed date, time and location. Before handover, remove all personal belongings and ensure the vehicle meets the rental conditions: it must be clean and have at least the same fuel level as at pickup. Alternatively, you may use the washing or refuelling services at the rates specified in the rental agreement. Inspect the vehicle together with the lessor and record its condition and the end of the rental. If the vehicle is returned dirty, the lessor may postpone the deposit refund until the vehicle has been washed and its condition checked.",
+                }
             ]
         }
     ],
@@ -268,109 +247,88 @@ const localizedFaqCategories: Record<'en' | 'zh', FAQCategory[]> = {
         {
             "title": "预订",
             "description": "如何提交、修改和取消预订。",
-            "items": [
-                [
-                    "如何预订汽车？",
-                    "选择汽车，填写租赁日期并查看费用明细。然后填写所需信息并提交申请。如需补充信息或文件，我们会通知您。您也可以拨打“联系方式”页面上的电话，我们可以协助您完成预订。"
-                ],
-                [
-                    "什么情况下预订才算确认？",
-                    "支付预付款后，预订才算确认。仅提交申请并不代表车辆已为您预留。请等待预订确认。您可以在个人账户中查看申请状态，并以该状态及收到的通知为准。"
-                ],
-                [
-                    "可以更改租赁日期吗？",
-                    "可以。请联系我们申请更改日期。是否可以延长或调整租期取决于车辆是否可用及预订条款。在收到确认之前，请勿认为更改已获批准。"
-                ],
-                [
-                    "如何取消预订？",
-                    "请联系我们，或使用个人账户中提供的取消功能。如果在租赁开始前至少24小时取消，预付款将全额退还。如果距离租赁开始不足24小时取消，将从预付款中扣留相当于一天租金的金额。"
-                ]
+            "items": [{
+                    question: "如何预订汽车？",
+                    answer: "选择汽车，填写租赁日期并查看费用明细。然后填写所需信息并提交申请。如需补充信息或文件，我们会通知您。您也可以拨打“联系方式”页面上的电话，我们可以协助您完成预订。",
+                },{
+                    question: "什么情况下预订才算确认？",
+                    answer: "支付预付款后，预订才算确认。仅提交申请并不代表车辆已为您预留。请等待预订确认。您可以在个人账户中查看申请状态，并以该状态及收到的通知为准。",
+                },{
+                    question: "可以更改租赁日期吗？",
+                    answer: "可以。请联系我们申请更改日期。是否可以延长或调整租期取决于车辆是否可用及预订条款。在收到确认之前，请勿认为更改已获批准。",
+                },{
+                    question: "如何取消预订？",
+                    answer: "请联系我们，或使用个人账户中提供的取消功能。如果在租赁开始前至少24小时取消，预付款将全额退还。如果距离租赁开始不足24小时取消，将从预付款中扣留相当于一天租金的金额。",
+                }
             ]
         },
         {
             "title": "文件与要求",
             "description": "驾驶员要求及办理租赁所需的文件。",
-            "items": [
-                [
-                    "驾驶员需要满足哪些条件？",
-                    "驾驶员年龄须至少为25岁，驾龄须至少为5年。驾驶员必须持有在俄罗斯联邦境内有效且类别相符的驾驶证。只有经出租方批准并列入合同或申请的驾驶员才可以驾驶车辆。未经批准不得将车辆交给其他人驾驶。"
-                ],
-                [
-                    "个人承租需要哪些文件？",
-                    "个人办理租赁需要提供护照，以及在俄罗斯联邦境内有效的驾驶证。"
-                ],
-                [
-                    "个体经营者（ИП）需要哪些文件？",
-                    "个体经营者办理租赁需要提供护照、每位获准驾驶人员的驾驶证，以及个体经营者的详细信息卡。"
-                ],
-                [
-                    "法人（有限责任公司）需要哪些文件？",
-                    "有限责任公司须提供公司详细信息卡、驾驶员护照，以及在俄罗斯联邦境内有效的驾驶证。如果由代理人签署合同，还须提供授权其签署租赁合同的委托书。此外，还须提供授权驾驶员驾驶该车辆的委托书。"
-                ],
-                [
-                    "可以由其他人驾驶汽车吗？",
-                    "只有经出租方批准并列入合同或申请的驾驶员才可以驾驶车辆。未经事先批准，不得允许其他人驾驶。"
-                ],
-                [
-                    "驾龄不足5年可以租车吗？",
-                    "不可以。租车要求的最低驾龄为5年，驾驶员年龄还须至少为25岁。"
-                ]
+            "items": [{
+                    question: "驾驶员需要满足哪些条件？",
+                    answer: "驾驶员年龄须至少为25岁，驾龄须至少为5年。驾驶员必须持有在俄罗斯联邦境内有效且类别相符的驾驶证。只有经出租方批准并列入合同或申请的驾驶员才可以驾驶车辆。未经批准不得将车辆交给其他人驾驶。",
+                },{
+                    question: "个人承租需要哪些文件？",
+                    answer: "个人办理租赁需要提供护照，以及在俄罗斯联邦境内有效的驾驶证。",
+                },{
+                    question: "个体经营者（ИП）需要哪些文件？",
+                    answer: "个体经营者办理租赁需要提供护照、每位获准驾驶人员的驾驶证，以及个体经营者的详细信息卡。",
+                },{
+                    question: "法人（有限责任公司）需要哪些文件？",
+                    answer: "有限责任公司须提供公司详细信息卡、驾驶员护照，以及在俄罗斯联邦境内有效的驾驶证。如果由代理人签署合同，还须提供授权其签署租赁合同的委托书。此外，还须提供授权驾驶员驾驶该车辆的委托书。",
+                },{
+                    question: "可以由其他人驾驶汽车吗？",
+                    answer: "只有经出租方批准并列入合同或申请的驾驶员才可以驾驶车辆。未经事先批准，不得允许其他人驾驶。",
+                },{
+                    question: "驾龄不足5年可以租车吗？",
+                    answer: "不可以。租车要求的最低驾龄为5年，驾驶员年龄还须至少为25岁。",
+                }
             ]
         },
         {
             "title": "费用、付款与押金",
             "description": "租赁费用由哪些部分构成。",
-            "items": [
-                [
-                    "租赁费用如何计算？",
-                    "总费用取决于所选车辆、租赁时长以及适用的附加服务和条款。某些情况下，还可能涉及路线限制及事先约定的其他费用。确认预订前，请核对最终费用明细。"
-                ],
-                [
-                    "需要支付押金吗？",
-                    "是否需要押金及押金金额取决于所租车辆的具体条款。预订前请确认押金金额、支付方式及退还条件。"
-                ],
-                [
-                    "交通罚款由谁支付？",
-                    "租赁期间因承租人使用车辆而产生的交通罚款由承租人承担。"
-                ],
-                [
-                    "车辆归还后收到的交通罚款如何处理？",
-                    "如果罚款对应的违规行为发生在租赁期间，即使罚单在车辆归还后才送达，承租人仍有义务支付。"
-                ]
+            "items": [{
+                    question: "租赁费用如何计算？",
+                    answer: "总费用取决于所选车辆、租赁时长以及适用的附加服务和条款。某些情况下，还可能涉及路线限制及事先约定的其他费用。确认预订前，请核对最终费用明细。",
+                },{
+                    question: "需要支付押金吗？",
+                    answer: "是否需要押金及押金金额取决于所租车辆的具体条款。预订前请确认押金金额、支付方式及退还条件。",
+                },{
+                    question: "交通罚款由谁支付？",
+                    answer: "租赁期间因承租人使用车辆而产生的交通罚款由承租人承担。",
+                },{
+                    question: "车辆归还后收到的交通罚款如何处理？",
+                    answer: "如果罚款对应的违规行为发生在租赁期间，即使罚单在车辆归还后才送达，承租人仍有义务支付。",
+                }
             ]
         },
         {
             "title": "取车、使用与还车",
             "description": "租赁期间需要了解的重要事项。",
-            "items": [
-                [
-                    "如何办理取车？",
-                    "取车地点、时间和交接流程将在预订时协商确定。取车时须完成规定手续，检查车辆，并在出发前记录已有损坏。"
-                ],
-                [
-                    "出发前应该检查什么？",
-                    "检查车身、车窗、车轮和内饰。对所有明显损坏拍照或录像，并在出发前告知出租方。同时检查车辆配置、燃油量以及必要的文件和随车用品。"
-                ],
-                [
-                    "租金包含每天多少公里？",
-                    "租金包含每天250公里的行驶里程。"
-                ],
-                [
-                    "租赁汽车可以开到哪里？",
-                    "您可以按照预订时选择的路线行驶。不得驶离双方约定的路线。"
-                ],
-                [
-                    "租赁期间可以更改路线吗？",
-                    "未经出租方事先同意，不得更改预订时选定的路线。"
-                ],
-                [
-                    "车辆发生故障或交通事故怎么办？",
-                    "发生事故时，首先确保人员安全，并按照法律规定处理。必要时联系紧急救援部门。请立即联系出租方并遵循双方约定的处理流程。未经同意，不要自行安排维修或作出可能影响事故处理的决定；为确保即时安全而必须采取的措施除外。"
-                ],
-                [
-                    "如何归还汽车？",
-                    "请在约定的日期、时间和地点归还车辆。交车前请取走个人物品，并确保车辆符合租赁条件：车辆应保持清洁，燃油量不得低于取车时的水平。您也可以按照租赁合同规定的费率使用洗车或加油服务。请与出租方共同检查车辆状况并记录租赁结束情况。如果车辆归还时未清洁，出租方有权在车辆清洗并完成车况检查后再退还押金。"
-                ]
+            "items": [{
+                    question: "如何办理取车？",
+                    answer: "取车地点、时间和交接流程将在预订时协商确定。取车时须完成规定手续，检查车辆，并在出发前记录已有损坏。",
+                },{
+                    question: "出发前应该检查什么？",
+                    answer: "检查车身、车窗、车轮和内饰。对所有明显损坏拍照或录像，并在出发前告知出租方。同时检查车辆配置、燃油量以及必要的文件和随车用品。",
+                },{
+                    question: "租金包含每天多少公里？",
+                    answer: "租金包含每天250公里的行驶里程。",
+                },{
+                    question: "租赁汽车可以开到哪里？",
+                    answer: "您可以按照预订时选择的路线行驶。不得驶离双方约定的路线。",
+                },{
+                    question: "租赁期间可以更改路线吗？",
+                    answer: "未经出租方事先同意，不得更改预订时选定的路线。",
+                },{
+                    question: "车辆发生故障或交通事故怎么办？",
+                    answer: "发生事故时，首先确保人员安全，并按照法律规定处理。必要时联系紧急救援部门。请立即联系出租方并遵循双方约定的处理流程。未经同意，不要自行安排维修或作出可能影响事故处理的决定；为确保即时安全而必须采取的措施除外。",
+                },{
+                    question: "如何归还汽车？",
+                    answer: "请在约定的日期、时间和地点归还车辆。交车前请取走个人物品，并确保车辆符合租赁条件：车辆应保持清洁，燃油量不得低于取车时的水平。您也可以按照租赁合同规定的费率使用洗车或加油服务。请与出租方共同检查车辆状况并记录租赁结束情况。如果车辆归还时未清洁，出租方有权在车辆清洗并完成车况检查后再退还押金。",
+                }
             ]
         }
     ]
