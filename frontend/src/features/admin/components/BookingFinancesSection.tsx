@@ -104,7 +104,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
         } finally {
             setLoading(false);
         }
-    }, [bookingId]);
+    }, [bookingId, t]);
 
     useEffect(() => {
         void loadFinance();
@@ -262,7 +262,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
         })).sort((a, b) =>
             (a.date ? new Date(a.date).getTime() : 0) -
             (b.date ? new Date(b.date).getTime() : 0)
-        ), [charges]);
+        ), [charges, t]);
 
 
     const canRegisterPayment = bookingStatus === "Confirmed" || bookingStatus === "Active" || bookingStatus === "Completed";
@@ -279,9 +279,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                         type="button" 
                         onClick={() => setPaymentModalOpen(true)} 
                         disabled={!canRegisterPayment} 
-                        title={!canRegisterPayment 
-                            ? t("finance.payment.disabled")} 
-                            : undefined} 
+                        title={!canRegisterPayment ? t("finance.payment.disabled") : undefined} 
                         className={`${buttonClass} bg-blue-600 text-white hover:bg-blue-700`}>
                         <CircleDollarSign className="h-4 w-4" /> 
                             {t("finance.addPayment")}
@@ -311,7 +309,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             </div>
 
             <div className="mb-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-                <SummaryCard label={t("finance.rentalCost)} value={formatPrice(price.total)} hint={t("finance.withoutDeposit")} />
+                <SummaryCard label={t("finance.rentalCost")} value={formatPrice(price.total)} hint={t("finance.withoutDeposit")} />
                 <SummaryCard label={t("finance.totalWithDeposit")} value={formatPrice(price.totalToPay)} hint="" />
                 <SummaryCard label={t("finance.received")} value={formatPrice(summary?.totalReceived ?? 0)} hint="" />
                 <SummaryCard label={t("finance.refunded")} value={formatPrice(summary?.totalRefunded ?? 0)} hint="" />
@@ -409,7 +407,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
             {loading && <p className="mt-3 text-sm text-gray-500 dark:text-gray-400">{t("finance.updating")}</p>}
 
             {settingsModalOpen && (
-                <Modal title={t("finance.tariffSettings") onClose={() => setSettingsModalOpen(false)}>
+                <Modal title={t("finance.tariffSettings")} onClose={() => setSettingsModalOpen(false)}>
                     <form className="space-y-4" onSubmit={submitSettings}>
                         <Field label={t("finance.fuelTariff")}>
                             <input className={inputClass} type="number" min="0" step="0.01" required value={rentalTariffs.fuel_per_liter ?? ""} onChange={event => setRentalTariffs(prev => ({ ...prev, fuel_per_liter: event.target.value }))} />
@@ -434,7 +432,7 @@ export const BookingFinancesSection = ({ bookingId, price, services, bookingStat
                     <form className="space-y-4" onSubmit={submitCharge}>
                         <Field label={t("finance.chargeType")}>
                             <select className={inputClass} value={chargeForm.type} onChange={event => setChargeForm(prev => ({ ...prev, type: event.target.value as BookingChargeType }))}>
-                                {Object.entries(chargeTypeLabels).filter(([value]) => !["Rental", "AdditionalServices", "RouteSurcharge", "Deposit"].includes(value)).map(([value, label]) => <option key={value} value={value} disabled={value === "LateCancellation" && bookingStatus !== "Cancelled"}>{label}</option>)}
+                                {Object.entries(chargeTypeLabels).filter(([value]) => !["Rental", "AdditionalServices", "RouteSurcharge", "Deposit"].includes(value)).map(([value, label]) => <option key={value} value={value} disabled={value === "LateCancellation" && bookingStatus !== "Cancelled"}>{t(label)}</option>)}
                             </select>
                         </Field>
                         {chargeForm.type === "Refueling" || chargeForm.type === "ExcessMileage" ? (
@@ -530,6 +528,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 }
 
 function Modal({ title, children, onClose }: { title: string; children: ReactNode; onClose: () => void }) {
+    const { t } = useI18n();
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="presentation" onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}>
             <div role="dialog" aria-modal="true" aria-label={title} className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-xl dark:bg-gray-800 sm:p-6">
@@ -541,10 +540,4 @@ function Modal({ title, children, onClose }: { title: string; children: ReactNod
             </div>
         </div>
     );
-}
-
-function statusClass(status: string) {
-    if (status === t("finance.accrued")) return "bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-300";
-    if (status === t("finance.status.rejected")) return "bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400";
-    return "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200";
 }
