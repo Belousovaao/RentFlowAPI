@@ -2,9 +2,10 @@ import { Fragment, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminAssetsApi } from '@/features/admin/api/adminAsset.api';
 import { Asset, AssetStatus, AssetStatusColors, AssetStatusLabels } from '@/entities/asset/asset.types';
-import { Pencil, Plus, Image, ArrowLeft, } from 'lucide-react';
+import { Pencil, Plus, Image, ArrowLeft, CalendarClock } from 'lucide-react';
 import { getPhotoUrl } from '@/shared/utils/photoUrl';
 import { useI18n } from '@/app/providers/I18nProvider';
+import { DateInput } from '@/features/ui/components/DateInput';
 
 export const AdminAssetsListPage = () => {
   const { t, language } = useI18n();
@@ -270,8 +271,14 @@ export const AdminAssetsListPage = () => {
                         >
                           <Pencil className="w-4 h-4" />
                         </Link>
-                        <button type="button" onClick={() => openMaintenance(asset.id)} className="text-sm text-primary-600 hover:text-primary-800 dark:text-primary-400">
-                          {t('admin.assets.maintenance')}
+                        <button
+                          type="button"
+                          onClick={() => openMaintenance(asset.id)}
+                          className="rounded p-1 text-primary-600 transition-colors hover:bg-primary-50 hover:text-primary-800 dark:text-primary-400 dark:hover:bg-gray-700"
+                          title={t('admin.assets.maintenance')}
+                          aria-label={t('admin.assets.maintenance')}
+                        >
+                          <CalendarClock className="h-4 w-4" />
                         </button>
                       </div>
                     </td>
@@ -298,11 +305,20 @@ export const AdminAssetsListPage = () => {
                           <div className="flex flex-wrap items-end gap-3">
                             <label className="text-sm">
                               <span className="block mb-1">{t('admin.assets.startDate')}</span>
-                              <input type="date" value={maintenanceStart} onChange={e => setMaintenanceStart(e.target.value)} className="rounded border px-3 py-2 dark:bg-gray-800 dark:border-gray-600" />
+                              <DateInput
+                                value={maintenanceStart}
+                                onChange={setMaintenanceStart}
+                                className="rounded border px-3 py-2 dark:bg-gray-800 dark:border-gray-600"
+                              />
                             </label>
                             <label className="text-sm">
                               <span className="block mb-1">{t('admin.assets.endDate')}</span>
-                              <input type="date" value={maintenanceEnd} min={maintenanceStart || undefined} onChange={e => setMaintenanceEnd(e.target.value)} className="rounded border px-3 py-2 dark:bg-gray-800 dark:border-gray-600" />
+                              <DateInput
+                                value={maintenanceEnd}
+                                onChange={setMaintenanceEnd}
+                                minDate={maintenanceStart ? new Date(`${maintenanceStart}T00:00:00`) : undefined}
+                                className="rounded border px-3 py-2 dark:bg-gray-800 dark:border-gray-600"
+                              />
                             </label>
                             <label className="text-sm flex-1 min-w-48">
                               <span className="block mb-1">{t('admin.assets.maintenanceReason')}</span>
