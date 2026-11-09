@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { DayPicker } from 'react-day-picker';
-import { enUS, ru, zhCN } from 'date-fns/locale';
+import { enUS, ru, zhCN } from 'react-day-picker/locale';
 import { useI18n } from '@/app/providers/I18nProvider';
 import 'react-day-picker/dist/style.css';
 import './DateRangePicker.css';
