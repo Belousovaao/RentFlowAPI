@@ -174,6 +174,7 @@ public class AssetRepository : IAssetRepository
     {
         // Здесь можно реализовать логику популярности на основе количества бронирований
         return await _context.Assets
+            .Where(a => a.Status != AssetStatus.Disabled && a.Status != AssetStatus.Service)
             .Include(a => a.Photos)
             .Include(a => a.Bookings)
             .OrderByDescending(a => a.Bookings.Count)
@@ -184,6 +185,7 @@ public class AssetRepository : IAssetRepository
     public async Task<IReadOnlyList<Asset>> GetNearbyAssetsAsync(double latitude, double longitude, double radiusKm, CancellationToken ct = default)
     {
         var assets = await _context.Assets
+            .Where(a => a.Status != AssetStatus.Disabled && a.Status != AssetStatus.Service)
             .Include(a => a.Photos)
             .Where(a => a.Latitude.HasValue && a.Longitude.HasValue)
             .ToListAsync(ct);
