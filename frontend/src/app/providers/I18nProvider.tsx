@@ -1530,6 +1530,15 @@ const financeTranslations: Record<Language, Translations> = {
         "finance.chargeOne": "项费用",
         "finance.chargeMany": "项费用",
         "account.bookingDetails.totalRental": "租赁总费用",
+        'admin.assets.maintenance': '维护时段',
+        'admin.assets.addMaintenance': '添加维护时段',
+        'admin.assets.startDate': '开始日期',
+        'admin.assets.endDate': '结束日期',
+        'admin.assets.maintenanceReason': '原因（可选）',
+        'admin.assets.noMaintenance': '暂无维护时段',
+        'admin.assets.saveMaintenance': '保存时段',
+        'admin.assets.deleteMaintenance': '删除时段',
+        'admin.assets.maintenanceError': '更新维护时段失败。',
     }
 };
 
@@ -1917,15 +1926,6 @@ const translations: Record<Language, Translations> = {
         'checkout.priceBreakdown': 'Расчет стоимости',
         'checkout.additionalServices': 'Дополнительные услуги',
         'checkout.whereToGo': 'Куда планируете поехать?',
-        'admin.assets.maintenance': '维护时段',
-        'admin.assets.addMaintenance': '添加维护时段',
-        'admin.assets.startDate': '开始日期',
-        'admin.assets.endDate': '结束日期',
-        'admin.assets.maintenanceReason': '原因（可选）',
-        'admin.assets.noMaintenance': '暂无维护时段',
-        'admin.assets.saveMaintenance': '保存时段',
-        'admin.assets.deleteMaintenance': '删除时段',
-        'admin.assets.maintenanceError': '更新维护时段失败。',
     },
     zh: {
         ...financeTranslations.zh,
