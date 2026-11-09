@@ -315,6 +315,7 @@ const localizedSections: Record<'en' | 'zh', Record<string, LocalizedTermsSectio
 };
 
 export const RentalTermsPage = () => {
+    const { language, t } = useI18n();
     const [expandedSections, setExpandedSections] = useState<string[]>(['booking', 'changes']);
 
     const toggleSection = (id: string) => {
