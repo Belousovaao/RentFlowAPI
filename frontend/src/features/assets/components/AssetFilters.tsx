@@ -263,14 +263,14 @@ export const AssetFilters = ({
                                             type="number"
                                             value={localFilters.yearFrom || ''}
                                             onChange={(e) => updateFilter('yearFrom', e.target.value ? Number(e.target.value) : undefined)}
-                                            placeholder="От"
+                                            placeholder={t('asset.filters.from')}
                                             className="w-full px-3 py-2 text-sm border border-gray-700 dark:border-gray-300 rounded-lg bg-white dark:bg-gray-700"
                                         />
                                         <input
                                             type="number"
                                             value={localFilters.yearTo || ''}
                                             onChange={(e) => updateFilter('yearTo', e.target.value ? Number(e.target.value) : undefined)}
-                                            placeholder="До"
+                                            placeholder={t('asset.filters.to')}
                                             className="w-full px-3 py-2 text-sm border border-gray-700 dark:border-gray-300 rounded-lg bg-white dark:bg-gray-700"
                                         />
                                     </div>
