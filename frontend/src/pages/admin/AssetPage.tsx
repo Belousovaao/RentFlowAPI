@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { adminAssetsApi } from '@/features/admin/api/adminAsset.api';
 import { Asset, AssetStatus, AssetStatusColors, AssetStatusLabels } from '@/entities/asset/asset.types';
@@ -14,6 +14,11 @@ export const AdminAssetsListPage = () => {
   const [total, setTotal] = useState(0);
   const [showDisabled, setShowDisabled] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [maintenanceAssetId, setMaintenanceAssetId] = useState<string | null>(null);
+  const [maintenancePeriods, setMaintenancePeriods] = useState<{ id: string; startDate: string; endDate: string; reason?: string | null }[]>([]);
+  const [maintenanceStart, setMaintenanceStart] = useState('');
+  const [maintenanceEnd, setMaintenanceEnd] = useState('');
+  const [maintenanceReason, setMaintenanceReason] = useState('');
   const navigate = useNavigate();
 
   const fetchAssets = async () => {
@@ -55,6 +60,56 @@ export const AdminAssetsListPage = () => {
       fetchAssets(); // Обновляем список
     } catch (err) {
       alert(t('admin.assets.statusError'));
+    }
+  };
+
+  const openMaintenance = async (assetId: string) => {
+    if (maintenanceAssetId === assetId) {
+      setMaintenanceAssetId(null);
+      return;
+    }
+    setMaintenanceAssetId(assetId);
+    setMaintenanceStart('');
+    setMaintenanceEnd('');
+    setMaintenanceReason('');
+    try {
+      const response = await adminAssetsApi.getMaintenancePeriods(assetId);
+      setMaintenancePeriods(response.data);
+    } catch {
+      alert(t('admin.assets.maintenanceError'));
+    }
+  };
+
+  const saveMaintenance = async (assetId: string) => {
+    if (!maintenanceStart || !maintenanceEnd || maintenanceEnd < maintenanceStart) {
+      alert(t('admin.assets.maintenanceError'));
+      return;
+    }
+    try {
+      const start = new Date(maintenanceStart + 'T00:00:00.000Z');
+      const end = new Date(maintenanceEnd + 'T00:00:00.000Z');
+      end.setUTCDate(end.getUTCDate() + 1);
+      await adminAssetsApi.createMaintenancePeriod(assetId, {
+        startDate: start.toISOString(),
+        endDate: end.toISOString(),
+        reason: maintenanceReason || undefined
+      });
+      const response = await adminAssetsApi.getMaintenancePeriods(assetId);
+      setMaintenancePeriods(response.data);
+      setMaintenanceStart('');
+      setMaintenanceEnd('');
+      setMaintenanceReason('');
+    } catch {
+      alert(t('admin.assets.maintenanceError'));
+    }
+  };
+
+  const deleteMaintenance = async (assetId: string, periodId: string) => {
+    try {
+      await adminAssetsApi.deleteMaintenancePeriod(assetId, periodId);
+      setMaintenancePeriods(current => current.filter(period => period.id !== periodId));
+    } catch {
+      alert(t('admin.assets.maintenanceError'));
     }
   };
 
@@ -215,9 +270,53 @@ export const AdminAssetsListPage = () => {
                         >
                           <Pencil className="w-4 h-4" />
                         </Link>
+                        <button type="button" onClick={() => openMaintenance(asset.id)} className="text-sm text-primary-600 hover:text-primary-800 dark:text-primary-400">
+                          {t('admin.assets.maintenance')}
+                        </button>
                       </div>
                     </td>
                   </tr>
+                  {maintenanceAssetId === asset.id && (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-4 bg-gray-50 dark:bg-gray-900/60">
+                        <div className="space-y-3">
+                          <div className="font-medium text-gray-900 dark:text-white">{t('admin.assets.maintenance')}</div>
+                          {maintenancePeriods.length === 0 ? (
+                            <p className="text-sm text-gray-500">{t('admin.assets.noMaintenance')}</p>
+                          ) : (
+                            <ul className="space-y-2">
+                              {maintenancePeriods.map(period => (
+                                <li key={period.id} className="flex flex-wrap items-center justify-between gap-2 text-sm">
+                                  <span>{new Date(period.startDate).toLocaleDateString()} – {new Date(new Date(period.endDate).getTime() - 86400000).toLocaleDateString()}{period.reason ? ' · ' + period.reason : ''}</span>
+                                  <button type="button" onClick={() => deleteMaintenance(asset.id, period.id)} className="text-red-600 hover:underline">
+                                    {t('admin.assets.deleteMaintenance')}
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          <div className="flex flex-wrap items-end gap-3">
+                            <label className="text-sm">
+                              <span className="block mb-1">{t('admin.assets.startDate')}</span>
+                              <input type="date" value={maintenanceStart} onChange={e => setMaintenanceStart(e.target.value)} className="rounded border px-3 py-2 dark:bg-gray-800 dark:border-gray-600" />
+                            </label>
+                            <label className="text-sm">
+                              <span className="block mb-1">{t('admin.assets.endDate')}</span>
+                              <input type="date" value={maintenanceEnd} min={maintenanceStart || undefined} onChange={e => setMaintenanceEnd(e.target.value)} className="rounded border px-3 py-2 dark:bg-gray-800 dark:border-gray-600" />
+                            </label>
+                            <label className="text-sm flex-1 min-w-48">
+                              <span className="block mb-1">{t('admin.assets.maintenanceReason')}</span>
+                              <input type="text" value={maintenanceReason} onChange={e => setMaintenanceReason(e.target.value)} maxLength={500} className="w-full rounded border px-3 py-2 dark:bg-gray-800 dark:border-gray-600" />
+                            </label>
+                            <button type="button" onClick={() => saveMaintenance(asset.id)} className="rounded bg-primary-600 px-4 py-2 text-white hover:bg-primary-700">
+                              {t('admin.assets.saveMaintenance')}
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                  </Fragment>
                 ))}
               
               </tbody>
