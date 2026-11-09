@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ShieldCheck } from 'lucide-react';
+import { useI18n } from '../../app/providers/I18nProvider';
 
 const sections = [
     {
@@ -374,9 +375,9 @@ export default function PrivacyPolicy() {
     const { language } = useI18n();
     const currentSections = language === 'ru' ? sections : localizedSections[language];
     const pageText = {
-        ru: { back: 'На главную', nav: 'Содержание политики', contents: 'Содержание', title: 'Политика обработки персональных данных', intro: 'Информация о том, какие персональные данные могут обрабатываться при использовании сайта и оформлении аренды автомобиля, для каких целей и как пользователь может реализовать свои права.', operator: 'Оператор', footer: 'Оператор персональных данных: Володин Михаил Игоревич', slogan: '«Волнами Драйв» — движение на твоей волне.' },
-        en: { back: 'Home', nav: 'Privacy policy contents', contents: 'Contents', title: 'Personal Data Processing Policy', intro: 'Information about the personal data that may be processed when using the website and arranging a vehicle rental, the purposes of processing, and how users can exercise their rights.', operator: 'Operator', footer: 'Personal data operator: Mikhail Igorevich Volodin', slogan: 'Volnami Drive — move to your own rhythm.' },
-        zh: { back: '返回首页', nav: '隐私政策目录', contents: '目录', title: '个人信息处理政策', intro: '本页面介绍使用网站及办理车辆租赁时可能处理的个人信息、处理目的，以及用户如何行使自身权利。', operator: '处理者', footer: '个人信息处理者：米哈伊尔·伊戈列维奇·沃洛金', slogan: 'Volnami Drive — 随心出发，畅享旅程。' },
+        ru: { back: 'На главную', nav: 'Содержание политики', contents: 'Содержание', title: 'Политика обработки персональных данных', intro: 'Информация о том, какие персональные данные могут обрабатываться при использовании сайта и оформлении аренды автомобиля, для каких целей и как пользователь может реализовать свои права.', operator: 'Оператор', footer: 'Оператор персональных данных: Володин Михаил Игоревич', slogan: '«Волнами Драйв» — движение на твоей волне.', inn: 'ИНН' },
+        en: { back: 'Home', nav: 'Privacy policy contents', contents: 'Contents', title: 'Personal Data Processing Policy', intro: 'Information about the personal data that may be processed when using the website and arranging a vehicle rental, the purposes of processing, and how users can exercise their rights.', operator: 'Operator', footer: 'Personal data operator: Mikhail Igorevich Volodin', slogan: 'Volnami Drive — move to your own rhythm.', inn: 'INN' },
+        zh: { back: '返回首页', nav: '隐私政策目录', contents: '目录', title: '个人信息处理政策', intro: '本页面介绍使用网站及办理车辆租赁时可能处理的个人信息、处理目的，以及用户如何行使自身权利。', operator: '处理者', footer: '个人信息处理者：米哈伊尔·伊戈列维奇·沃洛金', slogan: 'Volnami Drive — 随心出发，畅享旅程。', inn: '税务识别号' },
     }[language];
     return (
         <main className="min-h-screen bg-gray-50 pb-16 pt-24 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
@@ -462,7 +463,7 @@ export default function PrivacyPolicy() {
                     <p className="font-semibold text-gray-900 dark:text-white">
                         {pageText.footer}
                     </p>
-                    <p className="mt-2">ИНН 272404167841.</p>
+                    <p className="mt-2">{pageText.inn} 272404167841.</p>
                     <p className="mt-2">
                         {pageText.slogan}
                     </p>
