@@ -24,7 +24,7 @@ public class GetAvailableAssetsHandler : IRequestHandler<GetAvailableAssetsQuery
     public async Task<List<AssetDto>> Handle(GetAvailableAssetsQuery request, CancellationToken ct)
     {
         var assets = (await _assets.GetAllAsync())
-            .Where(a => a.Status != RentFlow.Domain.Assets.AssetStatus.Disabled)
+            .Where(a => a.Status != RentFlow.Domain.Assets.AssetStatus.Disabled && a.Status != RentFlow.Domain.Assets.AssetStatus.Service)
             .ToList();
         var startDate = _dateTimeProvider.ToUtc(request.StartDate, null);
         var endDate = _dateTimeProvider.ToUtc(request.EndDate, null);
